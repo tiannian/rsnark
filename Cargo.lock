@@ -669,9 +669,19 @@ dependencies = [
 name = "rsnark-core"
 version = "0.1.0"
 dependencies = [
+ "rsnark-macros",
  "ruint",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "rsnark-macros"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.106",
 ]
 
 [[package]]

@@ -1,6 +1,6 @@
 use crate::{
     API, LocalVariable, Variable, VariableIniter,
-    types::{CircuitDefine, OpCode, Operation, VariableType},
+    types::{CircuitDefinition, OpCode, Operation, VariableType},
 };
 
 #[derive(Debug, Default)]
@@ -50,8 +50,8 @@ impl CircuitBuilder {
         res
     }
 
-    pub fn build(self) -> CircuitDefine {
-        CircuitDefine {
+    pub fn build(self) -> CircuitDefinition {
+        CircuitDefinition {
             private_len: self.variable_initer.private_index(),
             public_len: self.variable_initer.public_index(),
             local_len: self.variable_initer.local_index(),

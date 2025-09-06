@@ -2,7 +2,7 @@ use ruint::aliases::U256;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct CircuitDefine {
+pub struct CircuitDefinition {
     pub private_len: u64,
     pub public_len: u64,
     pub local_len: u64,
