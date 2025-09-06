@@ -61,7 +61,12 @@ impl CircuitBuilder {
 }
 
 impl API for CircuitBuilder {
-    fn add(&mut self, x1: &dyn Variable, x2: &dyn Variable, xn: &[&dyn Variable]) -> LocalVariable {
+    fn add(
+        &mut self,
+        x1: &impl Variable,
+        x2: &impl Variable,
+        xn: &[&dyn Variable],
+    ) -> LocalVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(
@@ -73,7 +78,12 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn mul_acc(&mut self, a: &dyn Variable, b: &dyn Variable, c: &dyn Variable) -> LocalVariable {
+    fn mul_acc(
+        &mut self,
+        a: &impl Variable,
+        b: &impl Variable,
+        c: &impl Variable,
+    ) -> LocalVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(
@@ -85,7 +95,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn neg(&mut self, x: &dyn Variable) -> LocalVariable {
+    fn neg(&mut self, x: &impl Variable) -> LocalVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(OpCode::Neg, vec![x.ty()], vec![res.clone()]);
@@ -93,7 +103,12 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn sub(&mut self, x1: &dyn Variable, x2: &dyn Variable, xn: &[&dyn Variable]) -> LocalVariable {
+    fn sub(
+        &mut self,
+        x1: &impl Variable,
+        x2: &impl Variable,
+        xn: &[&dyn Variable],
+    ) -> LocalVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(
@@ -105,7 +120,12 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn mul(&mut self, x1: &dyn Variable, x2: &dyn Variable, xn: &[&dyn Variable]) -> LocalVariable {
+    fn mul(
+        &mut self,
+        x1: &impl Variable,
+        x2: &impl Variable,
+        xn: &[&dyn Variable],
+    ) -> LocalVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(
@@ -117,7 +137,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn div_unchecked(&mut self, x1: &dyn Variable, x2: &dyn Variable) -> LocalVariable {
+    fn div_unchecked(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(
@@ -129,7 +149,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn div(&mut self, x1: &dyn Variable, x2: &dyn Variable) -> LocalVariable {
+    fn div(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(OpCode::Div, vec![x1.ty(), x2.ty()], vec![res.clone()]);
@@ -137,7 +157,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn inverse(&mut self, x: &dyn Variable) -> LocalVariable {
+    fn inverse(&mut self, x: &impl Variable) -> LocalVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(OpCode::Inverse, vec![x.ty()], vec![res.clone()]);
@@ -145,7 +165,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn to_binary(&mut self, x: &dyn Variable, n: u64) -> Vec<LocalVariable> {
+    fn to_binary(&mut self, x: &impl Variable, n: u64) -> Vec<LocalVariable> {
         let res = self._allocate_local_variable_n(n);
 
         self._append_operation(OpCode::ToBinary, vec![x.ty(), n.ty()], res.clone());
@@ -163,7 +183,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn xor(&mut self, x1: &dyn Variable, x2: &dyn Variable) -> LocalVariable {
+    fn xor(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(OpCode::Xor, vec![x1.ty(), x2.ty()], vec![res.clone()]);
@@ -171,7 +191,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn or(&mut self, x1: &dyn Variable, x2: &dyn Variable) -> LocalVariable {
+    fn or(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(OpCode::Or, vec![x1.ty(), x2.ty()], vec![res.clone()]);
@@ -179,7 +199,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn and(&mut self, x1: &dyn Variable, x2: &dyn Variable) -> LocalVariable {
+    fn and(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(OpCode::And, vec![x1.ty(), x2.ty()], vec![res.clone()]);
@@ -187,7 +207,12 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn select(&mut self, x1: &dyn Variable, x2: &dyn Variable, x3: &dyn Variable) -> LocalVariable {
+    fn select(
+        &mut self,
+        x1: &impl Variable,
+        x2: &impl Variable,
+        x3: &impl Variable,
+    ) -> LocalVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(
@@ -201,12 +226,12 @@ impl API for CircuitBuilder {
 
     fn lookup2(
         &mut self,
-        b0: &dyn Variable,
-        b1: &dyn Variable,
-        y1: &dyn Variable,
-        y2: &dyn Variable,
-        y3: &dyn Variable,
-        y4: &dyn Variable,
+        b0: &impl Variable,
+        b1: &impl Variable,
+        y1: &impl Variable,
+        y2: &impl Variable,
+        y3: &impl Variable,
+        y4: &impl Variable,
     ) -> LocalVariable {
         let res = self._allocate_local_variable();
 
@@ -219,7 +244,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn is_zero(&mut self, x: &dyn Variable) -> LocalVariable {
+    fn is_zero(&mut self, x: &impl Variable) -> LocalVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(OpCode::IsZero, vec![x.ty()], vec![res.clone()]);
@@ -227,7 +252,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn cmp(&mut self, x1: &dyn Variable, x2: &dyn Variable) -> LocalVariable {
+    fn cmp(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(OpCode::Cmp, vec![x1.ty(), x2.ty()], vec![res.clone()]);
@@ -235,23 +260,23 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn assert_is_equal(&mut self, x1: &dyn Variable, x2: &dyn Variable) {
+    fn assert_is_equal(&mut self, x1: &impl Variable, x2: &impl Variable) {
         self._append_operation(OpCode::AssertIsEqual, vec![x1.ty(), x2.ty()], vec![]);
     }
 
-    fn assert_is_different(&mut self, x1: &dyn Variable, x2: &dyn Variable) {
+    fn assert_is_different(&mut self, x1: &impl Variable, x2: &impl Variable) {
         self._append_operation(OpCode::AssertIsDifferent, vec![x1.ty(), x2.ty()], vec![]);
     }
 
-    fn assert_is_boolean(&mut self, x: &dyn Variable) {
+    fn assert_is_boolean(&mut self, x: &impl Variable) {
         self._append_operation(OpCode::AssertIsBoolean, vec![x.ty()], vec![]);
     }
 
-    fn assert_is_crumb(&mut self, x: &dyn Variable) {
+    fn assert_is_crumb(&mut self, x: &impl Variable) {
         self._append_operation(OpCode::AssertIsCrumb, vec![x.ty()], vec![]);
     }
 
-    fn assert_is_less_or_equal(&mut self, v: &dyn Variable, bound: &dyn Variable) {
+    fn assert_is_less_or_equal(&mut self, v: &impl Variable, bound: &impl Variable) {
         self._append_operation(
             OpCode::AssertIsLessOrEqual,
             vec![v.ty(), bound.ty()],
@@ -259,14 +284,14 @@ impl API for CircuitBuilder {
         );
     }
 
-    fn println(&mut self, message: &dyn Variable) {
+    fn println(&mut self, message: &impl Variable) {
         self._append_operation(OpCode::Println, vec![message.ty()], vec![]);
     }
 }
 
 fn get_variable_type_2n(
-    x1: &dyn Variable,
-    x2: &dyn Variable,
+    x1: &impl Variable,
+    x2: &impl Variable,
     xn: &[&dyn Variable],
 ) -> Vec<VariableType> {
     let mut types = Vec::with_capacity(2 + xn.len());

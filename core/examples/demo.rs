@@ -1,6 +1,6 @@
 use rsnark_core::{
-    API, Circuit, CircuitBuilder, CircuitElement, PrivateCircuitElement, PublicCircuitElement,
-    VariableIniter,
+    API, Circuit, CircuitBuilder, CircuitDefine, CircuitElement, PrivateCircuitElement,
+    PublicCircuitElement, VariableIniter,
 };
 use ruint::aliases::U256;
 
@@ -13,6 +13,14 @@ pub struct ExampleSubCircuit {
 impl CircuitElement for ExampleSubCircuit {
     type Private = ExampleSubCircuitDefine;
     type Public = ExampleSubCircuitDefine;
+
+    fn create_public(initer: &mut VariableIniter) -> Self::Public {
+        ExampleSubCircuitDefine::new(initer)
+    }
+
+    fn create_private(initer: &mut VariableIniter) -> Self::Private {
+        ExampleSubCircuitDefine::new(initer)
+    }
 
     fn append_public(&self, witness: &mut Vec<U256>) {
         self.x2.append_public(witness);
@@ -32,15 +40,15 @@ pub struct ExampleSubCircuitDefine {
 
 impl ExampleSubCircuitDefine {
     pub fn new(initer: &mut VariableIniter) -> Self {
-        let x2 = initer.new_public();
-        let x0 = initer.new_private();
-        let x1 = initer.new_private();
+        let x2 = u64::create_public(initer);
+        let x0 = u64::create_private(initer);
+        let x1 = u64::create_private(initer);
 
         Self { x2, x0, x1 }
     }
 }
 
-impl Circuit for <ExampleSubCircuit as CircuitElement>::Private {
+impl Circuit for CircuitDefine<ExampleSubCircuit> {
     fn define(&self, api: &mut impl API) {
         let x = api.add(&self.x0, &self.x1, &[]);
         api.assert_is_equal(&x, &self.x2);
@@ -55,6 +63,14 @@ pub struct ExampleCircuit {
 impl CircuitElement for ExampleCircuit {
     type Private = ExampleCircuitDefine;
     type Public = ExampleCircuitDefine;
+
+    fn create_public(initer: &mut VariableIniter) -> Self::Public {
+        ExampleCircuitDefine::new(initer)
+    }
+
+    fn create_private(initer: &mut VariableIniter) -> Self::Private {
+        ExampleCircuitDefine::new(initer)
+    }
 
     fn append_public(&self, witness: &mut Vec<U256>) {
         self.y.append_public(witness);
@@ -72,14 +88,14 @@ pub struct ExampleCircuitDefine {
 
 impl ExampleCircuitDefine {
     pub fn new(initer: &mut VariableIniter) -> Self {
-        let y = initer.new_public();
-        let sub_circuit = PrivateCircuitElement::<ExampleSubCircuit>::new(initer);
+        let y = u64::create_public(initer);
+        let sub_circuit = ExampleSubCircuit::create_private(initer);
 
         Self { y, sub_circuit }
     }
 }
 
-impl Circuit for <ExampleCircuit as CircuitElement>::Private {
+impl Circuit for CircuitDefine<ExampleCircuit> {
     fn define(&self, api: &mut impl API) {
         self.sub_circuit.define(api);
 
@@ -90,7 +106,7 @@ impl Circuit for <ExampleCircuit as CircuitElement>::Private {
 
 fn main() {
     let mut builder = CircuitBuilder::default();
-    let circuit = ExampleSubCircuitDefine::new(builder.variable_initer_mut());
+    let circuit = ExampleCircuit::create_private(builder.variable_initer_mut());
     circuit.define(&mut builder);
 
     let define = builder.build();
