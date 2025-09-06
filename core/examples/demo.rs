@@ -9,7 +9,7 @@ pub struct DemoCircuit {
 
 impl Circuit for CircuitDefine<DemoCircuit> {
     fn define(&self, api: &mut impl API) {
-        let c = api.add(&self.a, &self.b, &[]);
+        let c = api.add(&self.a, &self.b);
 
         api.assert_is_equal(&c, &self.c);
     }

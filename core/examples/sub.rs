@@ -50,7 +50,7 @@ impl ExampleSubCircuitDefine {
 
 impl Circuit for CircuitDefine<ExampleSubCircuit> {
     fn define(&self, api: &mut impl API) {
-        let x = api.add(&self.x0, &self.x1, &[]);
+        let x = api.add(&self.x0, &self.x1);
         api.assert_is_equal(&x, &self.x2);
     }
 }
@@ -99,7 +99,7 @@ impl Circuit for CircuitDefine<ExampleCircuit> {
     fn define(&self, api: &mut impl API) {
         self.sub_circuit.define(api);
 
-        let inner = api.add(&self.y, &1u64, &[]);
+        let inner = api.add(&self.y, &1u64);
         api.assert_is_equal(&self.y, &inner);
     }
 }

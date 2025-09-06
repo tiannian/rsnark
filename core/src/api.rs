@@ -1,8 +1,13 @@
 use crate::{LocalVariable, Variable};
 
 pub trait API {
+    /// returns res = x1 + x2
+    fn add(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
+        self.add_multi(x1, x2, &[])
+    }
+
     /// returns res = x1+x2+...xn
-    fn add(
+    fn add_multi(
         &mut self,
         x1: &impl Variable,
         x2: &impl Variable,
@@ -16,16 +21,26 @@ pub trait API {
     /// returns -x
     fn neg(&mut self, x: &impl Variable) -> LocalVariable;
 
+    /// returns res = x1 - x2
+    fn sub(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
+        self.sub_multi(x1, x2, &[])
+    }
+
     /// returns res = x1 - x2 - ...xn
-    fn sub(
+    fn sub_multi(
         &mut self,
         x1: &impl Variable,
         x2: &impl Variable,
         xn: &[&dyn Variable],
     ) -> LocalVariable;
 
+    /// returns res = x1 * x2
+    fn mul(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
+        self.mul_multi(x1, x2, &[])
+    }
+
     /// returns res = x1 * x2 * ...xn
-    fn mul(
+    fn mul_multi(
         &mut self,
         x1: &impl Variable,
         x2: &impl Variable,

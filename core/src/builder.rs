@@ -61,7 +61,7 @@ impl CircuitBuilder {
 }
 
 impl API for CircuitBuilder {
-    fn add(
+    fn add_multi(
         &mut self,
         x1: &impl Variable,
         x2: &impl Variable,
@@ -103,7 +103,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn sub(
+    fn sub_multi(
         &mut self,
         x1: &impl Variable,
         x2: &impl Variable,
@@ -120,7 +120,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn mul(
+    fn mul_multi(
         &mut self,
         x1: &impl Variable,
         x2: &impl Variable,
