@@ -82,7 +82,9 @@ impl ExampleCircuitDefine {
 impl Circuit for <ExampleCircuit as CircuitElement>::Private {
     fn define(&self, api: &mut impl API) {
         self.sub_circuit.define(api);
-        api.assert_is_equal(&self.y, &self.sub_circuit.x2);
+
+        let inner = api.add(&self.y, &1u64, &[]);
+        api.assert_is_equal(&self.y, &inner);
     }
 }
 
