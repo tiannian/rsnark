@@ -1,0 +1,7 @@
+[package]
+name = "rsnark-provers-core"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+rsnark-core = { workspace = true }
