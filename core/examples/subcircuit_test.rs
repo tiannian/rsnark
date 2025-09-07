@@ -1,4 +1,4 @@
-use rsnark_core::{API, Circuit, CircuitBuilder, CircuitDefine, CircuitElement};
+use rsnark_core::{API, Circuit, CircuitBuilder, CircuitDefine, CircuitElement, types::Witness};
 
 // Sub-circuit: Adder - computes a + b = sum
 #[derive(Circuit)]
@@ -72,4 +72,22 @@ fn main() {
     let json = serde_json::to_string_pretty(&define).unwrap();
     println!("Generated circuit definition:");
     println!("{}", json);
+
+    let composite_circuit = CompositeCircuit {
+        adder: AdderCircuit { a: 1, b: 2, sum: 3 },
+        multiplier: MultiplierCircuit {
+            x: 4,
+            y: 5,
+            product: 20,
+        },
+        final_result: 23,
+    };
+
+    let mut witness = Witness::new(define.public_len, define.private_len);
+
+    composite_circuit.append_public(witness.public_mut());
+    composite_circuit.append_private(witness.private_mut());
+
+    let witness = serde_json::to_string_pretty(&witness).unwrap();
+    println!("Witness: {}", witness);
 }

@@ -58,8 +58,31 @@ pub enum VariableType {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Witness {
-    pub public: Vec<U256>,
-    pub private: Vec<U256>,
+    public: Vec<U256>,
+    private: Vec<U256>,
+}
+
+impl Witness {
+    pub fn new(public_len: u64, private_len: u64) -> Self {
+        Self {
+            public: Vec::with_capacity(public_len as usize),
+            private: Vec::with_capacity(private_len as usize),
+        }
+    }
+
+    pub fn to_public(&self) -> PublicWitness {
+        PublicWitness {
+            public: self.public.clone(),
+        }
+    }
+
+    pub fn public_mut(&mut self) -> &mut Vec<U256> {
+        &mut self.public
+    }
+
+    pub fn private_mut(&mut self) -> &mut Vec<U256> {
+        &mut self.private
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]

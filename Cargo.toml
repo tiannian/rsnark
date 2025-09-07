@@ -9,3 +9,5 @@ edition = "2024"
 [workspace.dependencies]
 ruint = "1.16.0"
 serde = { version = "1.0.219", features = ["derive"] }
+
+rsnark-macros = { version = "0.1.0", path = "macros" }

@@ -17,5 +17,4 @@ pub use initer::*;
 
 pub use ruint::aliases::U256;
 
-// 重新导出宏
 pub use rsnark_macros::Circuit;
