@@ -1,10 +1,12 @@
+use std::marker::PhantomData;
+
 use rsnark_core::{Circuit, CircuitBuilder, CircuitElement};
 
-use crate::{Backend, Curve};
+use crate::{Backend, CircuitProver, Curve};
 
 pub struct Prover<B> {
-    backend: B,
-    curve: Curve,
+    pub(crate) backend: B,
+    pub(crate) curve: Curve,
 }
 
 impl<B> Prover<B>
@@ -17,10 +19,10 @@ where
         Self { backend, curve }
     }
 
-    pub fn compile<C>(&self) -> B::CircuitConstraint
+    pub fn compile_circuit<C>(&self) -> CircuitProver<B, C>
     where
         C: CircuitElement,
-        C::Private: Circuit,
+        C::PrivateElement: Circuit,
     {
         let mut builder = CircuitBuilder::default();
         let circuit = C::create_private(builder.variable_initer_mut());
@@ -30,6 +32,15 @@ where
 
         let cs = self.backend.compile(&self.curve, &define);
 
-        cs
+        CircuitProver {
+            prover: Self {
+                backend: self.backend.clone(),
+                curve: self.curve.clone(),
+            },
+            constraint: cs,
+            marker: PhantomData,
+        }
     }
+
+    // pub fn compile_constraints(&self, constraints: &[u8]) -> B::CircuitConstraint {
 }

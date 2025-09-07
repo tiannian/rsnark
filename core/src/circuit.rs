@@ -7,33 +7,33 @@ pub trait Circuit {
 }
 
 pub trait CircuitElement {
-    type Private;
-    type Public;
+    type PrivateElement;
+    type PublicElement;
 
-    fn create_public(initer: &mut VariableIniter) -> Self::Public;
-    fn create_private(initer: &mut VariableIniter) -> Self::Private;
+    fn create_public(initer: &mut VariableIniter) -> Self::PublicElement;
+    fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement;
     fn append_public(&self, witness: &mut Vec<U256>);
     fn append_private(&self, witness: &mut Vec<U256>);
 }
 
 #[doc(hidden)]
-pub type PrivateCircuitElement<T> = <T as CircuitElement>::Private;
+pub type PrivateCircuitElement<T> = <T as CircuitElement>::PrivateElement;
 #[doc(hidden)]
-pub type PublicCircuitElement<T> = <T as CircuitElement>::Public;
+pub type PublicCircuitElement<T> = <T as CircuitElement>::PublicElement;
 
-pub type CircuitDefine<T> = <T as CircuitElement>::Private;
+pub type CircuitDefine<T> = <T as CircuitElement>::PrivateElement;
 
 macro_rules! define_circuit_element_for_from_u256 {
     ($t:ty) => {
         impl CircuitElement for $t {
-            type Private = PrivateVariable;
-            type Public = PublicVariable;
+            type PrivateElement = PrivateVariable;
+            type PublicElement = PublicVariable;
 
-            fn create_public(initer: &mut VariableIniter) -> Self::Public {
+            fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
                 initer.new_public()
             }
 
-            fn create_private(initer: &mut VariableIniter) -> Self::Private {
+            fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {
                 initer.new_private()
             }
 

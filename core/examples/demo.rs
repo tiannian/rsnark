@@ -23,14 +23,14 @@ mod __rsnark_generated_demo {
     };
 
     impl CircuitElement for DemoCircuit {
-        type Private = DemoCircuitDefine;
-        type Public = DemoCircuitDefine;
+        type PrivateElement = DemoCircuitDefine;
+        type PublicElement = DemoCircuitDefine;
 
-        fn create_public(initer: &mut VariableIniter) -> Self::Public {
+        fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
             DemoCircuitDefine::new(initer)
         }
 
-        fn create_private(initer: &mut VariableIniter) -> Self::Private {
+        fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {
             DemoCircuitDefine::new(initer)
         }
 

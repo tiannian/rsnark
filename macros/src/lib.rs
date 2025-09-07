@@ -125,14 +125,14 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
             };
             
             impl CircuitElement for #name {
-                type Private = #define_name;
-                type Public = #define_name;
+                type PrivateElement = #define_name;
+                type PublicElement = #define_name;
                 
-                fn create_public(initer: &mut VariableIniter) -> Self::Public {
+                fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
                     #define_name::new(initer)
                 }
                 
-                fn create_private(initer: &mut VariableIniter) -> Self::Private {
+                fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {
                     #define_name::new(initer)
                 }
                 

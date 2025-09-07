@@ -63,10 +63,10 @@ pub struct Witness {
 }
 
 impl Witness {
-    pub fn new(public_len: u64, private_len: u64) -> Self {
+    pub fn new() -> Self {
         Self {
-            public: Vec::with_capacity(public_len as usize),
-            private: Vec::with_capacity(private_len as usize),
+            public: Vec::new(),
+            private: Vec::new(),
         }
     }
 

@@ -11,14 +11,14 @@ pub struct ExampleSubCircuit {
 }
 
 impl CircuitElement for ExampleSubCircuit {
-    type Private = ExampleSubCircuitDefine;
-    type Public = ExampleSubCircuitDefine;
+    type PrivateElement = ExampleSubCircuitDefine;
+    type PublicElement = ExampleSubCircuitDefine;
 
-    fn create_public(initer: &mut VariableIniter) -> Self::Public {
+    fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
         ExampleSubCircuitDefine::new(initer)
     }
 
-    fn create_private(initer: &mut VariableIniter) -> Self::Private {
+    fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {
         ExampleSubCircuitDefine::new(initer)
     }
 
@@ -61,14 +61,14 @@ pub struct ExampleCircuit {
 }
 
 impl CircuitElement for ExampleCircuit {
-    type Private = ExampleCircuitDefine;
-    type Public = ExampleCircuitDefine;
+    type PrivateElement = ExampleCircuitDefine;
+    type PublicElement = ExampleCircuitDefine;
 
-    fn create_public(initer: &mut VariableIniter) -> Self::Public {
+    fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
         ExampleCircuitDefine::new(initer)
     }
 
-    fn create_private(initer: &mut VariableIniter) -> Self::Private {
+    fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {
         ExampleCircuitDefine::new(initer)
     }
 

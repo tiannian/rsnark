@@ -83,7 +83,7 @@ fn main() {
         final_result: 23,
     };
 
-    let mut witness = Witness::new(define.public_len, define.private_len);
+    let mut witness = Witness::new();
 
     composite_circuit.append_public(witness.public_mut());
     composite_circuit.append_private(witness.private_mut());

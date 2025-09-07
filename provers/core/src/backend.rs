@@ -1,13 +1,8 @@
 use rsnark_core::types::{CircuitDefinition, PublicWitness, Witness};
 
-use crate::Proof;
+use crate::{Curve, Proof};
 
-pub enum Curve {
-    BN254,
-    BLS12_381,
-}
-
-pub trait Backend {
+pub trait Backend: Clone {
     type CircuitConstraint;
     type ProvingKey;
     type VerifyingKey;
