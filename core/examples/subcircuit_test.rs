@@ -33,15 +33,10 @@ impl Circuit for CircuitDefine<MultiplierCircuit> {
 // Main circuit: Composite circuit containing sub-circuits
 #[derive(Circuit)]
 pub struct CompositeCircuit {
-    // Main circuit inputs
-    a: u32,
-    b: u32,
-
     // Embedded sub-circuits
     adder: AdderCircuit,
     multiplier: MultiplierCircuit,
 
-    // Main circuit public output
     pub final_result: u32,
 }
 
@@ -56,10 +51,6 @@ impl Circuit for CircuitDefine<CompositeCircuit> {
         // 3. Main circuit logic: add sub-circuit results
         let final_sum = api.add(&self.adder.sum, &self.multiplier.product);
         api.assert_is_equal(&final_sum, &self.final_result);
-
-        // 4. Additional verification: ensure input data consistency
-        let computed_sum = api.add(&self.a, &self.b);
-        api.assert_is_equal(&computed_sum, &self.adder.sum);
     }
 }
 
