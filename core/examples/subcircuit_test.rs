@@ -1,5 +1,5 @@
 use rsnark_core::{
-    API, Circuit, CircuitBuilder, CircuitDefine, CircuitElement, CircuitPublicWitness,
+    API, Circuit, CircuitBuilder, CircuitDefine, CircuitPublicWitness, CircuitWitness,
     types::Witness,
 };
 

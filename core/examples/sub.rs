@@ -1,5 +1,5 @@
 use rsnark_core::{
-    API, Circuit, CircuitBuilder, CircuitDefine, CircuitElement, CircuitPublicWitness,
+    API, Circuit, CircuitBuilder, CircuitDefine, CircuitPublicWitness, CircuitWitness,
     PrivateCircuitElement, PublicCircuitElement, VariableIniter,
 };
 use ruint::aliases::U256;
@@ -10,7 +10,7 @@ pub struct ExampleSubCircuit {
     x1: u64,
 }
 
-impl CircuitElement for ExampleSubCircuit {
+impl CircuitWitness for ExampleSubCircuit {
     type PrivateElement = ExampleSubCircuitDefine;
     type PublicElement = ExampleSubCircuitDefine;
     type PublicWitness = ExampleSubCircuitPublicWitness;
@@ -77,7 +77,7 @@ pub struct ExampleCircuit {
     pub sub_circuit: ExampleSubCircuit,
 }
 
-impl CircuitElement for ExampleCircuit {
+impl CircuitWitness for ExampleCircuit {
     type PrivateElement = ExampleCircuitDefine;
     type PublicElement = ExampleCircuitDefine;
     type PublicWitness = ExampleCircuitPublicWitness;

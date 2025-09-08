@@ -19,11 +19,11 @@ mod __rsnark_generated_demo {
     use super::*;
 
     use ::rsnark_core::{
-        CircuitElement, CircuitPublicWitness, PrivateCircuitElement, PublicCircuitElement, U256,
+        CircuitPublicWitness, CircuitWitness, PrivateCircuitElement, PublicCircuitElement, U256,
         VariableIniter,
     };
 
-    impl CircuitElement for DemoCircuit {
+    impl CircuitWitness for DemoCircuit {
         type PrivateElement = DemoCircuitDefine;
         type PublicElement = DemoCircuitDefine;
         type PublicWitness = DemoCircuitPublicWitness;

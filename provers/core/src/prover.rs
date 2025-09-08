@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use rsnark_core::{Circuit, CircuitBuilder, CircuitElement};
+use rsnark_core::{Circuit, CircuitBuilder, CircuitWitness};
 
 use crate::{Backend, CircuitProver, Curve};
 
@@ -21,7 +21,7 @@ where
 
     pub fn compile_circuit<C>(&self) -> CircuitProver<B, C>
     where
-        C: CircuitElement,
+        C: CircuitWitness,
         C::PrivateElement: Circuit,
     {
         let mut builder = CircuitBuilder::default();

@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use rsnark_core::{CircuitElement, CircuitPublicWitness, PublicWitness, types};
+use rsnark_core::{CircuitPublicWitness, CircuitWitness, PublicWitness, types};
 
 use crate::{Backend, Proof, Prover};
 
@@ -16,7 +16,7 @@ where
 impl<B, C> CircuitProver<B, C>
 where
     B: Backend,
-    C: CircuitElement,
+    C: CircuitWitness,
 {
     pub fn setup(&self) -> (B::ProvingKey, B::VerifyingKey) {
         self.prover.backend.setup(&self.constraint)

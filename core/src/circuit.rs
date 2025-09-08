@@ -6,7 +6,7 @@ pub trait Circuit {
     fn define(&self, api: &mut impl API);
 }
 
-pub trait CircuitElement: CircuitPublicWitness {
+pub trait CircuitWitness: CircuitPublicWitness {
     type PrivateElement;
     type PublicElement;
     type PublicWitness: CircuitPublicWitness;
@@ -25,17 +25,17 @@ pub trait CircuitPublicWitness {
 }
 
 #[doc(hidden)]
-pub type PrivateCircuitElement<T> = <T as CircuitElement>::PrivateElement;
+pub type PrivateCircuitElement<T> = <T as CircuitWitness>::PrivateElement;
 #[doc(hidden)]
-pub type PublicCircuitElement<T> = <T as CircuitElement>::PublicElement;
+pub type PublicCircuitElement<T> = <T as CircuitWitness>::PublicElement;
 
-pub type CircuitDefine<T> = <T as CircuitElement>::PrivateElement;
+pub type CircuitDefine<T> = <T as CircuitWitness>::PrivateElement;
 
-pub type PublicWitness<T> = <T as CircuitElement>::PublicWitness;
+pub type PublicWitness<T> = <T as CircuitWitness>::PublicWitness;
 
 macro_rules! define_circuit_element_for_from_u256 {
     ($t:ty) => {
-        impl CircuitElement for $t {
+        impl CircuitWitness for $t {
             type PrivateElement = PrivateVariable;
             type PublicElement = PublicVariable;
             type PublicWitness = $t;
