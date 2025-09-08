@@ -31,6 +31,8 @@ pub type PublicCircuitElement<T> = <T as CircuitElement>::PublicElement;
 
 pub type CircuitDefine<T> = <T as CircuitElement>::PrivateElement;
 
+pub type PublicWitness<T> = <T as CircuitElement>::PublicWitness;
+
 macro_rules! define_circuit_element_for_from_u256 {
     ($t:ty) => {
         impl CircuitElement for $t {

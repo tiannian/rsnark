@@ -89,3 +89,13 @@ impl Witness {
 pub struct PublicWitness {
     pub public: Vec<U256>,
 }
+
+impl PublicWitness {
+    pub fn new() -> Self {
+        Self { public: Vec::new() }
+    }
+
+    pub fn public_mut(&mut self) -> &mut Vec<U256> {
+        &mut self.public
+    }
+}
