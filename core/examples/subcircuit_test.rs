@@ -1,4 +1,7 @@
-use rsnark_core::{API, Circuit, CircuitBuilder, CircuitDefine, CircuitElement, types::Witness};
+use rsnark_core::{
+    API, Circuit, CircuitBuilder, CircuitDefine, CircuitElement, CircuitPublicWitness,
+    types::Witness,
+};
 
 // Sub-circuit: Adder - computes a + b = sum
 #[derive(Circuit)]

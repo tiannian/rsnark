@@ -1,6 +1,6 @@
 use rsnark_core::{
-    API, Circuit, CircuitBuilder, CircuitDefine, CircuitElement, PrivateCircuitElement,
-    PublicCircuitElement, VariableIniter,
+    API, Circuit, CircuitBuilder, CircuitDefine, CircuitElement, CircuitPublicWitness,
+    PrivateCircuitElement, PublicCircuitElement, VariableIniter,
 };
 use ruint::aliases::U256;
 
@@ -13,6 +13,7 @@ pub struct ExampleSubCircuit {
 impl CircuitElement for ExampleSubCircuit {
     type PrivateElement = ExampleSubCircuitDefine;
     type PublicElement = ExampleSubCircuitDefine;
+    type PublicWitness = ExampleSubCircuitPublicWitness;
 
     fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
         ExampleSubCircuitDefine::new(initer)
@@ -22,13 +23,19 @@ impl CircuitElement for ExampleSubCircuit {
         ExampleSubCircuitDefine::new(initer)
     }
 
-    fn append_public(&self, witness: &mut Vec<U256>) {
-        self.x2.append_public(witness);
-    }
-
     fn append_private(&self, witness: &mut Vec<U256>) {
         self.x0.append_private(witness);
         self.x1.append_private(witness);
+    }
+
+    fn into_public_witness(self) -> Self::PublicWitness {
+        ExampleSubCircuitPublicWitness { x2: self.x2 }
+    }
+}
+
+impl CircuitPublicWitness for ExampleSubCircuit {
+    fn append_public(&self, witness: &mut Vec<U256>) {
+        self.x2.append_public(witness);
     }
 }
 
@@ -48,6 +55,16 @@ impl ExampleSubCircuitDefine {
     }
 }
 
+pub struct ExampleSubCircuitPublicWitness {
+    pub x2: u64,
+}
+
+impl CircuitPublicWitness for ExampleSubCircuitPublicWitness {
+    fn append_public(&self, witness: &mut Vec<U256>) {
+        self.x2.append_public(witness);
+    }
+}
+
 impl Circuit for CircuitDefine<ExampleSubCircuit> {
     fn define(&self, api: &mut impl API) {
         let x = api.add(&self.x0, &self.x1);
@@ -63,6 +80,7 @@ pub struct ExampleCircuit {
 impl CircuitElement for ExampleCircuit {
     type PrivateElement = ExampleCircuitDefine;
     type PublicElement = ExampleCircuitDefine;
+    type PublicWitness = ExampleCircuitPublicWitness;
 
     fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
         ExampleCircuitDefine::new(initer)
@@ -72,12 +90,18 @@ impl CircuitElement for ExampleCircuit {
         ExampleCircuitDefine::new(initer)
     }
 
-    fn append_public(&self, witness: &mut Vec<U256>) {
-        self.y.append_public(witness);
-    }
-
     fn append_private(&self, witness: &mut Vec<U256>) {
         self.sub_circuit.append_private(witness);
+    }
+
+    fn into_public_witness(self) -> Self::PublicWitness {
+        ExampleCircuitPublicWitness { y: self.y }
+    }
+}
+
+impl CircuitPublicWitness for ExampleCircuit {
+    fn append_public(&self, witness: &mut Vec<U256>) {
+        self.y.append_public(witness);
     }
 }
 
@@ -92,6 +116,16 @@ impl ExampleCircuitDefine {
         let sub_circuit = ExampleSubCircuit::create_private(initer);
 
         Self { y, sub_circuit }
+    }
+}
+
+pub struct ExampleCircuitPublicWitness {
+    pub y: u64,
+}
+
+impl CircuitPublicWitness for ExampleCircuitPublicWitness {
+    fn append_public(&self, witness: &mut Vec<U256>) {
+        self.y.append_public(witness);
     }
 }
 

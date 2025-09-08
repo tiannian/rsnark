@@ -6,14 +6,22 @@ pub trait Circuit {
     fn define(&self, api: &mut impl API);
 }
 
-pub trait CircuitElement {
+pub trait CircuitElement: CircuitPublicWitness {
     type PrivateElement;
     type PublicElement;
+    type PublicWitness: CircuitPublicWitness;
 
     fn create_public(initer: &mut VariableIniter) -> Self::PublicElement;
+
     fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement;
-    fn append_public(&self, witness: &mut Vec<U256>);
+
+    fn into_public_witness(self) -> Self::PublicWitness;
+
     fn append_private(&self, witness: &mut Vec<U256>);
+}
+
+pub trait CircuitPublicWitness {
+    fn append_public(&self, witness: &mut Vec<U256>);
 }
 
 #[doc(hidden)]
@@ -28,6 +36,7 @@ macro_rules! define_circuit_element_for_from_u256 {
         impl CircuitElement for $t {
             type PrivateElement = PrivateVariable;
             type PublicElement = PublicVariable;
+            type PublicWitness = $t;
 
             fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
                 initer.new_public()
@@ -37,12 +46,18 @@ macro_rules! define_circuit_element_for_from_u256 {
                 initer.new_private()
             }
 
-            fn append_public(&self, witness: &mut Vec<U256>) {
+            fn append_private(&self, witness: &mut Vec<U256>) {
                 let x = U256::from(*self);
                 witness.push(x);
             }
 
-            fn append_private(&self, witness: &mut Vec<U256>) {
+            fn into_public_witness(self) -> Self::PublicWitness {
+                self
+            }
+        }
+
+        impl CircuitPublicWitness for $t {
+            fn append_public(&self, witness: &mut Vec<U256>) {
                 let x = U256::from(*self);
                 witness.push(x);
             }

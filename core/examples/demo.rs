@@ -19,12 +19,14 @@ mod __rsnark_generated_demo {
     use super::*;
 
     use ::rsnark_core::{
-        CircuitElement, PrivateCircuitElement, PublicCircuitElement, U256, VariableIniter,
+        CircuitElement, CircuitPublicWitness, PrivateCircuitElement, PublicCircuitElement, U256,
+        VariableIniter,
     };
 
     impl CircuitElement for DemoCircuit {
         type PrivateElement = DemoCircuitDefine;
         type PublicElement = DemoCircuitDefine;
+        type PublicWitness = DemoCircuitPublicWitness;
 
         fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
             DemoCircuitDefine::new(initer)
@@ -34,13 +36,19 @@ mod __rsnark_generated_demo {
             DemoCircuitDefine::new(initer)
         }
 
-        fn append_public(&self, witness: &mut Vec<U256>) {
-            self.c.append_public(witness);
-        }
-
         fn append_private(&self, witness: &mut Vec<U256>) {
             self.a.append_private(witness);
             self.b.append_private(witness);
+        }
+
+        fn into_public_witness(self) -> Self::PublicWitness {
+            DemoCircuitPublicWitness { c: self.c }
+        }
+    }
+
+    impl CircuitPublicWitness for DemoCircuit {
+        fn append_public(&self, witness: &mut Vec<U256>) {
+            self.c.append_public(witness);
         }
     }
 
@@ -58,6 +66,17 @@ mod __rsnark_generated_demo {
             let c = u32::create_public(initer);
 
             Self { a, b, c }
+        }
+    }
+
+    #[doc(hidden)]
+    pub struct DemoCircuitPublicWitness {
+        pub c: u32,
+    }
+
+    impl CircuitPublicWitness for DemoCircuitPublicWitness {
+        fn append_public(&self, witness: &mut Vec<U256>) {
+            self.c.append_public(witness);
         }
     }
 }
