@@ -1,7 +1,7 @@
 use ruint::aliases::U256;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CircuitDefinition {
     pub private_len: u64,
     pub public_len: u64,
@@ -9,7 +9,7 @@ pub struct CircuitDefinition {
     pub operations: Vec<Operation>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum OpCode {
     Add,
@@ -37,7 +37,7 @@ pub enum OpCode {
     Println,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Operation {
     pub op: OpCode,
     #[serde(rename = "in")]
@@ -46,7 +46,7 @@ pub struct Operation {
     pub outputs: Vec<VariableType>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "t", content = "v")]
 pub enum VariableType {

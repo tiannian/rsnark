@@ -1,0 +1,8 @@
+[package]
+name = "rsnark-provers-mock"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+rsnark-provers-core = { workspace = true }
+rsnark-core = { workspace = true }
