@@ -83,6 +83,14 @@ impl Witness {
     pub fn private_mut(&mut self) -> &mut Vec<U256> {
         &mut self.private
     }
+
+    pub fn public(&self) -> &[U256] {
+        &self.public
+    }
+
+    pub fn private(&self) -> &[U256] {
+        &self.private
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
