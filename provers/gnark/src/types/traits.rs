@@ -39,12 +39,8 @@ pub trait InnerSerializableObject: GoInnerRef {
 
         if res == 0 {
             Ok(())
-        } else if res == -10003 {
-            Err(Error::SerializeError)
-        } else if res == -10004 {
-            Err(Error::WriteToFileError)
         } else {
-            Err(Error::UnknownGoError(res))
+            Err(Error::from_go_error(res))
         }
     }
 
@@ -56,12 +52,8 @@ pub trait InnerSerializableObject: GoInnerRef {
 
         if res == 0 {
             Ok(Self::from_go_inner_ref(res))
-        } else if res == -10002 {
-            Err(Error::ReadFromFileError)
-        } else if res == -10001 {
-            Err(Error::DeserializeError)
         } else {
-            Err(Error::UnknownGoError(res))
+            Err(Error::from_go_error(res))
         }
     }
 }

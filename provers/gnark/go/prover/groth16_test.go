@@ -157,7 +157,7 @@ func TestGroth16ProveAndVerify(t *testing.T) {
 	publicWitness := types.NewTemplatePublicWitnessFromTemplate(witness)
 
 	// Test verification
-	err = prover.Verify(proofBytes, types.CurveBN254, vk, publicWitness)
+	err = prover.Verify(proofBytes, vk, publicWitness)
 	if err != nil {
 		t.Fatalf("Failed to verify proof: %v", err)
 	}
@@ -234,7 +234,7 @@ func TestGroth16VerifyWithWrongPublicWitness(t *testing.T) {
 	)
 
 	// Test verification - this should fail
-	err = prover.Verify(proofBytes, types.CurveBN254, vk, wrongPublicWitness)
+	err = prover.Verify(proofBytes, vk, wrongPublicWitness)
 	if err == nil {
 		t.Error("Expected error when verifying with wrong public witness")
 	}
@@ -405,7 +405,7 @@ func TestGroth16MultipleProofs(t *testing.T) {
 
 			// Verify proof
 			publicWitness := types.NewTemplatePublicWitnessFromTemplate(witness)
-			err = prover.Verify(proofBytes, types.CurveBN254, vk, publicWitness)
+			err = prover.Verify(proofBytes, vk, publicWitness)
 			if err != nil {
 				t.Fatalf("Failed to verify proof for %s: %v", tc.name, err)
 			}

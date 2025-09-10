@@ -106,9 +106,9 @@ func (p *Groth16Prover) Prove(compiled *types.CompiledCircuit, pk *types.Groth16
 }
 
 // VerifyWithTemplate verifies a proof against the public witness
-func (p *Groth16Prover) Verify(proofBytes []byte, curve types.CurveType, vk *types.Groth16VerifyingKey, publicWitness *types.TemplatePublicWitness) error {
+func (p *Groth16Prover) Verify(proofBytes []byte, vk *types.Groth16VerifyingKey, publicWitness *types.TemplatePublicWitness) error {
 	// Deserialize the proof from bytes
-	proof := groth16.NewProof(curve.ToECC())
+	proof := groth16.NewProof(p.curve.ToECC())
 	buf := bytes.NewReader(proofBytes)
 	_, err := proof.ReadFrom(buf)
 	if err != nil {
@@ -126,7 +126,7 @@ func (p *Groth16Prover) Verify(proofBytes []byte, curve types.CurveType, vk *typ
 	}
 
 	// Create gnark public witness
-	gnarkWitness, err := frontend.NewWitness(templateCircuit, curve.ToECC().ScalarField())
+	gnarkWitness, err := frontend.NewWitness(templateCircuit, p.curve.ToECC().ScalarField())
 	if err != nil {
 		return fmt.Errorf("failed to create gnark witness: %w", err)
 	}

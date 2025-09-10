@@ -9,8 +9,8 @@ import (
 // TemplateWitness represents the witness data for the circuit
 // Contains both public and private variables as big.Int arrays
 type TemplateWitness struct {
-	PublicVariables  []*big.Int `json:"public_variables"`
-	PrivateVariables []*big.Int `json:"private_variables"`
+	PublicVariables  []*big.Int `json:"public"`
+	PrivateVariables []*big.Int `json:"private"`
 }
 
 // NewTemplateWitness creates a new TemplateWitness

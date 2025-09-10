@@ -20,4 +20,14 @@ impl CurveType {
             CurveType::BW6_761 => 4,
         }
     }
+
+    pub(crate) fn from_curve_id(curve_id: u64) -> Self {
+        match curve_id {
+            1 => CurveType::BN254,
+            2 => CurveType::BLS12_381,
+            3 => CurveType::BLS12_377,
+            4 => CurveType::BW6_761,
+            _ => unreachable!(),
+        }
+    }
 }

@@ -32,6 +32,10 @@ var Groth16ProverImpl Groth16Prover
 type Groth16Prover interface {
 	new(curve_id *uint64) uint64
 	curve_id(prover *uint64) uint64
+	compile(prover *uint64, circuit *[]uint8) int64
+	setup(prover *uint64, compiled_circuit *int64) []uint8
+	prove(prover *uint64, compiled_circuit *int64, pk *int64, witness *[]uint8) []uint8
+	verify(prover *uint64, vk *int64, proof *[]uint8, public_witness *[]uint8) int64
 }
 
 //export CGroth16Prover_new
@@ -50,6 +54,58 @@ func CGroth16Prover_curve_id(prover C.uint64_t, slot *C.void, cb *C.void) {
 	_new_prover := newC_uint64_t(prover)
 	resp := Groth16ProverImpl.curve_id(&_new_prover)
 	resp_ref, buffer := cvt_ref(cntC_uint64_t, refC_uint64_t)(&resp)
+	asmcall.CallFuncG0P2(unsafe.Pointer(cb), unsafe.Pointer(&resp_ref), unsafe.Pointer(slot))
+	runtime.KeepAlive(resp_ref)
+	runtime.KeepAlive(resp)
+	runtime.KeepAlive(buffer)
+}
+
+//export CGroth16Prover_compile
+func CGroth16Prover_compile(prover C.uint64_t, circuit C.ListRef, slot *C.void, cb *C.void) {
+	_new_prover := newC_uint64_t(prover)
+	_new_circuit := new_list_mapper_primitive(newC_uint8_t)(circuit)
+	resp := Groth16ProverImpl.compile(&_new_prover, &_new_circuit)
+	resp_ref, buffer := cvt_ref(cntC_int64_t, refC_int64_t)(&resp)
+	asmcall.CallFuncG0P2(unsafe.Pointer(cb), unsafe.Pointer(&resp_ref), unsafe.Pointer(slot))
+	runtime.KeepAlive(resp_ref)
+	runtime.KeepAlive(resp)
+	runtime.KeepAlive(buffer)
+}
+
+//export CGroth16Prover_setup
+func CGroth16Prover_setup(prover C.uint64_t, compiled_circuit C.int64_t, slot *C.void, cb *C.void) {
+	_new_prover := newC_uint64_t(prover)
+	_new_compiled_circuit := newC_int64_t(compiled_circuit)
+	resp := Groth16ProverImpl.setup(&_new_prover, &_new_compiled_circuit)
+	resp_ref, buffer := cvt_ref(cnt_list_mapper_primitive(cntC_uint8_t), ref_list_mapper_primitive(refC_uint8_t))(&resp)
+	asmcall.CallFuncG0P2(unsafe.Pointer(cb), unsafe.Pointer(&resp_ref), unsafe.Pointer(slot))
+	runtime.KeepAlive(resp_ref)
+	runtime.KeepAlive(resp)
+	runtime.KeepAlive(buffer)
+}
+
+//export CGroth16Prover_prove
+func CGroth16Prover_prove(prover C.uint64_t, compiled_circuit C.int64_t, pk C.int64_t, witness C.ListRef, slot *C.void, cb *C.void) {
+	_new_prover := newC_uint64_t(prover)
+	_new_compiled_circuit := newC_int64_t(compiled_circuit)
+	_new_pk := newC_int64_t(pk)
+	_new_witness := new_list_mapper_primitive(newC_uint8_t)(witness)
+	resp := Groth16ProverImpl.prove(&_new_prover, &_new_compiled_circuit, &_new_pk, &_new_witness)
+	resp_ref, buffer := cvt_ref(cnt_list_mapper_primitive(cntC_uint8_t), ref_list_mapper_primitive(refC_uint8_t))(&resp)
+	asmcall.CallFuncG0P2(unsafe.Pointer(cb), unsafe.Pointer(&resp_ref), unsafe.Pointer(slot))
+	runtime.KeepAlive(resp_ref)
+	runtime.KeepAlive(resp)
+	runtime.KeepAlive(buffer)
+}
+
+//export CGroth16Prover_verify
+func CGroth16Prover_verify(prover C.uint64_t, vk C.int64_t, proof C.ListRef, public_witness C.ListRef, slot *C.void, cb *C.void) {
+	_new_prover := newC_uint64_t(prover)
+	_new_vk := newC_int64_t(vk)
+	_new_proof := new_list_mapper_primitive(newC_uint8_t)(proof)
+	_new_public_witness := new_list_mapper_primitive(newC_uint8_t)(public_witness)
+	resp := Groth16ProverImpl.verify(&_new_prover, &_new_vk, &_new_proof, &_new_public_witness)
+	resp_ref, buffer := cvt_ref(cntC_int64_t, refC_int64_t)(&resp)
 	asmcall.CallFuncG0P2(unsafe.Pointer(cb), unsafe.Pointer(&resp_ref), unsafe.Pointer(slot))
 	runtime.KeepAlive(resp_ref)
 	runtime.KeepAlive(resp)

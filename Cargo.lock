@@ -1018,7 +1018,9 @@ dependencies = [
 name = "rsnark-provers-gnark"
 version = "0.1.0"
 dependencies = [
+ "rsnark-core",
  "rust2go",
+ "serde_json",
  "thiserror",
 ]
 
