@@ -1,4 +1,4 @@
-package main
+package circuit
 
 import (
 	"testing"
@@ -9,7 +9,6 @@ import (
 
 func TestTemplateCircuit(t *testing.T) {
 	// Clear any existing circuit definition
-	clearCircuitDefine()
 
 	// Set up a simple circuit definition: private[0] + private[1] = public[0]
 	// With witness: private = [3, 5], public = [8]
@@ -54,14 +53,8 @@ func TestTemplateCircuit(t *testing.T) {
   ]
 }`
 
-	// Set the circuit definition
-	err := setCircuitDefine(testJSON)
-	if err != nil {
-		t.Fatalf("Failed to set circuit definition: %v", err)
-	}
-
-	// Create a template circuit
-	circuit, err := NewTemplateCircuit()
+	// Create a template circuit from JSON
+	circuit, err := NewTemplateCircuitFromJSON(testJSON)
 	if err != nil {
 		t.Fatalf("Failed to create template circuit: %v", err)
 	}
@@ -89,7 +82,6 @@ func TestTemplateCircuit(t *testing.T) {
 
 func TestTemplateCircuitWithInvalidWitness(t *testing.T) {
 	// Clear any existing circuit definition
-	clearCircuitDefine()
 
 	// Set up the same circuit definition: private[0] + private[1] = public[0]
 	testJSON := `{
@@ -133,14 +125,8 @@ func TestTemplateCircuitWithInvalidWitness(t *testing.T) {
   ]
 }`
 
-	// Set the circuit definition
-	err := setCircuitDefine(testJSON)
-	if err != nil {
-		t.Fatalf("Failed to set circuit definition: %v", err)
-	}
-
-	// Create a template circuit
-	circuit, err := NewTemplateCircuit()
+	// Create a template circuit from JSON
+	circuit, err := NewTemplateCircuitFromJSON(testJSON)
 	if err != nil {
 		t.Fatalf("Failed to create template circuit: %v", err)
 	}
@@ -160,19 +146,15 @@ func TestTemplateCircuitWithInvalidWitness(t *testing.T) {
 }
 
 func TestNewTemplateCircuitWithoutDefinition(t *testing.T) {
-	// Clear circuit definition
-	clearCircuitDefine()
-
-	// Try to create circuit without definition
-	_, err := NewTemplateCircuit()
+	// Try to create circuit with nil definition
+	_, err := NewTemplateCircuit(nil)
 	if err == nil {
-		t.Error("Expected error when creating circuit without definition")
+		t.Error("Expected error when creating circuit with nil definition")
 	}
 }
 
 func TestTemplateCircuitDefineWithoutDefinition(t *testing.T) {
 	// Clear circuit definition
-	clearCircuitDefine()
 
 	// Create a circuit (this should fail)
 	circuit := &TemplateCircuit{
@@ -189,7 +171,6 @@ func TestTemplateCircuitDefineWithoutDefinition(t *testing.T) {
 
 func TestSimpleArithmeticCircuit(t *testing.T) {
 	// Clear any existing circuit definition
-	clearCircuitDefine()
 
 	// Create a simple arithmetic circuit: a + b = c
 	// With witness: private = [3, 5], public = [8]
@@ -220,14 +201,8 @@ func TestSimpleArithmeticCircuit(t *testing.T) {
   ]
 }`
 
-	// Set the circuit definition
-	err := setCircuitDefine(simpleJSON)
-	if err != nil {
-		t.Fatalf("Failed to set simple circuit definition: %v", err)
-	}
-
-	// Create a template circuit
-	circuit, err := NewTemplateCircuit()
+	// Create a template circuit from JSON
+	circuit, err := NewTemplateCircuitFromJSON(simpleJSON)
 	if err != nil {
 		t.Fatalf("Failed to create simple template circuit: %v", err)
 	}
@@ -253,7 +228,6 @@ func TestSimpleArithmeticCircuit(t *testing.T) {
 
 func TestConstantVariableCircuit(t *testing.T) {
 	// Clear any existing circuit definition
-	clearCircuitDefine()
 
 	// Create a circuit with constant: private_var + 5 = public_var
 	// With witness: private = [3], public = [8] (because 3 + 5 = 8)
@@ -284,14 +258,8 @@ func TestConstantVariableCircuit(t *testing.T) {
   ]
 }`
 
-	// Set the circuit definition
-	err := setCircuitDefine(constantJSON)
-	if err != nil {
-		t.Fatalf("Failed to set constant circuit definition: %v", err)
-	}
-
-	// Create a template circuit
-	circuit, err := NewTemplateCircuit()
+	// Create a template circuit from JSON
+	circuit, err := NewTemplateCircuitFromJSON(constantJSON)
 	if err != nil {
 		t.Fatalf("Failed to create constant template circuit: %v", err)
 	}

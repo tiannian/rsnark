@@ -1,4 +1,4 @@
-package main
+package circuit
 
 import (
 	"encoding/json"
@@ -303,48 +303,7 @@ func TestCircuitDefinitionParsing(t *testing.T) {
 	}
 }
 
-func TestWitnessTypes(t *testing.T) {
-	// Test witness creation and marshaling
-	witness := Witness{
-		Public:  []*big.Int{big.NewInt(1), big.NewInt(2), big.NewInt(3)},
-		Private: []*big.Int{big.NewInt(10), big.NewInt(20), big.NewInt(30), big.NewInt(40)},
-	}
-
-	jsonBytes, err := json.Marshal(witness)
-	if err != nil {
-		t.Fatalf("Failed to marshal witness: %v", err)
-	}
-
-	var witness2 Witness
-	err = json.Unmarshal(jsonBytes, &witness2)
-	if err != nil {
-		t.Fatalf("Failed to unmarshal witness: %v", err)
-	}
-
-	if len(witness2.Public) != 3 || len(witness2.Private) != 4 {
-		t.Errorf("Witness arrays length mismatch")
-	}
-
-	// Test public witness
-	pubWitness := PublicWitness{
-		Public: []*big.Int{big.NewInt(1), big.NewInt(2), big.NewInt(3)},
-	}
-
-	jsonBytes, err = json.Marshal(pubWitness)
-	if err != nil {
-		t.Fatalf("Failed to marshal public witness: %v", err)
-	}
-
-	var pubWitness2 PublicWitness
-	err = json.Unmarshal(jsonBytes, &pubWitness2)
-	if err != nil {
-		t.Fatalf("Failed to unmarshal public witness: %v", err)
-	}
-
-	if len(pubWitness2.Public) != 3 {
-		t.Errorf("Public witness arrays length mismatch")
-	}
-}
+// TestWitnessTypes has been removed - witness functionality moved to types package
 
 func TestAllOpCodes(t *testing.T) {
 	// Test that all defined OpCodes can be marshaled/unmarshaled

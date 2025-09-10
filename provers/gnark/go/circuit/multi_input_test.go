@@ -1,13 +1,10 @@
-package main
+package circuit
 
 import (
 	"testing"
 )
 
 func TestMultiInputOperations(t *testing.T) {
-	// Clear any existing circuit definition
-	clearCircuitDefine()
-
 	// Create a circuit with multi-input add operation: a + b + c = result
 	multiAddJSON := `{
   "private_len": 3,
@@ -40,14 +37,8 @@ func TestMultiInputOperations(t *testing.T) {
   ]
 }`
 
-	// Set the circuit definition
-	err := setCircuitDefine(multiAddJSON)
-	if err != nil {
-		t.Fatalf("Failed to set multi-input circuit definition: %v", err)
-	}
-
-	// Create a template circuit
-	circuit, err := NewTemplateCircuit()
+	// Create a template circuit from JSON
+	circuit, err := NewTemplateCircuitFromJSON(multiAddJSON)
 	if err != nil {
 		t.Fatalf("Failed to create multi-input template circuit: %v", err)
 	}
@@ -65,7 +56,6 @@ func TestMultiInputOperations(t *testing.T) {
 
 func TestMultiInputMultiplication(t *testing.T) {
 	// Clear any existing circuit definition
-	clearCircuitDefine()
 
 	// Create a circuit with multi-input multiplication: a * b * c = result
 	multiMulJSON := `{
@@ -99,14 +89,8 @@ func TestMultiInputMultiplication(t *testing.T) {
   ]
 }`
 
-	// Set the circuit definition
-	err := setCircuitDefine(multiMulJSON)
-	if err != nil {
-		t.Fatalf("Failed to set multi-multiplication circuit definition: %v", err)
-	}
-
-	// Create a template circuit
-	circuit, err := NewTemplateCircuit()
+	// Create a template circuit from JSON
+	circuit, err := NewTemplateCircuitFromJSON(multiMulJSON)
 	if err != nil {
 		t.Fatalf("Failed to create multi-multiplication template circuit: %v", err)
 	}
@@ -124,7 +108,6 @@ func TestMultiInputMultiplication(t *testing.T) {
 
 func TestToBinaryOperation(t *testing.T) {
 	// Clear any existing circuit definition
-	clearCircuitDefine()
 
 	// Create a circuit with ToBinary operation: convert number to 8 bits
 	toBinaryJSON := `{
@@ -178,14 +161,8 @@ func TestToBinaryOperation(t *testing.T) {
   ]
 }`
 
-	// Set the circuit definition
-	err := setCircuitDefine(toBinaryJSON)
-	if err != nil {
-		t.Fatalf("Failed to set to_binary circuit definition: %v", err)
-	}
-
-	// Create a template circuit
-	circuit, err := NewTemplateCircuit()
+	// Create a template circuit from JSON
+	circuit, err := NewTemplateCircuitFromJSON(toBinaryJSON)
 	if err != nil {
 		t.Fatalf("Failed to create to_binary template circuit: %v", err)
 	}
@@ -203,7 +180,6 @@ func TestToBinaryOperation(t *testing.T) {
 
 func TestFromBinaryOperation(t *testing.T) {
 	// Clear any existing circuit definition
-	clearCircuitDefine()
 
 	// Create a circuit with FromBinary operation: convert 4 bits to number
 	fromBinaryJSON := `{
@@ -241,14 +217,8 @@ func TestFromBinaryOperation(t *testing.T) {
   ]
 }`
 
-	// Set the circuit definition
-	err := setCircuitDefine(fromBinaryJSON)
-	if err != nil {
-		t.Fatalf("Failed to set from_binary circuit definition: %v", err)
-	}
-
-	// Create a template circuit
-	circuit, err := NewTemplateCircuit()
+	// Create a template circuit from JSON
+	circuit, err := NewTemplateCircuitFromJSON(fromBinaryJSON)
 	if err != nil {
 		t.Fatalf("Failed to create from_binary template circuit: %v", err)
 	}
@@ -266,7 +236,6 @@ func TestFromBinaryOperation(t *testing.T) {
 
 func TestMulAccOperation(t *testing.T) {
 	// Clear any existing circuit definition
-	clearCircuitDefine()
 
 	// Create a circuit with MulAcc operation: acc + a * b = result
 	mulAccJSON := `{
@@ -300,14 +269,8 @@ func TestMulAccOperation(t *testing.T) {
   ]
 }`
 
-	// Set the circuit definition
-	err := setCircuitDefine(mulAccJSON)
-	if err != nil {
-		t.Fatalf("Failed to set mul_acc circuit definition: %v", err)
-	}
-
-	// Create a template circuit
-	circuit, err := NewTemplateCircuit()
+	// Create a template circuit from JSON
+	circuit, err := NewTemplateCircuitFromJSON(mulAccJSON)
 	if err != nil {
 		t.Fatalf("Failed to create mul_acc template circuit: %v", err)
 	}

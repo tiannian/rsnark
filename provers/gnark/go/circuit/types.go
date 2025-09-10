@@ -1,4 +1,4 @@
-package main
+package circuit
 
 import (
 	"encoding/json"
@@ -173,17 +173,6 @@ type CircuitDefinition struct {
 func (cd *CircuitDefinition) String() string {
 	return fmt.Sprintf("CircuitDefinition{private_len: %d, public_len: %d, local_len: %d, operations: %d}",
 		cd.PrivateLen, cd.PublicLen, cd.LocalLen, len(cd.Operations))
-}
-
-// Witness represents the witness data for the circuit
-type Witness struct {
-	Public  []*big.Int `json:"public"`
-	Private []*big.Int `json:"private"`
-}
-
-// PublicWitness represents only the public part of the witness
-type PublicWitness struct {
-	Public []*big.Int `json:"public"`
 }
 
 // ParseCircuitDefinition parses a JSON string into a CircuitDefinition

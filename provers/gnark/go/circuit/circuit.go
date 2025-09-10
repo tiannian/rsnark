@@ -1,72 +1,31 @@
-package main
+package circuit
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/consensys/gnark/frontend"
 )
-
-// Global circuit definition storage
-var (
-	// globalCircuitDefinition stores the current circuit definition
-	globalCircuitDefinition *CircuitDefinition
-	// mutex protects concurrent access to the global circuit definition
-	circuitMutex sync.RWMutex
-)
-
-// setCircuitDefine parses a JSON string and sets the global circuit definition
-func setCircuitDefine(jsonData string) error {
-	// Parse the JSON string into a CircuitDefinition
-	cd, err := ParseCircuitDefinition([]byte(jsonData))
-	if err != nil {
-		return fmt.Errorf("failed to parse circuit definition: %w", err)
-	}
-
-	// Set the global circuit definition with thread safety
-	circuitMutex.Lock()
-	globalCircuitDefinition = cd
-	circuitMutex.Unlock()
-
-	return nil
-}
-
-// isCircuitDefineSet returns true if a circuit definition has been set
-func isCircuitDefineSet() bool {
-	circuitMutex.RLock()
-	defer circuitMutex.RUnlock()
-	return globalCircuitDefinition != nil
-}
-
-// clearCircuitDefine clears the global circuit definition
-func clearCircuitDefine() {
-	circuitMutex.Lock()
-	globalCircuitDefinition = nil
-	circuitMutex.Unlock()
-}
 
 // TemplateCircuit represents a gnark circuit template
 type TemplateCircuit struct {
 	PublicVariables  []frontend.Variable `gnark:",public"`
 	PrivateVariables []frontend.Variable `gnark:",secret"`
+	// circuitDefinition holds the circuit definition (not exported, not part of witness)
+	circuitDefinition *CircuitDefinition
 }
 
 // Define implements the gnark Circuit interface
 func (circuit *TemplateCircuit) Define(api frontend.API) error {
-	// Get the global circuit definition
-	circuitMutex.RLock()
-	cd := globalCircuitDefinition
-	circuitMutex.RUnlock()
-
-	if cd == nil {
+	// Check if circuit definition is set
+	if circuit.circuitDefinition == nil {
 		return fmt.Errorf("no circuit definition set")
 	}
 
 	// Initialize local variables array based on LocalLen
-	localVariables := make([]frontend.Variable, cd.LocalLen)
+	localVariables := make([]frontend.Variable, circuit.circuitDefinition.LocalLen)
 
 	// Execute operations in order
-	for i, operation := range cd.Operations {
+	for i, operation := range circuit.circuitDefinition.Operations {
 		if err := executeOperation(api, operation, circuit.PublicVariables, circuit.PrivateVariables, &localVariables); err != nil {
 			return fmt.Errorf("failed to execute operation %d (%s): %w", i, operation.Op, err)
 		}
@@ -75,20 +34,28 @@ func (circuit *TemplateCircuit) Define(api frontend.API) error {
 	return nil
 }
 
-// NewTemplateCircuit creates a new TemplateCircuit based on the global CircuitDefinition
-func NewTemplateCircuit() (*TemplateCircuit, error) {
-	circuitMutex.RLock()
-	cd := globalCircuitDefinition
-	circuitMutex.RUnlock()
-
+// NewTemplateCircuit creates a new TemplateCircuit based on the provided CircuitDefinition
+func NewTemplateCircuit(cd *CircuitDefinition) (*TemplateCircuit, error) {
 	if cd == nil {
-		return nil, fmt.Errorf("no circuit definition set")
+		return nil, fmt.Errorf("circuit definition cannot be nil")
 	}
 
 	return &TemplateCircuit{
-		PublicVariables:  make([]frontend.Variable, cd.PublicLen),
-		PrivateVariables: make([]frontend.Variable, cd.PrivateLen),
+		PublicVariables:   make([]frontend.Variable, cd.PublicLen),
+		PrivateVariables:  make([]frontend.Variable, cd.PrivateLen),
+		circuitDefinition: cd,
 	}, nil
+}
+
+// NewTemplateCircuitFromJSON creates a new TemplateCircuit from a JSON string
+func NewTemplateCircuitFromJSON(jsonData string) (*TemplateCircuit, error) {
+	// Parse the JSON string into a CircuitDefinition
+	cd, err := ParseCircuitDefinition([]byte(jsonData))
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse circuit definition: %w", err)
+	}
+
+	return NewTemplateCircuit(cd)
 }
 
 // executeOperation executes a single operation using the gnark API
