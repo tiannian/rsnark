@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 use anyhow::Result;
-use rsnark_core::{CircuitPublicWitness, CircuitWitness, PublicWitness, types};
+use rsnark_core::{CircuitPublicWitness, CircuitWitness, types};
 
 use crate::{Backend, Proof, Prover};
 
@@ -41,7 +41,7 @@ where
         &self,
         verifying_key: &B::VerifyingKey,
         proof: &Proof,
-        public_witness: PublicWitness<C>,
+        public_witness: C::PublicWitness,
     ) -> Result<()>
     where
         C::PublicWitness: CircuitPublicWitness,

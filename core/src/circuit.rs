@@ -1,25 +1,57 @@
 use ruint::aliases::U256;
 
-use crate::{API, PrivateVariable, PublicVariable, VariableIniter};
+use crate::{
+    API, VariableIniter,
+    variable::{PrivateVariable, PublicVariable},
+};
 
+/// Defines the logic of an arithmetic circuit for zero-knowledge proofs.
+///
+/// This trait should be implemented by circuit structures to define their
+/// constraint system. The circuit logic is expressed using the provided API
+/// operations to build the constraint graph.
 pub trait Circuit {
     fn define(&self, api: &mut impl API);
 }
 
+/// Defines a circuit with witness data structure.
+///
+/// This trait should not be implemented manually. Instead, use the
+/// `#[derive(Circuit)]` macro to automatically generate the implementation.
+/// It provides methods for creating circuit variables and handling witness data.
 pub trait CircuitWitness: CircuitPublicWitness {
+    #[doc(hidden)]
     type PrivateElement;
+    #[doc(hidden)]
     type PublicElement;
+
+    /// The type representing the public witness for this circuit.
     type PublicWitness: CircuitPublicWitness;
 
+    #[doc(hidden)]
     fn create_public(initer: &mut VariableIniter) -> Self::PublicElement;
 
+    #[doc(hidden)]
     fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement;
 
+    /// Converts this circuit witness into its public witness representation.
+    ///
+    /// This extracts only the public portion of the witness, which is
+    /// needed for verification in zero-knowledge proof systems.
+    ///
+    /// # Returns
+    /// The public witness containing only public inputs
     fn into_public_witness(self) -> Self::PublicWitness;
 
+    #[doc(hidden)]
     fn append_private(&self, witness: &mut Vec<U256>);
 }
 
+/// Represents the public witness portion of a circuit.
+///
+/// This trait should not be implemented manually. Instead, use the
+/// `#[derive(Circuit)]` macro to automatically generate the implementation.
+/// It handles serialization of public inputs for the circuit.
 pub trait CircuitPublicWitness {
     fn append_public(&self, witness: &mut Vec<U256>);
 }
@@ -29,8 +61,16 @@ pub type PrivateCircuitElement<T> = <T as CircuitWitness>::PrivateElement;
 #[doc(hidden)]
 pub type PublicCircuitElement<T> = <T as CircuitWitness>::PublicElement;
 
+/// Type alias for the circuit definition structure.
+///
+/// This represents the private element structure used during circuit construction,
+/// containing all the private variables and intermediate computations.
 pub type CircuitDefine<T> = <T as CircuitWitness>::PrivateElement;
 
+/// Type alias for the public witness of a circuit.
+///
+/// This represents the public inputs that are visible to the verifier
+/// in a zero-knowledge proof system.
 pub type PublicWitness<T> = <T as CircuitWitness>::PublicWitness;
 
 macro_rules! define_circuit_element_for_from_u256 {

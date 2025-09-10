@@ -1,7 +1,7 @@
 pub mod types;
 
-mod variable;
-pub use variable::*;
+pub mod variable;
+pub use variable::Variable;
 
 mod api;
 pub use api::*;

@@ -1,8 +1,10 @@
 use crate::{
-    API, LocalVariable, Variable, VariableIniter,
+    API, Variable, VariableIniter,
     types::{CircuitDefinition, OpCode, Operation, VariableType},
+    variable::LocalVariable,
 };
 
+#[doc(hidden)]
 #[derive(Debug, Default)]
 pub struct CircuitBuilder {
     operations: Vec<Operation>,

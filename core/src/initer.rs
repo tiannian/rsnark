@@ -1,5 +1,6 @@
-use crate::{LocalVariable, PrivateVariable, PublicVariable};
+use crate::variable::{LocalVariable, PrivateVariable, PublicVariable};
 
+#[doc(hidden)]
 #[derive(Debug, Default)]
 pub struct VariableIniter {
     private_idx: u64,

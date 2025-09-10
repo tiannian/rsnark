@@ -2,7 +2,14 @@ use ruint::aliases::U256;
 
 use crate::types::VariableType;
 
+/// A trait that defines types that can be used as API parameters in circuit construction.
+///
+/// This trait enables various types to be used interchangeably in circuit operations,
+/// including public variables, private variables, local variables, and constant values.
+/// Each implementor must provide its variable type representation.
 pub trait Variable {
+    /// Returns the variable type representation for this variable.
+    /// This is used internally by the circuit builder to track variable usage.
     fn ty(&self) -> VariableType;
 }
 
@@ -22,7 +29,9 @@ macro_rules! define_variable {
 }
 
 define_variable!(PublicVariable, Public);
+
 define_variable!(PrivateVariable, Private);
+
 define_variable!(LocalVariable, Local);
 
 macro_rules! define_variable_for_from_u256 {
