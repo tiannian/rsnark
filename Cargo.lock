@@ -995,6 +995,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "rsnark"
+version = "0.1.0"
+dependencies = [
+ "rsnark-core",
+ "rsnark-provers-core",
+ "rsnark-provers-gnark",
+ "rsnark-provers-mock",
+]
+
+[[package]]
 name = "rsnark-core"
 version = "0.1.0"
 dependencies = [

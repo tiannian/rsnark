@@ -1,6 +1,7 @@
 pub mod types;
 
 pub mod variable;
+#[doc(inline)]
 pub use variable::Variable;
 
 mod api;

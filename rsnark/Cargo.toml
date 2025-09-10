@@ -1,0 +1,10 @@
+[package]
+name = "rsnark"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+rsnark-core = { workspace = true }
+rsnark-provers-core = { workspace = true }
+rsnark-provers-gnark = { workspace = true }
+rsnark-provers-mock = { workspace = true }
