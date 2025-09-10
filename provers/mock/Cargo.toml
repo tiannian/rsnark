@@ -8,3 +8,4 @@ rsnark-provers-core = { workspace = true }
 rsnark-core = { workspace = true }
 
 sha3 = "0.10.8"
+thiserror = { workspace = true }

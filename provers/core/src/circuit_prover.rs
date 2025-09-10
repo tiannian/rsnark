@@ -1,5 +1,6 @@
 use std::marker::PhantomData;
 
+use anyhow::Result;
 use rsnark_core::{CircuitPublicWitness, CircuitWitness, PublicWitness, types};
 
 use crate::{Backend, Proof, Prover};
@@ -18,11 +19,11 @@ where
     B: Backend,
     C: CircuitWitness,
 {
-    pub fn setup(&self) -> (B::ProvingKey, B::VerifyingKey) {
-        self.prover.backend.setup(&self.constraint)
+    pub fn setup(&self) -> Result<(B::ProvingKey, B::VerifyingKey)> {
+        Ok(self.prover.backend.setup(&self.constraint)?)
     }
 
-    pub fn prove(&self, proving_key: &B::ProvingKey, circuit_witness: &C) -> Proof {
+    pub fn prove(&self, proving_key: &B::ProvingKey, circuit_witness: &C) -> Result<Proof> {
         let mut witness = types::Witness::new();
 
         circuit_witness.append_public(witness.public_mut());
@@ -31,9 +32,9 @@ where
         let proof = self
             .prover
             .backend
-            .prove(&self.constraint, proving_key, &witness);
+            .prove(&self.constraint, proving_key, &witness)?;
 
-        proof
+        Ok(proof)
     }
 
     pub fn verify(
@@ -41,7 +42,7 @@ where
         verifying_key: &B::VerifyingKey,
         proof: &Proof,
         public_witness: PublicWitness<C>,
-    ) -> bool
+    ) -> Result<()>
     where
         C::PublicWitness: CircuitPublicWitness,
     {
@@ -49,6 +50,8 @@ where
 
         public_witness.append_public(witness.public_mut());
 
-        self.prover.backend.verify(verifying_key, proof, &witness)
+        self.prover.backend.verify(verifying_key, proof, &witness)?;
+
+        Ok(())
     }
 }

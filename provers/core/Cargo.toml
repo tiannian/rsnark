@@ -5,3 +5,5 @@ edition.workspace = true
 
 [dependencies]
 rsnark-core = { workspace = true }
+
+anyhow = { workspace = true }

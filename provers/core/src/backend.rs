@@ -7,23 +7,28 @@ pub trait Backend: Clone {
     type ProvingKey;
     type VerifyingKey;
 
-    fn new() -> Self;
+    type Error: std::error::Error + Send + Sync + 'static;
 
-    fn compile(&self, curve: &Curve, circuit: &CircuitDefinition) -> Self::CircuitConstraint;
+    fn new(curve: Curve) -> Self;
 
-    fn setup(&self, cs: &Self::CircuitConstraint) -> (Self::ProvingKey, Self::VerifyingKey);
+    fn compile(&self, circuit: &CircuitDefinition) -> Result<Self::CircuitConstraint, Self::Error>;
+
+    fn setup(
+        &self,
+        cs: &Self::CircuitConstraint,
+    ) -> Result<(Self::ProvingKey, Self::VerifyingKey), Self::Error>;
 
     fn prove(
         &self,
         cs: &Self::CircuitConstraint,
         pk: &Self::ProvingKey,
         witness: &Witness,
-    ) -> Proof;
+    ) -> Result<Proof, Self::Error>;
 
     fn verify(
         &self,
         vk: &Self::VerifyingKey,
         proof: &Proof,
         public_witness: &PublicWitness,
-    ) -> bool;
+    ) -> Result<bool, Self::Error>;
 }

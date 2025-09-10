@@ -6,7 +6,6 @@ use crate::{Backend, CircuitProver, Curve};
 
 pub struct Prover<B> {
     pub(crate) backend: B,
-    pub(crate) curve: Curve,
 }
 
 impl<B> Prover<B>
@@ -14,12 +13,12 @@ where
     B: Backend,
 {
     pub fn new(curve: Curve) -> Self {
-        let backend = B::new();
+        let backend = B::new(curve);
 
-        Self { backend, curve }
+        Self { backend }
     }
 
-    pub fn compile_circuit<C>(&self) -> CircuitProver<B, C>
+    pub fn compile_circuit<C>(&self) -> Result<CircuitProver<B, C>, B::Error>
     where
         C: CircuitWitness,
         C::PrivateElement: Circuit,
@@ -30,16 +29,15 @@ where
 
         let define = builder.build();
 
-        let cs = self.backend.compile(&self.curve, &define);
+        let cs = self.backend.compile(&define)?;
 
-        CircuitProver {
+        Ok(CircuitProver {
             prover: Self {
                 backend: self.backend.clone(),
-                curve: self.curve.clone(),
             },
             constraint: cs,
             marker: PhantomData,
-        }
+        })
     }
 
     // pub fn compile_constraints(&self, constraints: &[u8]) -> B::CircuitConstraint {

@@ -5,11 +5,11 @@ edition = "2024"
 
 [dependencies]
 rust2go = { version = "0.4.1" }
-thiserror = "2.0.11"
-
 serde_json = { workspace = true }
+thiserror = { workspace = true }
 
 rsnark-core = { workspace = true }
+rsnark-provers-core = { workspace = true }
 
 [build-dependencies]
 rust2go = { version = "0.4.1", features = ["build"] }

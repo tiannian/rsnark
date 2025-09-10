@@ -5,6 +5,9 @@ use rsnark_core::{
 use rsnark_provers_core::{Backend, Curve, Proof};
 use sha3::{Digest, Sha3_256};
 
+#[derive(Debug, thiserror::Error)]
+pub enum Error {}
+
 #[derive(Clone)]
 pub struct MockProverBackend;
 
@@ -13,16 +16,21 @@ impl Backend for MockProverBackend {
     type ProvingKey = ();
     type VerifyingKey = ();
 
-    fn new() -> Self {
+    type Error = Error;
+
+    fn new(_curve: Curve) -> Self {
         Self
     }
 
-    fn compile(&self, _curve: &Curve, circuit: &CircuitDefinition) -> Self::CircuitConstraint {
-        circuit.clone()
+    fn compile(&self, circuit: &CircuitDefinition) -> Result<Self::CircuitConstraint, Self::Error> {
+        Ok(circuit.clone())
     }
 
-    fn setup(&self, _cs: &Self::CircuitConstraint) -> (Self::ProvingKey, Self::VerifyingKey) {
-        ((), ())
+    fn setup(
+        &self,
+        _cs: &Self::CircuitConstraint,
+    ) -> Result<(Self::ProvingKey, Self::VerifyingKey), Self::Error> {
+        Ok(((), ()))
     }
 
     fn prove(
@@ -30,9 +38,9 @@ impl Backend for MockProverBackend {
         _cs: &Self::CircuitConstraint,
         _pk: &Self::ProvingKey,
         witness: &Witness,
-    ) -> Proof {
+    ) -> Result<Proof, Self::Error> {
         let res_hash = hash_public_witness(witness.public());
-        Proof(vec![res_hash])
+        Ok(Proof(vec![res_hash]))
     }
 
     fn verify(
@@ -40,9 +48,13 @@ impl Backend for MockProverBackend {
         _vk: &Self::VerifyingKey,
         proof: &Proof,
         public_witness: &PublicWitness,
-    ) -> bool {
+    ) -> Result<bool, Self::Error> {
         let res_hash = hash_public_witness(&public_witness.public);
-        res_hash == proof.0[0]
+        if res_hash == proof.0[0] {
+            Ok(true)
+        } else {
+            Ok(false)
+        }
     }
 }
 

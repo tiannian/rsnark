@@ -8,7 +8,6 @@ import (
 	"github.com/tiannian/rsnark/provers-gnark/circuit"
 	"github.com/tiannian/rsnark/provers-gnark/prover"
 	"github.com/tiannian/rsnark/provers-gnark/prover/types"
-	prover_types "github.com/tiannian/rsnark/provers-gnark/prover/types"
 )
 
 type Groth16ProverCall struct{}
@@ -23,7 +22,7 @@ func init() {
 }
 
 func (p Groth16ProverCall) new(curve *uint64) uint64 {
-	curveType := prover_types.CurveType(*curve)
+	curveType := types.CurveType(*curve)
 
 	prover := prover.NewGroth16Prover(curveType)
 	proverMutex.Lock()

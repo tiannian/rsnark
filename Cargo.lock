@@ -72,6 +72,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.99"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0674a1ddeecb70197781e945de4b3b8ffb61fa939a5597bcf48503737663100"
+
+[[package]]
 name = "ark-ff"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1011,6 +1017,7 @@ dependencies = [
 name = "rsnark-provers-core"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "rsnark-core",
 ]
 
@@ -1019,6 +1026,7 @@ name = "rsnark-provers-gnark"
 version = "0.1.0"
 dependencies = [
  "rsnark-core",
+ "rsnark-provers-core",
  "rust2go",
  "serde_json",
  "thiserror",
@@ -1031,6 +1039,7 @@ dependencies = [
  "rsnark-core",
  "rsnark-provers-core",
  "sha3",
+ "thiserror",
 ]
 
 [[package]]
