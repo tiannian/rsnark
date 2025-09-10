@@ -93,7 +93,7 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
     let new_field_inits = fields.iter().map(|field| {
         let field_name = field.ident.as_ref().unwrap();
         let field_type = &field.ty;
-        
+
         match &field.vis {
             Visibility::Public(_) => {
                 quote! {
