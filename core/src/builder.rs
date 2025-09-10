@@ -165,7 +165,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn to_binary(&mut self, x: &impl Variable, n: u64) -> Vec<LocalVariable> {
+    fn variable_to_binary(&mut self, x: &impl Variable, n: u64) -> Vec<LocalVariable> {
         let res = self._allocate_local_variable_n(n);
 
         self._append_operation(OpCode::ToBinary, vec![x.ty(), n.ty()], res.clone());
@@ -173,7 +173,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn from_binary(&mut self, b: &[&dyn Variable]) -> LocalVariable {
+    fn variable_from_binary(&mut self, b: &[&dyn Variable]) -> LocalVariable {
         let res = self._allocate_local_variable();
 
         let inputs = b.iter().map(|x| x.ty()).collect();

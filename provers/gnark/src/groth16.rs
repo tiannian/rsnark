@@ -15,7 +15,7 @@ pub struct Groth16Backend(u64);
 
 impl Groth16Backend {
     fn _new(curve: CurveType) -> Self {
-        let prover = ffi::Groth16ProverImpl::new(curve.to_curve_id());
+        let prover = ffi::Groth16ProverImpl::create(curve.to_curve_id());
 
         Self(prover)
     }

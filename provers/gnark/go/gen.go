@@ -30,7 +30,7 @@ import (
 var Groth16ProverImpl Groth16Prover
 
 type Groth16Prover interface {
-	new(curve_id *uint64) uint64
+	create(curve_id *uint64) uint64
 	curve_id(prover *uint64) uint64
 	compile(prover *uint64, circuit *[]uint8) int64
 	setup(prover *uint64, compiled_circuit *int64) []uint8
@@ -38,10 +38,10 @@ type Groth16Prover interface {
 	verify(prover *uint64, vk *int64, proof *[]uint8, public_witness *[]uint8) int64
 }
 
-//export CGroth16Prover_new
-func CGroth16Prover_new(curve_id C.uint64_t, slot *C.void, cb *C.void) {
+//export CGroth16Prover_create
+func CGroth16Prover_create(curve_id C.uint64_t, slot *C.void, cb *C.void) {
 	_new_curve_id := newC_uint64_t(curve_id)
-	resp := Groth16ProverImpl.new(&_new_curve_id)
+	resp := Groth16ProverImpl.create(&_new_curve_id)
 	resp_ref, buffer := cvt_ref(cntC_uint64_t, refC_uint64_t)(&resp)
 	asmcall.CallFuncG0P2(unsafe.Pointer(cb), unsafe.Pointer(&resp_ref), unsafe.Pointer(slot))
 	runtime.KeepAlive(resp_ref)

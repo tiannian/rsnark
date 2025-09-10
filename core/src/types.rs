@@ -62,6 +62,12 @@ pub struct Witness {
     private: Vec<U256>,
 }
 
+impl Default for Witness {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Witness {
     pub fn new() -> Self {
         Self {
@@ -96,6 +102,12 @@ impl Witness {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PublicWitness {
     pub public: Vec<U256>,
+}
+
+impl Default for PublicWitness {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl PublicWitness {

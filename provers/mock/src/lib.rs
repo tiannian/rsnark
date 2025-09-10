@@ -63,7 +63,7 @@ fn hash_public_witness(public_witness: &[U256]) -> U256 {
 
     for value in public_witness {
         let bytes: [u8; 32] = value.to_be_bytes();
-        hasher.update(&bytes);
+        hasher.update(bytes);
     }
 
     let res_bytes = hasher.finalize();

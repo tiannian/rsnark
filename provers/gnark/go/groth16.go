@@ -21,7 +21,7 @@ func init() {
 	Groth16ProverImpl = Groth16ProverCall{}
 }
 
-func (p Groth16ProverCall) new(curve *uint64) uint64 {
+func (p Groth16ProverCall) create(curve *uint64) uint64 {
 	curveType := types.CurveType(*curve)
 
 	prover := prover.NewGroth16Prover(curveType)

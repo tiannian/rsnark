@@ -65,10 +65,10 @@ pub trait API {
     /// returns x.to_binary()
     ///
     /// n is the number of bits to select (starting from lsb)
-    fn to_binary(&mut self, x: &impl Variable, n: u64) -> Vec<LocalVariable>;
+    fn variable_to_binary(&mut self, x: &impl Variable, n: u64) -> Vec<LocalVariable>;
 
     /// packs b in lsb
-    fn from_binary(&mut self, b: &[&dyn Variable]) -> LocalVariable;
+    fn variable_from_binary(&mut self, b: &[&dyn Variable]) -> LocalVariable;
 
     /// returns x1 ^ x2
     fn xor(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable;
