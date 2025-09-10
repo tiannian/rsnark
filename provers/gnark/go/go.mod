@@ -2,12 +2,15 @@ module github.com/tiannian/rsnark/provers-gnark
 
 go 1.24.6
 
-require github.com/consensys/gnark v0.14.0
+require (
+	github.com/consensys/gnark v0.14.0
+	github.com/consensys/gnark-crypto v0.19.0
+	github.com/ihciah/rust2go v0.0.0-20250905150534-7eab29ad7274
+)
 
 require (
 	github.com/bits-and-blooms/bitset v1.24.0 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
-	github.com/consensys/gnark-crypto v0.19.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
 	github.com/google/pprof v0.0.0-20250820193118-f64d9cf942d6 // indirect

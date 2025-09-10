@@ -3,7 +3,6 @@ package types
 import (
 	"bytes"
 	"fmt"
-	"os"
 
 	"github.com/consensys/gnark/backend/groth16"
 )
@@ -41,24 +40,6 @@ func (pk *Groth16ProvingKey) Deserialize(data []byte, curve CurveType) error {
 	return nil
 }
 
-// SaveToFile saves the proving key to a file
-func (pk *Groth16ProvingKey) SaveToFile(filename string) error {
-	data, err := pk.Serialize()
-	if err != nil {
-		return fmt.Errorf("failed to serialize proving key: %w", err)
-	}
-	return os.WriteFile(filename, data, 0644)
-}
-
-// LoadFromFile loads the proving key from a file
-func (pk *Groth16ProvingKey) LoadFromFile(filename string, curve CurveType) error {
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		return fmt.Errorf("failed to read file: %w", err)
-	}
-	return pk.Deserialize(data, curve)
-}
-
 // Groth16VerifyingKey wraps gnark Groth16 verifying key with basic serialization
 type Groth16VerifyingKey struct {
 	Key groth16.VerifyingKey
@@ -90,22 +71,4 @@ func (vk *Groth16VerifyingKey) Deserialize(data []byte, curve CurveType) error {
 		return fmt.Errorf("failed to deserialize verifying key: %w", err)
 	}
 	return nil
-}
-
-// SaveToFile saves the verifying key to a file
-func (vk *Groth16VerifyingKey) SaveToFile(filename string) error {
-	data, err := vk.Serialize()
-	if err != nil {
-		return fmt.Errorf("failed to serialize verifying key: %w", err)
-	}
-	return os.WriteFile(filename, data, 0644)
-}
-
-// LoadFromFile loads the verifying key from a file
-func (vk *Groth16VerifyingKey) LoadFromFile(filename string, curve CurveType) error {
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		return fmt.Errorf("failed to read file: %w", err)
-	}
-	return vk.Deserialize(data, curve)
 }

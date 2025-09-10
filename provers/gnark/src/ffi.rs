@@ -1,0 +1,36 @@
+pub mod binding {
+    #![allow(warnings)]
+    rust2go::r2g_include_binding!();
+}
+
+#[rust2go::r2g]
+pub trait Groth16Prover {
+    fn new(curve_id: u64) -> u64;
+
+    fn curve_id(prover: u64) -> u64;
+
+    // fn compile(prover: u64, circuit: Vec<u8>) -> i64;
+}
+
+#[rust2go::r2g]
+pub trait Object {
+    fn serialize(object_id: i64) -> Vec<u8>;
+
+    fn deserialize(ty: u64, curve_id: u64, data: Vec<u8>) -> i64;
+
+    fn write_to_file(object_id: i64, path: String) -> i64;
+
+    fn read_from_file(ty: u64, curve_id: u64, path: String) -> i64;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new() {
+        let prover = Groth16ProverImpl::new(1);
+        let curve = Groth16ProverImpl::curve_id(prover);
+        assert_eq!(curve, 1);
+    }
+}

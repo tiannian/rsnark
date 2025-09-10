@@ -24,8 +24,12 @@ func NewGroth16Prover(curve types.CurveType) *Groth16Prover {
 	}
 }
 
+func (p *Groth16Prover) CurveId() types.CurveType {
+	return p.curve
+}
+
 // CompileFromDefinition compiles a circuit from CircuitDefinition
-func (p *Groth16Prover) CompileFromDefinition(curve types.CurveType, cd *circuit.CircuitDefinition) (*types.CompiledCircuit, error) {
+func (p *Groth16Prover) Compile(cd *circuit.CircuitDefinition) (*types.CompiledCircuit, error) {
 	// Create TemplateCircuit from CircuitDefinition
 	templateCircuit, err := circuit.NewTemplateCircuit(cd)
 	if err != nil {
@@ -33,22 +37,7 @@ func (p *Groth16Prover) CompileFromDefinition(curve types.CurveType, cd *circuit
 	}
 
 	// Compile to R1CS for Groth16
-	r1cs, err := frontend.Compile(curve.ToECC().ScalarField(), r1cs.NewBuilder, templateCircuit)
-	if err != nil {
-		return nil, fmt.Errorf("failed to compile circuit to R1CS: %w", err)
-	}
-
-	compiled := &types.CompiledCircuit{
-		CS: r1cs,
-	}
-
-	return compiled, nil
-}
-
-// Compile compiles a circuit with the given curve and circuit definition (legacy method)
-func (p *Groth16Prover) Compile(curve types.CurveType, circuit frontend.Circuit) (*types.CompiledCircuit, error) {
-	// Compile to R1CS for Groth16
-	r1cs, err := frontend.Compile(curve.ToECC().ScalarField(), r1cs.NewBuilder, circuit)
+	r1cs, err := frontend.Compile(p.curve.ToECC().ScalarField(), r1cs.NewBuilder, templateCircuit)
 	if err != nil {
 		return nil, fmt.Errorf("failed to compile circuit to R1CS: %w", err)
 	}

@@ -2,8 +2,6 @@ package prover
 
 import (
 	"math/big"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/tiannian/rsnark/provers-gnark/circuit"
@@ -75,7 +73,7 @@ func TestGroth16CompileFromDefinition(t *testing.T) {
 	}
 
 	// Test compilation
-	compiled, err := prover.CompileFromDefinition(types.CurveBN254, circuitDef)
+	compiled, err := prover.Compile(circuitDef)
 	if err != nil {
 		t.Fatalf("Failed to compile circuit: %v", err)
 	}
@@ -99,7 +97,7 @@ func TestGroth16Setup(t *testing.T) {
 		t.Fatalf("Failed to create circuit definition: %v", err)
 	}
 
-	compiled, err := prover.CompileFromDefinition(types.CurveBN254, circuitDef)
+	compiled, err := prover.Compile(circuitDef)
 	if err != nil {
 		t.Fatalf("Failed to compile circuit: %v", err)
 	}
@@ -128,7 +126,7 @@ func TestGroth16ProveAndVerify(t *testing.T) {
 		t.Fatalf("Failed to create circuit definition: %v", err)
 	}
 
-	compiled, err := prover.CompileFromDefinition(types.CurveBN254, circuitDef)
+	compiled, err := prover.Compile(circuitDef)
 	if err != nil {
 		t.Fatalf("Failed to compile circuit: %v", err)
 	}
@@ -174,7 +172,7 @@ func TestGroth16ProveAndVerifyInvalidWitness(t *testing.T) {
 		t.Fatalf("Failed to create circuit definition: %v", err)
 	}
 
-	compiled, err := prover.CompileFromDefinition(types.CurveBN254, circuitDef)
+	compiled, err := prover.Compile(circuitDef)
 	if err != nil {
 		t.Fatalf("Failed to compile circuit: %v", err)
 	}
@@ -207,7 +205,7 @@ func TestGroth16VerifyWithWrongPublicWitness(t *testing.T) {
 		t.Fatalf("Failed to create circuit definition: %v", err)
 	}
 
-	compiled, err := prover.CompileFromDefinition(types.CurveBN254, circuitDef)
+	compiled, err := prover.Compile(circuitDef)
 	if err != nil {
 		t.Fatalf("Failed to compile circuit: %v", err)
 	}
@@ -251,7 +249,7 @@ func TestGroth16KeySerialization(t *testing.T) {
 		t.Fatalf("Failed to create circuit definition: %v", err)
 	}
 
-	compiled, err := prover.CompileFromDefinition(types.CurveBN254, circuitDef)
+	compiled, err := prover.Compile(circuitDef)
 	if err != nil {
 		t.Fatalf("Failed to compile circuit: %v", err)
 	}
@@ -306,7 +304,7 @@ func TestGroth16KeyFileOperations(t *testing.T) {
 		t.Fatalf("Failed to create circuit definition: %v", err)
 	}
 
-	compiled, err := prover.CompileFromDefinition(types.CurveBN254, circuitDef)
+	compiled, err := prover.Compile(circuitDef)
 	if err != nil {
 		t.Fatalf("Failed to compile circuit: %v", err)
 	}
@@ -317,37 +315,16 @@ func TestGroth16KeyFileOperations(t *testing.T) {
 		t.Fatalf("Failed to setup Groth16: %v", err)
 	}
 
-	// Create temporary directory for test files
-	tempDir, err := os.MkdirTemp("", "groth16_test")
+	// Test proving key serialization
+	_, err = pk.Serialize()
 	if err != nil {
-		t.Fatalf("Failed to create temp directory: %v", err)
-	}
-	defer os.RemoveAll(tempDir)
-
-	// Test proving key file operations
-	pkFile := filepath.Join(tempDir, "proving_key.bin")
-	err = pk.SaveToFile(pkFile)
-	if err != nil {
-		t.Fatalf("Failed to save proving key to file: %v", err)
+		t.Fatalf("Failed to serialize proving key: %v", err)
 	}
 
-	newPk := types.NewGroth16ProvingKey()
-	err = newPk.LoadFromFile(pkFile, types.CurveBN254)
+	// Test verifying key serialization
+	_, err = vk.Serialize()
 	if err != nil {
-		t.Fatalf("Failed to load proving key from file: %v", err)
-	}
-
-	// Test verifying key file operations
-	vkFile := filepath.Join(tempDir, "verifying_key.bin")
-	err = vk.SaveToFile(vkFile)
-	if err != nil {
-		t.Fatalf("Failed to save verifying key to file: %v", err)
-	}
-
-	newVk := types.NewGroth16VerifyingKey()
-	err = newVk.LoadFromFile(vkFile, types.CurveBN254)
-	if err != nil {
-		t.Fatalf("Failed to load verifying key from file: %v", err)
+		t.Fatalf("Failed to serialize verifying key: %v", err)
 	}
 }
 
@@ -360,7 +337,7 @@ func TestGroth16CompiledCircuitSerialization(t *testing.T) {
 		t.Fatalf("Failed to create circuit definition: %v", err)
 	}
 
-	compiled, err := prover.CompileFromDefinition(types.CurveBN254, circuitDef)
+	compiled, err := prover.Compile(circuitDef)
 	if err != nil {
 		t.Fatalf("Failed to compile circuit: %v", err)
 	}
@@ -381,25 +358,6 @@ func TestGroth16CompiledCircuitSerialization(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to deserialize compiled circuit: %v", err)
 	}
-
-	// Test compiled circuit file operations
-	tempDir, err := os.MkdirTemp("", "groth16_circuit_test")
-	if err != nil {
-		t.Fatalf("Failed to create temp directory: %v", err)
-	}
-	defer os.RemoveAll(tempDir)
-
-	circuitFile := filepath.Join(tempDir, "compiled_circuit.bin")
-	err = compiled.SaveToFile(circuitFile)
-	if err != nil {
-		t.Fatalf("Failed to save compiled circuit to file: %v", err)
-	}
-
-	loadedCompiled := types.NewCompiledCircuit()
-	err = loadedCompiled.LoadFromFile(circuitFile, types.CurveBN254)
-	if err != nil {
-		t.Fatalf("Failed to load compiled circuit from file: %v", err)
-	}
 }
 
 func TestGroth16MultipleProofs(t *testing.T) {
@@ -411,7 +369,7 @@ func TestGroth16MultipleProofs(t *testing.T) {
 		t.Fatalf("Failed to create circuit definition: %v", err)
 	}
 
-	compiled, err := prover.CompileFromDefinition(types.CurveBN254, circuitDef)
+	compiled, err := prover.Compile(circuitDef)
 	if err != nil {
 		t.Fatalf("Failed to compile circuit: %v", err)
 	}

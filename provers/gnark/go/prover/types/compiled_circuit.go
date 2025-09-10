@@ -3,7 +3,6 @@ package types
 import (
 	"bytes"
 	"fmt"
-	"os"
 
 	"github.com/consensys/gnark/backend/groth16"
 	"github.com/consensys/gnark/constraint"
@@ -42,22 +41,4 @@ func (cc *CompiledCircuit) Deserialize(data []byte, curve CurveType) error {
 
 	cc.CS = cs
 	return nil
-}
-
-// SaveToFile saves the compiled circuit to a file
-func (cc *CompiledCircuit) SaveToFile(filename string) error {
-	data, err := cc.Serialize()
-	if err != nil {
-		return fmt.Errorf("failed to serialize compiled circuit: %w", err)
-	}
-	return os.WriteFile(filename, data, 0644)
-}
-
-// LoadFromFile loads the compiled circuit from a file
-func (cc *CompiledCircuit) LoadFromFile(filename string, curve CurveType) error {
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		return fmt.Errorf("failed to read file: %w", err)
-	}
-	return cc.Deserialize(data, curve)
 }

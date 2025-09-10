@@ -6,10 +6,10 @@ import "github.com/consensys/gnark-crypto/ecc"
 type CurveType int
 
 const (
-	CurveBN254 CurveType = iota
-	CurveBLS12381
-	CurveBLS12377
-	CurveBW6761
+	CurveBN254    CurveType = 1
+	CurveBLS12381 CurveType = 2
+	CurveBLS12377 CurveType = 3
+	CurveBW6761   CurveType = 4
 )
 
 // String returns the string representation of the curve type
