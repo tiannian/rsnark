@@ -12,6 +12,9 @@ resolver = "2"
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
+authors = ["rsnark-dev", "tiannian <dtiannian@gmail.com>"]
+license = "MIT"
+readme = "README.md"
 
 [workspace.dependencies]
 ruint = "1.16.0"

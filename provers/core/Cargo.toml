@@ -2,6 +2,9 @@
 name = "rsnark-provers-core"
 version.workspace = true
 edition.workspace = true
+authors.workspace = true
+license.workspace = true
+readme.workspace = true
 
 [dependencies]
 rsnark-core = { workspace = true }
