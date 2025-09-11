@@ -132,7 +132,7 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
             Visibility::Public(_) => {
                 // Public fields: is_private = false
                 quote! {
-                    self.#field_name.append_witness(public, private, false);
+                    self.#field_name.append_witness(public, private, false || _is_private);
                 }
             }
             _ => {

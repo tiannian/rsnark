@@ -26,7 +26,8 @@ mod __rsnark_generated_addercircuit {
         ) {
             self.a.append_witness(public, private, true);
             self.b.append_witness(public, private, true);
-            self.sum.append_witness(public, private, false);
+            self.sum
+                .append_witness(public, private, false || _is_private);
         }
         fn into_public_witness(self) -> Self::PublicWitness {
             AdderCircuitPublicWitness {
@@ -95,7 +96,8 @@ mod __rsnark_generated_multipliercircuit {
         ) {
             self.x.append_witness(public, private, true);
             self.y.append_witness(public, private, true);
-            self.product.append_witness(public, private, false);
+            self.product
+                .append_witness(public, private, false || _is_private);
         }
         fn into_public_witness(self) -> Self::PublicWitness {
             MultiplierCircuitPublicWitness {
@@ -164,7 +166,8 @@ mod __rsnark_generated_compositecircuit {
         ) {
             self.adder.append_witness(public, private, true);
             self.multiplier.append_witness(public, private, true);
-            self.final_result.append_witness(public, private, false);
+            self.final_result
+                .append_witness(public, private, false || _is_private);
         }
         fn into_public_witness(self) -> Self::PublicWitness {
             CompositeCircuitPublicWitness {

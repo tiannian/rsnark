@@ -93,9 +93,11 @@ where
         let mut public = Vec::new();
         let mut private = Vec::new();
 
-        circuit_witness.append_witness(&mut public, &mut private, true);
+        circuit_witness.append_witness(&mut public, &mut private, false);
 
         let witness = types::Witness::from((public, private));
+
+        println!("witness: {:#?}", witness);
 
         let proof = self
             .backend
@@ -146,7 +148,7 @@ where
 
         public_witness.append_public_witness(witness.public_mut(), false);
 
-        println!("witness: {:#?}", witness);
+        println!("public witness: {:#?}", witness);
 
         self.backend.verify(verifying_key, proof, &witness)?;
 
