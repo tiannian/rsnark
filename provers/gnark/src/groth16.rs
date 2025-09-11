@@ -1,35 +1,69 @@
+use std::marker::PhantomData;
+
 use rsnark_core::{
     U256,
     types::{CircuitDefinition, PublicWitness, Witness},
 };
-use rsnark_provers_core::{Backend, Curve, Proof};
+use rsnark_provers_core::{Backend, CurveId, Proof};
 
 use crate::{
     Error, Result,
     ffi::{self, Groth16Prover},
-    types::{CompiledCircuit, CurveType, GoInnerRef, Groth16ProvingKey, Groth16VerifyingKey},
+    types::{CompiledCircuit, GoInnerRef, Groth16ProvingKey, Groth16VerifyingKey},
 };
 
-#[derive(Clone)]
-pub struct Groth16Backend(u64);
+/// Groth16 backend implementation using the Gnark library.
+///
+/// This backend provides a Rust interface to Gnark's Groth16 implementation,
+/// offering high-performance zero-knowledge proof generation and verification.
+/// The backend manages Go-side resources through FFI and supports multiple
+/// elliptic curves.
+///
+/// # Type Parameters
+///
+/// * `C` - The elliptic curve type that implements [`CurveId`]
+///
+/// # Resource Management
+///
+/// The backend maintains a reference to Go-side objects through `go_ref_id`.
+/// These resources are managed by the Gnark library and cleaned up automatically
+/// when no longer referenced.
+pub struct Groth16Backend<C> {
+    go_ref_id: u64,
+    marker: PhantomData<C>,
+}
 
-impl Groth16Backend {
-    fn _new(curve: CurveType) -> Self {
-        let prover = ffi::Groth16ProverImpl::create(curve.to_curve_id());
+impl<C> Clone for Groth16Backend<C>
+where
+    C: CurveId,
+{
+    fn clone(&self) -> Self {
+        Self {
+            go_ref_id: self.go_ref_id,
+            marker: PhantomData,
+        }
+    }
+}
 
-        Self(prover)
+impl<C> Groth16Backend<C>
+where
+    C: CurveId,
+{
+    fn _new() -> Self {
+        let curve = C::curve_id();
+
+        let prover = ffi::Groth16ProverImpl::create(curve);
+
+        Self {
+            go_ref_id: prover,
+            marker: PhantomData,
+        }
     }
 
-    pub fn curve_id(&self) -> CurveType {
-        let curve = ffi::Groth16ProverImpl::curve_id(self.0);
-
-        CurveType::from_curve_id(curve)
-    }
-
-    fn _compile(&self, circuit: &CircuitDefinition) -> Result<CompiledCircuit> {
+    fn _compile(&self, circuit: &CircuitDefinition) -> Result<CompiledCircuit<C>> {
         let circuit = serde_json::to_vec(circuit)?;
 
-        let res = ffi::Groth16ProverImpl::compile(self.0, circuit);
+        let res = ffi::Groth16ProverImpl::compile(self.go_ref_id, circuit);
 
         if res >= 0 {
             Ok(CompiledCircuit::from_go_inner_ref(res))
@@ -40,9 +74,9 @@ impl Groth16Backend {
 
     fn _setup(
         &self,
-        compiled_circuit: &CompiledCircuit,
-    ) -> Result<(Groth16ProvingKey, Groth16VerifyingKey)> {
-        let res = ffi::Groth16ProverImpl::setup(self.0, compiled_circuit.go_inner_ref());
+        compiled_circuit: &CompiledCircuit<C>,
+    ) -> Result<(Groth16ProvingKey<C>, Groth16VerifyingKey<C>)> {
+        let res = ffi::Groth16ProverImpl::setup(self.go_ref_id, compiled_circuit.go_inner_ref());
 
         let res0 = i64::from_be_bytes(res[0..8].try_into().unwrap());
         let res1 = i64::from_be_bytes(res[8..16].try_into().unwrap());
@@ -59,15 +93,15 @@ impl Groth16Backend {
 
     fn _prove(
         &self,
-        compiled_circuit: &CompiledCircuit,
-        pk: &Groth16ProvingKey,
+        compiled_circuit: &CompiledCircuit<C>,
+        pk: &Groth16ProvingKey<C>,
         witness: &Witness,
     ) -> Result<Vec<u8>> {
         // TODO: Compect go side witness
         let witness_bytes = serde_json::to_vec(witness)?;
 
         let res = ffi::Groth16ProverImpl::prove(
-            self.0,
+            self.go_ref_id,
             compiled_circuit.go_inner_ref(),
             pk.go_inner_ref(),
             witness_bytes,
@@ -84,15 +118,19 @@ impl Groth16Backend {
 
     fn _verify(
         &self,
-        vk: &Groth16VerifyingKey,
+        vk: &Groth16VerifyingKey<C>,
         proof: Vec<u8>,
         public_witness: &PublicWitness,
     ) -> Result<bool> {
         // TODO: Compect go side public witness
         let public_witness_bytes = serde_json::to_vec(public_witness)?;
 
-        let res =
-            ffi::Groth16ProverImpl::verify(self.0, vk.go_inner_ref(), proof, public_witness_bytes);
+        let res = ffi::Groth16ProverImpl::verify(
+            self.go_ref_id,
+            vk.go_inner_ref(),
+            proof,
+            public_witness_bytes,
+        );
 
         if res == 0 {
             Ok(true)
@@ -104,32 +142,39 @@ impl Groth16Backend {
     }
 }
 
-impl Backend for Groth16Backend {
-    type CircuitConstraint = CompiledCircuit;
-    type ProvingKey = Groth16ProvingKey;
-    type VerifyingKey = Groth16VerifyingKey;
+/// Implementation of the [`Backend`] trait for Groth16 using Gnark.
+///
+/// This implementation bridges Rust's type system with Gnark's Go implementation,
+/// providing compile-time curve selection and runtime proof operations.
+impl<C> Backend for Groth16Backend<C>
+where
+    C: CurveId,
+{
+    type CircuitConstraint = CompiledCircuit<C>;
+    type ProvingKey = Groth16ProvingKey<C>;
+    type VerifyingKey = Groth16VerifyingKey<C>;
 
     type Error = Error;
 
-    fn new(curve: Curve) -> Self {
-        Self::_new(curve.into())
+    fn new() -> Self {
+        Self::_new()
     }
 
-    fn compile(&self, circuit: &CircuitDefinition) -> Result<CompiledCircuit> {
+    fn compile(&self, circuit: &CircuitDefinition) -> Result<Self::CircuitConstraint> {
         self._compile(circuit)
     }
 
     fn setup(
         &self,
-        compiled_circuit: &CompiledCircuit,
-    ) -> Result<(Groth16ProvingKey, Groth16VerifyingKey)> {
+        compiled_circuit: &Self::CircuitConstraint,
+    ) -> Result<(Self::ProvingKey, Self::VerifyingKey)> {
         self._setup(compiled_circuit)
     }
 
     fn prove(
         &self,
-        compiled_circuit: &CompiledCircuit,
-        pk: &Groth16ProvingKey,
+        compiled_circuit: &Self::CircuitConstraint,
+        pk: &Self::ProvingKey,
         witness: &Witness,
     ) -> Result<Proof> {
         let proof = self._prove(compiled_circuit, pk, witness)?;
@@ -155,7 +200,7 @@ impl Backend for Groth16Backend {
 
     fn verify(
         &self,
-        vk: &Groth16VerifyingKey,
+        vk: &Self::VerifyingKey,
         proof: &Proof,
         public_witness: &PublicWitness,
     ) -> Result<bool> {
@@ -177,7 +222,7 @@ impl Backend for Groth16Backend {
 mod tests {
     use super::*;
     use rsnark_core::{API, Circuit, CircuitDefine, CircuitWitness};
-    use rsnark_provers_core::{Curve, Prover};
+    use rsnark_provers_core::{Prover, curve::BN254};
 
     #[derive(rsnark_core::Circuit)]
     pub struct TestCircuit {
@@ -195,7 +240,7 @@ mod tests {
 
     #[test]
     fn test_groth16_with_core_prover() {
-        let prover: Prover<Groth16Backend> = Prover::new(Curve::BN254);
+        let prover: Prover<Groth16Backend<BN254>> = Prover::new();
 
         let circuit_prover = prover.compile_circuit::<TestCircuit>().unwrap();
 

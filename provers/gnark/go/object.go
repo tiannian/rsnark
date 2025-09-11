@@ -105,3 +105,23 @@ func deserializeObject[T types.SerializableObject](curve_id uint64, data *[]byte
 
 	return int64(len(objects) - 1)
 }
+
+func (o ObjectCall) export_solidity(object_id *int64) []byte {
+	objectMutex.Lock()
+	defer objectMutex.Unlock()
+	object := objects[*object_id]
+
+	pk, ok := object.(*types.Groth16VerifyingKey)
+	if !ok {
+		log.Fatalf("failed to cast object to types.Groth16VerifyingKey")
+		return int64ToBytes(-10005)
+	}
+
+	solidity, err := pk.ExportSolidity()
+	if err != nil {
+		log.Fatalf("failed to export solidity: %v", err)
+		return int64ToBytes(-10006)
+	}
+
+	return append(int64ToBytes(0), solidity...)
+}

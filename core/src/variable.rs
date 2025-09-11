@@ -1,3 +1,7 @@
+//! Variable types for circuit construction.
+//!
+//! These types can used in API to define circuit.
+
 use ruint::aliases::U256;
 
 use crate::types::VariableType;

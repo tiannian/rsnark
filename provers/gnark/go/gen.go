@@ -31,7 +31,6 @@ var Groth16ProverImpl Groth16Prover
 
 type Groth16Prover interface {
 	create(curve_id *uint64) uint64
-	curve_id(prover *uint64) uint64
 	compile(prover *uint64, circuit *[]uint8) int64
 	setup(prover *uint64, compiled_circuit *int64) []uint8
 	prove(prover *uint64, compiled_circuit *int64, pk *int64, witness *[]uint8) []uint8
@@ -42,17 +41,6 @@ type Groth16Prover interface {
 func CGroth16Prover_create(curve_id C.uint64_t, slot *C.void, cb *C.void) {
 	_new_curve_id := newC_uint64_t(curve_id)
 	resp := Groth16ProverImpl.create(&_new_curve_id)
-	resp_ref, buffer := cvt_ref(cntC_uint64_t, refC_uint64_t)(&resp)
-	asmcall.CallFuncG0P2(unsafe.Pointer(cb), unsafe.Pointer(&resp_ref), unsafe.Pointer(slot))
-	runtime.KeepAlive(resp_ref)
-	runtime.KeepAlive(resp)
-	runtime.KeepAlive(buffer)
-}
-
-//export CGroth16Prover_curve_id
-func CGroth16Prover_curve_id(prover C.uint64_t, slot *C.void, cb *C.void) {
-	_new_prover := newC_uint64_t(prover)
-	resp := Groth16ProverImpl.curve_id(&_new_prover)
 	resp_ref, buffer := cvt_ref(cntC_uint64_t, refC_uint64_t)(&resp)
 	asmcall.CallFuncG0P2(unsafe.Pointer(cb), unsafe.Pointer(&resp_ref), unsafe.Pointer(slot))
 	runtime.KeepAlive(resp_ref)
@@ -119,6 +107,7 @@ type Object interface {
 	deserialize(ty *uint64, curve_id *uint64, data *[]uint8) int64
 	write_to_file(object_id *int64, path *string) int64
 	read_from_file(ty *uint64, curve_id *uint64, path *string) int64
+	export_solidity(object_id *int64) []uint8
 }
 
 //export CObject_serialize
@@ -164,6 +153,17 @@ func CObject_read_from_file(ty C.uint64_t, curve_id C.uint64_t, path C.StringRef
 	_new_path := newString(path)
 	resp := ObjectImpl.read_from_file(&_new_ty, &_new_curve_id, &_new_path)
 	resp_ref, buffer := cvt_ref(cntC_int64_t, refC_int64_t)(&resp)
+	asmcall.CallFuncG0P2(unsafe.Pointer(cb), unsafe.Pointer(&resp_ref), unsafe.Pointer(slot))
+	runtime.KeepAlive(resp_ref)
+	runtime.KeepAlive(resp)
+	runtime.KeepAlive(buffer)
+}
+
+//export CObject_export_solidity
+func CObject_export_solidity(object_id C.int64_t, slot *C.void, cb *C.void) {
+	_new_object_id := newC_int64_t(object_id)
+	resp := ObjectImpl.export_solidity(&_new_object_id)
+	resp_ref, buffer := cvt_ref(cnt_list_mapper_primitive(cntC_uint8_t), ref_list_mapper_primitive(refC_uint8_t))(&resp)
 	asmcall.CallFuncG0P2(unsafe.Pointer(cb), unsafe.Pointer(&resp_ref), unsafe.Pointer(slot))
 	runtime.KeepAlive(resp_ref)
 	runtime.KeepAlive(resp)

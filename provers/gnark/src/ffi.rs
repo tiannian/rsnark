@@ -7,8 +7,6 @@ pub mod binding {
 pub trait Groth16Prover {
     fn create(curve_id: u64) -> u64;
 
-    fn curve_id(prover: u64) -> u64;
-
     fn compile(prover: u64, circuit: Vec<u8>) -> i64;
 
     fn setup(prover: u64, compiled_circuit: i64) -> Vec<u8>;
@@ -27,4 +25,6 @@ pub trait Object {
     fn write_to_file(object_id: i64, path: String) -> i64;
 
     fn read_from_file(ty: u64, curve_id: u64, path: String) -> i64;
+
+    fn export_solidity(object_id: i64) -> Vec<u8>;
 }

@@ -1,13 +1,50 @@
+//! # rsnark-provers-mock
+//!
+//! Mock backend implementation for testing and development purposes.
+//!
+//! This crate provides a simple, non-cryptographic backend that can be used
+//! for testing circuit compilation and proof generation workflows without
+//! the computational overhead of real zero-knowledge proofs. The mock backend
+//! uses simple hashing to simulate proof generation and verification.
+//!
+//! ## Features
+//!
+//! - **Fast execution**: No complex cryptographic operations
+//! - **Deterministic behavior**: Proofs are based on SHA3 hashing
+//! - **Simple setup**: No key generation required
+//! - **Testing friendly**: Ideal for unit tests and development
+//!
+//! ## Limitations
+//!
+//! This mock implementation provides **no cryptographic security** and should
+//! never be used in production environments. It's designed solely for testing
+//! and development purposes.
+
 use rsnark_core::{
     U256,
     types::{CircuitDefinition, PublicWitness, Witness},
 };
-use rsnark_provers_core::{Backend, Curve, Proof};
+use rsnark_provers_core::{Backend, Proof};
 use sha3::{Digest, Sha3_256};
 
+/// Error type for mock backend operations.
+///
+/// Currently, the mock backend implementation does not produce any errors,
+/// but this enum is provided for future extensibility and API consistency.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {}
 
+/// Mock backend implementation for testing and development.
+///
+/// This backend provides a simple, non-cryptographic implementation of the
+/// [`Backend`] trait that can be used for testing circuit compilation and
+/// proof workflows. Instead of generating real zero-knowledge proofs, it
+/// creates deterministic "proofs" based on SHA3 hashing of public inputs.
+///
+/// # Security Warning
+///
+/// This implementation provides **no cryptographic security** and should
+/// never be used in production. It's designed only for testing and development.
 #[derive(Clone)]
 pub struct MockProverBackend;
 
@@ -18,14 +55,22 @@ impl Backend for MockProverBackend {
 
     type Error = Error;
 
-    fn new(_curve: Curve) -> Self {
+    fn new() -> Self {
         Self
     }
 
+    /// Returns a copy of the circuit definition as the "compiled" constraint.
+    ///
+    /// In the mock implementation, no actual compilation is performed.
+    /// The circuit definition is simply cloned and returned.
     fn compile(&self, circuit: &CircuitDefinition) -> Result<Self::CircuitConstraint, Self::Error> {
         Ok(circuit.clone())
     }
 
+    /// Returns unit values as mock proving and verifying keys.
+    ///
+    /// The mock backend doesn't require actual key generation, so it
+    /// returns empty unit values for both keys.
     fn setup(
         &self,
         _cs: &Self::CircuitConstraint,
@@ -33,6 +78,11 @@ impl Backend for MockProverBackend {
         Ok(((), ()))
     }
 
+    /// Generates a mock proof by hashing the public witness.
+    ///
+    /// The mock proof is simply the SHA3-256 hash of the public witness values.
+    /// This provides deterministic behavior for testing while avoiding complex
+    /// cryptographic operations.
     fn prove(
         &self,
         _cs: &Self::CircuitConstraint,
@@ -43,6 +93,10 @@ impl Backend for MockProverBackend {
         Ok(Proof(vec![res_hash]))
     }
 
+    /// Verifies a mock proof by comparing hashes.
+    ///
+    /// Verification simply checks if the proof hash matches the hash of the
+    /// provided public witness. Returns `true` if they match, `false` otherwise.
     fn verify(
         &self,
         _vk: &Self::VerifyingKey,

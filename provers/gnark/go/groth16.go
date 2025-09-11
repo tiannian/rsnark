@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/binary"
+	"fmt"
 	"log"
 	"sync"
 
@@ -31,16 +32,6 @@ func (p Groth16ProverCall) create(curve *uint64) uint64 {
 	provers = append(provers, prover)
 
 	return uint64(len(provers) - 1)
-}
-
-func (p Groth16ProverCall) curve_id(prover_id *uint64) uint64 {
-	proverMutex.Lock()
-	defer proverMutex.Unlock()
-
-	prover := provers[*prover_id]
-	curve := prover.CurveId()
-
-	return uint64(curve)
 }
 
 func (p Groth16ProverCall) compile(prover_id *uint64, circuitData *[]byte) int64 {
@@ -139,6 +130,8 @@ func (p Groth16ProverCall) prove(prover_id *uint64, compiled_circuit_id *int64, 
 		log.Fatalf("failed to deserialize witness: %v", err)
 		return int64ToBytes(-20007)
 	}
+
+	fmt.Printf("witness: %#v\n", witness)
 
 	proof, err := prover.Prove(compiled, pk, &witness)
 	if err != nil {

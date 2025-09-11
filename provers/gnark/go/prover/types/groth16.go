@@ -72,3 +72,14 @@ func (vk *Groth16VerifyingKey) Deserialize(data []byte, curve CurveType) error {
 	}
 	return nil
 }
+
+func (vk *Groth16VerifyingKey) ExportSolidity() ([]byte, error) {
+	var buf bytes.Buffer
+
+	err := vk.Key.ExportSolidity(&buf)
+	if err != nil {
+		return nil, fmt.Errorf("failed to export verifying key to solidity: %w", err)
+	}
+
+	return buf.Bytes(), nil
+}

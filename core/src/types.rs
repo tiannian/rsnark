@@ -1,3 +1,7 @@
+//! Some useful types for build prover.
+//!
+//! Note: These types are used for build prover, so they are not part of the public API.
+
 use ruint::aliases::U256;
 use serde::{Deserialize, Serialize};
 

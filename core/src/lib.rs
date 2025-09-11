@@ -1,3 +1,5 @@
+//! Core library to write circuits.
+
 pub mod types;
 
 pub mod variable;

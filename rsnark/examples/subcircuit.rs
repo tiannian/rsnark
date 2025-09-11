@@ -1,7 +1,5 @@
-use rsnark_core::{
-    API, Circuit, CircuitBuilder, CircuitDefine, CircuitPublicWitness, CircuitWitness,
-    types::Witness,
-};
+use rsnark::Groth16BN254GnarkProver;
+use rsnark_core::{API, Circuit, CircuitDefine, CircuitWitness};
 
 // Sub-circuit: Adder - computes a + b = sum
 #[derive(Circuit)]
@@ -58,39 +56,23 @@ impl Circuit for CircuitDefine<CompositeCircuit> {
 }
 
 fn main() {
-    println!("Sub-circuit test compilation successful!");
-    println!();
-    println!("Circuit architecture:");
-    println!("  AdderCircuit: a + b = sum");
-    println!("  MultiplierCircuit: x * y = product");
-    println!("  CompositeCircuit: (adder.sum + multiplier.product) = final_result");
-    println!();
+    let prover = Groth16BN254GnarkProver::new();
 
-    // Build and execute the circuit
-    let mut builder = CircuitBuilder::default();
-    let circuit = CompositeCircuit::create_private(builder.variable_initer_mut());
-    circuit.define(&mut builder);
+    let circuit_prover = prover.compile_circuit::<CompositeCircuit>().unwrap();
+    let (pk, vk) = circuit_prover.setup().unwrap();
 
-    let define = builder.build();
-    let json = serde_json::to_string_pretty(&define).unwrap();
-    println!("Generated circuit definition:");
-    println!("{}", json);
-
-    let composite_circuit = CompositeCircuit {
+    let circuit_witness = CompositeCircuit {
         adder: AdderCircuit { a: 1, b: 2, sum: 3 },
         multiplier: MultiplierCircuit {
-            x: 4,
-            y: 5,
-            product: 20,
+            x: 2,
+            y: 3,
+            product: 6,
         },
-        final_result: 23,
+        final_result: 9,
     };
 
-    let mut witness = Witness::new();
+    let proof = circuit_prover.prove(&pk, &circuit_witness).unwrap();
 
-    composite_circuit.append_public(witness.public_mut());
-    composite_circuit.append_private(witness.private_mut());
-
-    let witness = serde_json::to_string_pretty(&witness).unwrap();
-    println!("Witness: {}", witness);
+    let public_witness = circuit_witness.into_public_witness();
+    circuit_prover.verify(&vk, &proof, public_witness).unwrap();
 }
