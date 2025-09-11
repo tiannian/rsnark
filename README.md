@@ -7,7 +7,7 @@ rSnark is a Rust library for writing zero-knowledge circuits and generating proo
 ## Features
 
 - **Simple Circuit Definition**: Use derive macros to easily define circuits
-- **Multiple Backend Support**: Write circuit once, prover on multi prover system
+- **Multiple Backend Support**: Write circuit once, prover on multiple prover system
 - **Nested Circuits**: Compose complex circuits from simpler ones
 - **Type Safety**: Leverage Rust's type system for circuit safety
 
