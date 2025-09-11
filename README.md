@@ -23,6 +23,12 @@ Add rSnark to your `Cargo.toml`:
 rsnark = "0.1.0"
 ```
 
+or use `cargo add`:
+
+```bash
+cargo add rsnark
+```
+
 ### Writing Your First Circuit
 
 Defining a circuit requires two simple steps:
