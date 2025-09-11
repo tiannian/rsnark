@@ -10,12 +10,13 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 authors = ["rsnark-dev", "tiannian <dtiannian@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 description = "A Rust library to write Zero-Knowledge circuits for multiple prover systems"
+repository = "https://github.com/tiannian/rsnark"
 
 [workspace.dependencies]
 ruint = "1.16.0"

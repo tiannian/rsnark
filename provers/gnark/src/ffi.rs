@@ -3,6 +3,7 @@ pub mod binding {
     rust2go::r2g_include_binding!();
 }
 
+#[cfg(not(docsrs))]
 #[rust2go::r2g]
 pub trait Groth16Prover {
     fn create(curve_id: u64) -> u64;
@@ -16,6 +17,7 @@ pub trait Groth16Prover {
     fn verify(prover: u64, vk: i64, proof: Vec<u8>, public_witness: Vec<u8>) -> i64;
 }
 
+#[cfg(not(docsrs))]
 #[rust2go::r2g]
 pub trait Object {
     fn serialize(object_id: i64) -> Vec<u8>;
@@ -27,4 +29,100 @@ pub trait Object {
     fn read_from_file(ty: u64, curve_id: u64, path: String) -> i64;
 
     fn export_solidity(object_id: i64) -> Vec<u8>;
+}
+
+#[cfg(docsrs)]
+pub mod groth16_prover {
+    pub fn create(_curve_id: u64) -> u64 {
+        unimplemented!()
+    }
+
+    pub fn compile(_prover: u64, _circuit: Vec<u8>) -> i64 {
+        unimplemented!()
+    }
+
+    pub fn setup(_prover: u64, _compiled_circuit: i64) -> Vec<u8> {
+        unimplemented!()
+    }
+
+    pub fn prove(_prover: u64, _compiled_circuit: i64, _pk: i64, _witness: Vec<u8>) -> Vec<u8> {
+        unimplemented!()
+    }
+
+    pub fn verify(_prover: u64, _vk: i64, _proof: Vec<u8>, _public_witness: Vec<u8>) -> i64 {
+        unimplemented!()
+    }
+}
+
+#[cfg(docsrs)]
+pub mod object {
+    pub fn serialize(_object_id: i64) -> Vec<u8> {
+        unimplemented!()
+    }
+
+    pub fn deserialize(_ty: u64, _curve_id: u64, _data: Vec<u8>) -> i64 {
+        unimplemented!()
+    }
+
+    pub fn write_to_file(_object_id: i64, _path: String) -> i64 {
+        unimplemented!()
+    }
+
+    pub fn read_from_file(_ty: u64, _curve_id: u64, _path: String) -> i64 {
+        unimplemented!()
+    }
+
+    pub fn export_solidity(_object_id: i64) -> Vec<u8> {
+        unimplemented!()
+    }
+}
+
+#[cfg(not(docsrs))]
+pub mod groth16_prover {
+    use crate::ffi::Groth16Prover;
+
+    pub fn create(curve_id: u64) -> u64 {
+        super::Groth16ProverImpl::create(curve_id)
+    }
+
+    pub fn compile(prover: u64, circuit: Vec<u8>) -> i64 {
+        super::Groth16ProverImpl::compile(prover, circuit)
+    }
+
+    pub fn setup(prover: u64, compiled_circuit: i64) -> Vec<u8> {
+        super::Groth16ProverImpl::setup(prover, compiled_circuit)
+    }
+
+    pub fn prove(prover: u64, compiled_circuit: i64, pk: i64, witness: Vec<u8>) -> Vec<u8> {
+        super::Groth16ProverImpl::prove(prover, compiled_circuit, pk, witness)
+    }
+
+    pub fn verify(prover: u64, vk: i64, proof: Vec<u8>, public_witness: Vec<u8>) -> i64 {
+        super::Groth16ProverImpl::verify(prover, vk, proof, public_witness)
+    }
+}
+
+#[cfg(not(docsrs))]
+pub mod object {
+    use crate::ffi::Object;
+
+    pub fn serialize(object_id: i64) -> Vec<u8> {
+        super::ObjectImpl::serialize(object_id)
+    }
+
+    pub fn deserialize(ty: u64, curve_id: u64, data: Vec<u8>) -> i64 {
+        super::ObjectImpl::deserialize(ty, curve_id, data)
+    }
+
+    pub fn write_to_file(object_id: i64, path: String) -> i64 {
+        super::ObjectImpl::write_to_file(object_id, path)
+    }
+
+    pub fn read_from_file(ty: u64, curve_id: u64, path: String) -> i64 {
+        super::ObjectImpl::read_from_file(ty, curve_id, path)
+    }
+
+    pub fn export_solidity(object_id: i64) -> Vec<u8> {
+        super::ObjectImpl::export_solidity(object_id)
+    }
 }

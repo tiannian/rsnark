@@ -1,9 +1,6 @@
 use rsnark_provers_core::CurveId;
 
-use crate::{
-    Error, Result,
-    ffi::{self, Object},
-};
+use crate::{Error, Result, ffi};
 
 /// Trait for types that wrap Go-side object references.
 ///
@@ -24,7 +21,7 @@ pub trait GoInnerRef {
 /// performing file I/O operations on Go-side objects through FFI calls.
 pub trait InnerSerializableObject: GoInnerRef {
     fn inner_serialize(&self) -> Result<Vec<u8>> {
-        let res = ffi::ObjectImpl::serialize(self.go_inner_ref());
+        let res = ffi::object::serialize(self.go_inner_ref());
 
         if res.is_empty() {
             return Err(Error::SerializeError);
@@ -38,7 +35,7 @@ pub trait InnerSerializableObject: GoInnerRef {
         Self: Sized,
         C: CurveId,
     {
-        let res = ffi::ObjectImpl::deserialize(ty, C::curve_id(), data);
+        let res = ffi::object::deserialize(ty, C::curve_id(), data);
 
         if res != 0 {
             return Err(Error::DeserializeError);
@@ -48,7 +45,7 @@ pub trait InnerSerializableObject: GoInnerRef {
     }
 
     fn inner_write_to_file(object_id: i64, path: String) -> Result<()> {
-        let res = ffi::ObjectImpl::write_to_file(object_id, path);
+        let res = ffi::object::write_to_file(object_id, path);
 
         if res == 0 {
             Ok(())
@@ -62,7 +59,7 @@ pub trait InnerSerializableObject: GoInnerRef {
         Self: Sized,
         C: CurveId,
     {
-        let res = ffi::ObjectImpl::read_from_file(ty, C::curve_id(), path);
+        let res = ffi::object::read_from_file(ty, C::curve_id(), path);
 
         if res == 0 {
             Ok(Self::from_go_inner_ref(res))

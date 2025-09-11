@@ -1,8 +1,7 @@
 use std::marker::PhantomData;
 
 use crate::{
-    Error, Result,
-    ffi::{self, Object},
+    Error, Result, ffi,
     types::{GoInnerRef, InnerSerializableObject},
 };
 use rsnark_provers_core::{CurveId, curve::BN254};
@@ -96,7 +95,7 @@ impl Groth16VerifyingKey<BN254> {
     ///
     /// This function may return an error if the Solidity export operation fails.
     pub fn export_solidity(&self) -> Result<String> {
-        let res = ffi::ObjectImpl::export_solidity(self.go_ref_id);
+        let res = ffi::object::export_solidity(self.go_ref_id);
 
         let code = i64::from_be_bytes(res[0..8].try_into().unwrap());
 

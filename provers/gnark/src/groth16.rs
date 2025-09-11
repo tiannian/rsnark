@@ -7,8 +7,7 @@ use rsnark_core::{
 use rsnark_provers_core::{Backend, CurveId, Proof};
 
 use crate::{
-    Error, Result,
-    ffi::{self, Groth16Prover},
+    Error, Result, ffi,
     types::{CompiledCircuit, GoInnerRef, Groth16ProvingKey, Groth16VerifyingKey},
 };
 
@@ -52,7 +51,7 @@ where
     fn _new() -> Self {
         let curve = C::curve_id();
 
-        let prover = ffi::Groth16ProverImpl::create(curve);
+        let prover = ffi::groth16_prover::create(curve);
 
         Self {
             go_ref_id: prover,
@@ -63,7 +62,7 @@ where
     fn _compile(&self, circuit: &CircuitDefinition) -> Result<CompiledCircuit<C>> {
         let circuit = serde_json::to_vec(circuit)?;
 
-        let res = ffi::Groth16ProverImpl::compile(self.go_ref_id, circuit);
+        let res = ffi::groth16_prover::compile(self.go_ref_id, circuit);
 
         if res >= 0 {
             Ok(CompiledCircuit::from_go_inner_ref(res))
@@ -76,7 +75,7 @@ where
         &self,
         compiled_circuit: &CompiledCircuit<C>,
     ) -> Result<(Groth16ProvingKey<C>, Groth16VerifyingKey<C>)> {
-        let res = ffi::Groth16ProverImpl::setup(self.go_ref_id, compiled_circuit.go_inner_ref());
+        let res = ffi::groth16_prover::setup(self.go_ref_id, compiled_circuit.go_inner_ref());
 
         let res0 = i64::from_be_bytes(res[0..8].try_into().unwrap());
         let res1 = i64::from_be_bytes(res[8..16].try_into().unwrap());
@@ -100,7 +99,7 @@ where
         // TODO: Compect go side witness
         let witness_bytes = serde_json::to_vec(witness)?;
 
-        let res = ffi::Groth16ProverImpl::prove(
+        let res = ffi::groth16_prover::prove(
             self.go_ref_id,
             compiled_circuit.go_inner_ref(),
             pk.go_inner_ref(),
@@ -125,7 +124,7 @@ where
         // TODO: Compect go side public witness
         let public_witness_bytes = serde_json::to_vec(public_witness)?;
 
-        let res = ffi::Groth16ProverImpl::verify(
+        let res = ffi::groth16_prover::verify(
             self.go_ref_id,
             vk.go_inner_ref(),
             proof,
