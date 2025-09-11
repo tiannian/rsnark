@@ -90,12 +90,12 @@ where
     /// - The witness values are malformed or invalid
     ///
     pub fn prove(&self, proving_key: &B::ProvingKey, circuit_witness: &C) -> Result<Proof> {
-        let mut witness = types::Witness::new();
+        let mut public = Vec::new();
+        let mut private = Vec::new();
 
-        circuit_witness.append_public(witness.public_mut());
-        circuit_witness.append_private(witness.private_mut());
+        circuit_witness.append_witness(&mut public, &mut private, true);
 
-        println!("witness: {:#?}", witness);
+        let witness = types::Witness::from((public, private));
 
         let proof = self
             .backend
@@ -144,7 +144,9 @@ where
     {
         let mut witness = types::PublicWitness::new();
 
-        public_witness.append_public(witness.public_mut());
+        public_witness.append_public_witness(witness.public_mut(), false);
+
+        println!("witness: {:#?}", witness);
 
         self.backend.verify(verifying_key, proof, &witness)?;
 

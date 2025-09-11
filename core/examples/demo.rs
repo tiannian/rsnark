@@ -36,9 +36,15 @@ mod __rsnark_generated_demo {
             DemoCircuitDefine::new(initer)
         }
 
-        fn append_private(&self, witness: &mut Vec<U256>) {
-            self.a.append_private(witness);
-            self.b.append_private(witness);
+        fn append_witness(
+            &self,
+            public: &mut Vec<U256>,
+            private: &mut Vec<U256>,
+            _is_private: bool,
+        ) {
+            self.a.append_witness(public, private, true);
+            self.b.append_witness(public, private, true);
+            self.c.append_witness(public, private, false);
         }
 
         fn into_public_witness(self) -> Self::PublicWitness {
@@ -47,8 +53,8 @@ mod __rsnark_generated_demo {
     }
 
     impl CircuitPublicWitness for DemoCircuit {
-        fn append_public(&self, witness: &mut Vec<U256>) {
-            self.c.append_public(witness);
+        fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {
+            self.c.append_public_witness(witness, false);
         }
     }
 
@@ -75,8 +81,8 @@ mod __rsnark_generated_demo {
     }
 
     impl CircuitPublicWitness for DemoCircuitPublicWitness {
-        fn append_public(&self, witness: &mut Vec<U256>) {
-            self.c.append_public(witness);
+        fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {
+            self.c.append_public_witness(witness, false);
         }
     }
 }

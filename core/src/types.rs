@@ -72,6 +72,12 @@ impl Default for Witness {
     }
 }
 
+impl From<(Vec<U256>, Vec<U256>)> for Witness {
+    fn from((public, private): (Vec<U256>, Vec<U256>)) -> Self {
+        Self { public, private }
+    }
+}
+
 impl Witness {
     pub fn new() -> Self {
         Self {

@@ -23,9 +23,10 @@ impl CircuitWitness for ExampleSubCircuit {
         ExampleSubCircuitDefine::new(initer)
     }
 
-    fn append_private(&self, witness: &mut Vec<U256>) {
-        self.x0.append_private(witness);
-        self.x1.append_private(witness);
+    fn append_witness(&self, public: &mut Vec<U256>, private: &mut Vec<U256>, _is_private: bool) {
+        self.x0.append_witness(public, private, true);
+        self.x1.append_witness(public, private, true);
+        self.x2.append_witness(public, private, false);
     }
 
     fn into_public_witness(self) -> Self::PublicWitness {
@@ -34,8 +35,8 @@ impl CircuitWitness for ExampleSubCircuit {
 }
 
 impl CircuitPublicWitness for ExampleSubCircuit {
-    fn append_public(&self, witness: &mut Vec<U256>) {
-        self.x2.append_public(witness);
+    fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {
+        self.x2.append_public_witness(witness, false);
     }
 }
 
@@ -60,8 +61,8 @@ pub struct ExampleSubCircuitPublicWitness {
 }
 
 impl CircuitPublicWitness for ExampleSubCircuitPublicWitness {
-    fn append_public(&self, witness: &mut Vec<U256>) {
-        self.x2.append_public(witness);
+    fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {
+        self.x2.append_public_witness(witness, false);
     }
 }
 
@@ -90,8 +91,9 @@ impl CircuitWitness for ExampleCircuit {
         ExampleCircuitDefine::new(initer)
     }
 
-    fn append_private(&self, witness: &mut Vec<U256>) {
-        self.sub_circuit.append_private(witness);
+    fn append_witness(&self, public: &mut Vec<U256>, private: &mut Vec<U256>, _is_private: bool) {
+        self.y.append_witness(public, private, false);
+        self.sub_circuit.append_witness(public, private, false);
     }
 
     fn into_public_witness(self) -> Self::PublicWitness {
@@ -100,8 +102,8 @@ impl CircuitWitness for ExampleCircuit {
 }
 
 impl CircuitPublicWitness for ExampleCircuit {
-    fn append_public(&self, witness: &mut Vec<U256>) {
-        self.y.append_public(witness);
+    fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {
+        self.y.append_public_witness(witness, false);
     }
 }
 
@@ -124,8 +126,8 @@ pub struct ExampleCircuitPublicWitness {
 }
 
 impl CircuitPublicWitness for ExampleCircuitPublicWitness {
-    fn append_public(&self, witness: &mut Vec<U256>) {
-        self.y.append_public(witness);
+    fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {
+        self.y.append_public_witness(witness, false);
     }
 }
 

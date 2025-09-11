@@ -113,21 +113,34 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
     // Generate append_public method implementation for original struct
     let append_public_impl_orig = public_fields.iter().map(|(field_name, _)| {
         quote! {
-            self.#field_name.append_public(witness);
+            self.#field_name.append_public_witness(witness, false);
         }
     });
 
     // Generate append_public method implementation for PublicWitness struct
     let append_public_impl_witness = public_fields.iter().map(|(field_name, _)| {
         quote! {
-            self.#field_name.append_public(witness);
+            self.#field_name.append_public_witness(witness, false);
         }
     });
 
-    // Generate append_private method implementation
-    let append_private_impl = private_fields.iter().map(|(field_name, _)| {
-        quote! {
-            self.#field_name.append_private(witness);
+    // Generate append_witness method implementation for all fields
+    let append_witness_impl = fields.iter().map(|field| {
+        let field_name = field.ident.as_ref().unwrap();
+
+        match &field.vis {
+            Visibility::Public(_) => {
+                // Public fields: is_private = false
+                quote! {
+                    self.#field_name.append_witness(public, private, false);
+                }
+            }
+            _ => {
+                // Private fields: is_private = true
+                quote! {
+                    self.#field_name.append_witness(public, private, true);
+                }
+            }
         }
     });
 
@@ -150,7 +163,7 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
             use super::*;
 
             use ::rsnark_core::{
-                CircuitWitness, CircuitPublicWitness, PrivateCircuitElement, PublicCircuitElement, U256, VariableIniter,
+                CircuitWitness, CircuitPublicWitness, U256, VariableIniter,
             };
 
             impl CircuitWitness for #name {
@@ -166,8 +179,8 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
                     #define_name::new(initer)
                 }
 
-                fn append_private(&self, witness: &mut Vec<U256>) {
-                    #(#append_private_impl)*
+                fn append_witness(&self, public: &mut Vec<U256>, private: &mut Vec<U256>, _is_private: bool) {
+                    #(#append_witness_impl)*
                 }
 
                 fn into_public_witness(self) -> Self::PublicWitness {
@@ -193,7 +206,7 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
             }
 
             impl CircuitPublicWitness for #name {
-                fn append_public(&self, witness: &mut Vec<U256>) {
+                fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {
                     #(#append_public_impl_orig)*
                 }
             }
@@ -204,7 +217,7 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
             }
 
             impl CircuitPublicWitness for #public_witness_name {
-                fn append_public(&self, witness: &mut Vec<U256>) {
+                fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {
                     #(#append_public_impl_witness)*
                 }
             }
