@@ -19,6 +19,12 @@ pub struct Prover<B> {
     pub(crate) backend: B,
 }
 
+impl<B: Backend> Default for Prover<B> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<B> Prover<B>
 where
     B: Backend,
