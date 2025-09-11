@@ -31,7 +31,9 @@ mod __rsnark_generated_testcircuit {
             self.c.append_witness(public, private, false);
         }
         fn into_public_witness(self) -> Self::PublicWitness {
-            TestCircuitPublicWitness { c: self.c }
+            TestCircuitPublicWitness {
+                c: self.c.into_public_witness(),
+            }
         }
     }
     #[doc(hidden)]
@@ -42,22 +44,20 @@ mod __rsnark_generated_testcircuit {
     }
     impl TestCircuitCircuitDefine {
         fn new(initer: &mut VariableIniter) -> Self {
-            let a = <u32 as ::rsnark_core::CircuitWitness>::create_private(initer);
-            let b = <u32 as ::rsnark_core::CircuitWitness>::create_private(initer);
-            let c = <u32 as ::rsnark_core::CircuitWitness>::create_public(initer);
+            let a = u32::create_private(initer);
+            let b = u32::create_private(initer);
+            let c = u32::create_public(initer);
             Self { a, b, c }
         }
     }
     impl CircuitPublicWitness for TestCircuit {
         fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {
-            self.a.append_public_witness(witness, true);
-            self.b.append_public_witness(witness, true);
             self.c.append_public_witness(witness, false);
         }
     }
     #[doc(hidden)]
     pub struct TestCircuitPublicWitness {
-        pub c: u32,
+        pub c: ::rsnark_core::PublicWitness<u32>,
     }
     impl CircuitPublicWitness for TestCircuitPublicWitness {
         fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {

@@ -73,6 +73,10 @@
 //! Sub-circuits can also implement the Circuit trait, but you must manually call the
 //! sub-circuit's `define` function within the parent circuit's `define` function.
 //!
+//! > Note: Private has higher priority. This means that if you set a sub-circuit (which contains public fields) as private,
+//! > the public inputs of that sub-circuit will not be treated as public inputs in the parent circuit.
+//! > However, if you set a sub-circuit as public, its private inputs will still be treated as private inputs.
+//!
 //! ```rust
 //! use rsnark::core::{API, Circuit, CircuitDefine};
 //!

@@ -97,12 +97,12 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
         match &field.vis {
             Visibility::Public(_) => {
                 quote! {
-                    let #field_name = <#field_type as ::rsnark_core::CircuitWitness>::create_public(initer);
+                    let #field_name = #field_type::create_public(initer);
                 }
             }
             _ => {
                 quote! {
-                    let #field_name = <#field_type as ::rsnark_core::CircuitWitness>::create_private(initer);
+                    let #field_name = #field_type::create_private(initer);
                 }
             }
         }
@@ -147,14 +147,14 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
     // Generate public witness fields for into_public_witness method
     let public_witness_fields = public_fields.iter().map(|(field_name, _)| {
         quote! {
-            #field_name: self.#field_name
+            #field_name: self.#field_name.into_public_witness()
         }
     });
 
     // Generate PublicWitness struct fields
     let public_witness_struct_fields = public_fields.iter().map(|(field_name, field_type)| {
         quote! {
-            pub #field_name: #field_type
+            pub #field_name: ::rsnark_core::PublicWitness<#field_type>
         }
     });
 
