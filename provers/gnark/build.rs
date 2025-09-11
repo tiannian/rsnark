@@ -16,12 +16,6 @@ fn main() {
     if std::env::var("DOCS_RS").is_ok() {
         rust2go::Builder::new()
             .with_go_src("./go")
-            .with_regen_arg(RegenArgs {
-                src: "./src/ffi.rs".into(),
-                dst: "./go/gen.go".into(),
-                go118: true,
-                ..Default::default()
-            })
             .with_go_compiler(NoBuildCompiler)
             .build();
     } else {
