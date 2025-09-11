@@ -78,7 +78,7 @@ impl Groth16Backend {
         if code != 0 {
             Err(Error::from_go_error(code))
         } else {
-            Ok(res[8..].to_vec())
+            Ok(res)
         }
     }
 
@@ -134,20 +134,23 @@ impl Backend for Groth16Backend {
     ) -> Result<Proof> {
         let proof = self._prove(compiled_circuit, pk, witness)?;
 
-        if proof.len() % 32 != 0 {
-            return Err(Error::ProofLengthNotMultipleOf32);
+        let proof_len = proof.len() - 8;
+
+        if proof_len < 256 {
+            return Err(Error::ProofLengthWrong);
         }
 
-        let proof: Vec<U256> = proof
-            .chunks(32)
-            .map(|chunk| {
-                let mut bytes = [0u8; 32];
-                bytes.copy_from_slice(chunk);
-                U256::from_be_bytes(bytes)
-            })
-            .collect();
+        let proof = &proof[8..];
 
-        Ok(Proof(proof))
+        let mut res = Vec::with_capacity(8);
+
+        for i in 0..8 {
+            let mut bytes = [0u8; 32];
+            bytes.copy_from_slice(&proof[i * 32..(i + 1) * 32]);
+            res.push(U256::from_be_bytes(bytes));
+        }
+
+        Ok(Proof(res))
     }
 
     fn verify(
@@ -156,12 +159,57 @@ impl Backend for Groth16Backend {
         proof: &Proof,
         public_witness: &PublicWitness,
     ) -> Result<bool> {
-        let mut proof_bytes = Vec::with_capacity(proof.0.len() * 32);
+        let proof_len = proof.0.len() * 32 + 68;
+
+        let mut proof_bytes = Vec::with_capacity(proof_len);
         for value in &proof.0 {
             let bytes: [u8; 32] = value.to_be_bytes();
             proof_bytes.extend_from_slice(&bytes);
         }
 
+        proof_bytes.resize(proof_len, 0u8);
+
         self._verify(vk, proof_bytes, public_witness)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rsnark_core::{API, Circuit, CircuitDefine, CircuitWitness};
+    use rsnark_provers_core::{Curve, Prover};
+
+    #[derive(rsnark_core::Circuit)]
+    pub struct TestCircuit {
+        a: u32,
+        b: u32,
+        pub c: u32,
+    }
+
+    impl Circuit for CircuitDefine<TestCircuit> {
+        fn define(&self, api: &mut impl API) {
+            let c = api.add(&self.a, &self.b);
+            api.assert_is_equal(&c, &self.c);
+        }
+    }
+
+    #[test]
+    fn test_groth16_with_core_prover() {
+        let prover: Prover<Groth16Backend> = Prover::new(Curve::BN254);
+
+        let circuit_prover = prover.compile_circuit::<TestCircuit>().unwrap();
+
+        let (pk, vk) = circuit_prover.setup().unwrap();
+
+        let circuit_witness = TestCircuit {
+            a: 3,
+            b: 4,
+            c: 7, // 3 + 4 = 7
+        };
+
+        let proof = circuit_prover.prove(&pk, &circuit_witness).unwrap();
+
+        let public_witness = circuit_witness.into_public_witness();
+        circuit_prover.verify(&vk, &proof, public_witness).unwrap();
     }
 }

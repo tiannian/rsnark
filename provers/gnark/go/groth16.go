@@ -90,9 +90,9 @@ func (p Groth16ProverCall) setup(prover_id *uint64, compiled_circuit_id *int64) 
 	}
 
 	objects = append(objects, pk)
-	objects = append(objects, vk)
-
 	res0 := int64(len(objects) - 1)
+
+	objects = append(objects, vk)
 	res1 := int64(len(objects) - 1)
 
 	return int64ToBytes2(res0, res1)

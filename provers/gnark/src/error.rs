@@ -42,8 +42,8 @@ pub enum Error {
     #[error(transparent)]
     SerdeJsonError(#[from] serde_json::Error),
 
-    #[error("proof length is not a multiple of 32")]
-    ProofLengthNotMultipleOf32,
+    #[error("proof length is wrong")]
+    ProofLengthWrong,
 }
 
 impl Error {

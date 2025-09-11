@@ -5,6 +5,7 @@ mod traits;
 use rsnark_provers_core::Curve;
 pub use traits::*;
 
+#[derive(Debug, PartialEq)]
 pub enum CurveType {
     BN254,
     BLS12_381,
