@@ -12,11 +12,11 @@ mod __rsnark_generated_addercircuit {
         type PrivateElement = AdderCircuitCircuitDefine;
         type PublicElement = AdderCircuitCircuitDefine;
         type PublicWitness = AdderCircuitPublicWitness;
-        fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
-            AdderCircuitCircuitDefine::new(initer)
+        fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::PublicElement {
+            AdderCircuitCircuitDefine::new(initer, is_private)
         }
         fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {
-            AdderCircuitCircuitDefine::new(initer)
+            AdderCircuitCircuitDefine::new(initer, true)
         }
         fn append_witness(
             &self,
@@ -42,10 +42,10 @@ mod __rsnark_generated_addercircuit {
         pub sum: ::rsnark_core::PublicCircuitElement<u32>,
     }
     impl AdderCircuitCircuitDefine {
-        fn new(initer: &mut VariableIniter) -> Self {
+        fn new(initer: &mut VariableIniter, is_private: bool) -> Self {
             let a = u32::create_private(initer);
             let b = u32::create_private(initer);
-            let sum = u32::create_public(initer);
+            let sum = u32::create_public(initer, is_private);
             Self { a, b, sum }
         }
     }
@@ -82,11 +82,11 @@ mod __rsnark_generated_multipliercircuit {
         type PrivateElement = MultiplierCircuitCircuitDefine;
         type PublicElement = MultiplierCircuitCircuitDefine;
         type PublicWitness = MultiplierCircuitPublicWitness;
-        fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
-            MultiplierCircuitCircuitDefine::new(initer)
+        fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::PublicElement {
+            MultiplierCircuitCircuitDefine::new(initer, is_private)
         }
         fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {
-            MultiplierCircuitCircuitDefine::new(initer)
+            MultiplierCircuitCircuitDefine::new(initer, true)
         }
         fn append_witness(
             &self,
@@ -112,10 +112,10 @@ mod __rsnark_generated_multipliercircuit {
         pub product: ::rsnark_core::PublicCircuitElement<u32>,
     }
     impl MultiplierCircuitCircuitDefine {
-        fn new(initer: &mut VariableIniter) -> Self {
+        fn new(initer: &mut VariableIniter, is_private: bool) -> Self {
             let x = u32::create_private(initer);
             let y = u32::create_private(initer);
-            let product = u32::create_public(initer);
+            let product = u32::create_public(initer, is_private);
             Self { x, y, product }
         }
     }
@@ -152,11 +152,11 @@ mod __rsnark_generated_compositecircuit {
         type PrivateElement = CompositeCircuitCircuitDefine;
         type PublicElement = CompositeCircuitCircuitDefine;
         type PublicWitness = CompositeCircuitPublicWitness;
-        fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
-            CompositeCircuitCircuitDefine::new(initer)
+        fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::PublicElement {
+            CompositeCircuitCircuitDefine::new(initer, is_private)
         }
         fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {
-            CompositeCircuitCircuitDefine::new(initer)
+            CompositeCircuitCircuitDefine::new(initer, true)
         }
         fn append_witness(
             &self,
@@ -182,10 +182,10 @@ mod __rsnark_generated_compositecircuit {
         pub final_result: ::rsnark_core::PublicCircuitElement<u32>,
     }
     impl CompositeCircuitCircuitDefine {
-        fn new(initer: &mut VariableIniter) -> Self {
+        fn new(initer: &mut VariableIniter, is_private: bool) -> Self {
             let adder = AdderCircuit::create_private(initer);
             let multiplier = MultiplierCircuit::create_private(initer);
-            let final_result = u32::create_public(initer);
+            let final_result = u32::create_public(initer, is_private);
             Self {
                 adder,
                 multiplier,

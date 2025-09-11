@@ -1,4 +1,4 @@
-use crate::variable::{LocalVariable, PrivateVariable, PublicVariable};
+use crate::{types::VariableType, variable::CircuitVariable};
 
 #[doc(hidden)]
 #[derive(Debug, Default)]
@@ -9,22 +9,33 @@ pub struct VariableIniter {
 }
 
 impl VariableIniter {
-    pub fn new_private(&mut self) -> PrivateVariable {
+    pub fn new_private(&mut self) -> CircuitVariable {
         let idx = self.private_idx;
         self.private_idx += 1;
-        PrivateVariable { index: idx }
+        CircuitVariable {
+            ty: VariableType::Private(idx),
+        }
     }
 
-    pub fn new_public(&mut self) -> PublicVariable {
-        let idx = self.public_idx;
-        self.public_idx += 1;
-        PublicVariable { index: idx }
+    pub fn new_public(&mut self, is_private: bool) -> CircuitVariable {
+        if is_private {
+            self.new_private()
+        } else {
+            let idx = self.public_idx;
+            self.public_idx += 1;
+
+            CircuitVariable {
+                ty: VariableType::Public(idx),
+            }
+        }
     }
 
-    pub fn new_local(&mut self) -> LocalVariable {
+    pub fn new_local(&mut self) -> CircuitVariable {
         let idx = self.local_idx;
         self.local_idx += 1;
-        LocalVariable { index: idx }
+        CircuitVariable {
+            ty: VariableType::Local(idx),
+        }
     }
 
     pub fn private_index(&self) -> u64 {

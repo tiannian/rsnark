@@ -1,9 +1,6 @@
 use ruint::aliases::U256;
 
-use crate::{
-    API, VariableIniter,
-    variable::{PrivateVariable, PublicVariable},
-};
+use crate::{API, VariableIniter, variable::CircuitVariable};
 
 /// Defines the logic of an arithmetic circuit for zero-knowledge proofs.
 ///
@@ -29,7 +26,7 @@ pub trait CircuitWitness: CircuitPublicWitness {
     type PublicWitness: CircuitPublicWitness;
 
     #[doc(hidden)]
-    fn create_public(initer: &mut VariableIniter) -> Self::PublicElement;
+    fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::PublicElement;
 
     #[doc(hidden)]
     fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement;
@@ -76,12 +73,12 @@ pub type PublicWitness<T> = <T as CircuitWitness>::PublicWitness;
 macro_rules! define_circuit_element_for_from_u256 {
     ($t:ty) => {
         impl CircuitWitness for $t {
-            type PrivateElement = PrivateVariable;
-            type PublicElement = PublicVariable;
+            type PrivateElement = CircuitVariable;
+            type PublicElement = CircuitVariable;
             type PublicWitness = $t;
 
-            fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
-                initer.new_public()
+            fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::PublicElement {
+                initer.new_public(is_private)
             }
 
             fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {

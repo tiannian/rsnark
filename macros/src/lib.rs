@@ -97,7 +97,7 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
         match &field.vis {
             Visibility::Public(_) => {
                 quote! {
-                    let #field_name = #field_type::create_public(initer);
+                    let #field_name = #field_type::create_public(initer, is_private);
                 }
             }
             _ => {
@@ -171,12 +171,12 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
                 type PublicElement = #define_name;
                 type PublicWitness = #public_witness_name;
 
-                fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
-                    #define_name::new(initer)
+                fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::PublicElement {
+                    #define_name::new(initer, is_private)
                 }
 
                 fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {
-                    #define_name::new(initer)
+                    #define_name::new(initer, true)
                 }
 
                 fn append_witness(&self, public: &mut Vec<U256>, private: &mut Vec<U256>, _is_private: bool) {
@@ -196,7 +196,7 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
             }
 
             impl #define_name {
-                fn new(initer: &mut VariableIniter) -> Self {
+                fn new(initer: &mut VariableIniter, is_private: bool) -> Self {
                     #(#new_field_inits)*
 
                     Self {

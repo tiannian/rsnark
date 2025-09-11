@@ -97,8 +97,6 @@ where
 
         let witness = types::Witness::from((public, private));
 
-        println!("witness: {:#?}", witness);
-
         let proof = self
             .backend
             .prove(&self.constraint, proving_key, &witness)?;
@@ -147,8 +145,6 @@ where
         let mut witness = types::PublicWitness::new();
 
         public_witness.append_public_witness(witness.public_mut(), false);
-
-        println!("public witness: {:#?}", witness);
 
         self.backend.verify(verifying_key, proof, &witness)?;
 
