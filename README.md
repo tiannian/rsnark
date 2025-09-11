@@ -61,15 +61,15 @@ Similar to compiler target triples, rSnark uses backend triples to define which 
 
 Currently supported backend triples:
 
-| Triple | Description | Type Alias |
-|--------|-------------|------------|
-| `groth16-bn254-gnark` | Groth16 with BN254 curve using Gnark backend | `Groth16BN254GnarkProver` |
-| `groth16-bls12-381-gnark` | Groth16 with BLS12-381 curve using Gnark backend | `Groth16BLS12_381GnarkProver` |
-| `groth16-bls24-317-gnark` | Groth16 with BLS24-317 curve using Gnark backend | `Groth16BLS24_317GnarkProver` |
-| `groth16-bls12-377-gnark` | Groth16 with BLS12-377 curve using Gnark backend | `Groth16BLS12_377GnarkProver` |
-| `groth16-bw6-761-gnark` | Groth16 with BW6-761 curve using Gnark backend | `Groth16BW6_761GnarkProver` |
-| `groth16-bls24-315-gnark` | Groth16 with BLS24-315 curve using Gnark backend | `Groth16BLS24_315GnarkProver` |
-| `groth16-bw6-633-gnark` | Groth16 with BW6-633 curve using Gnark backend | `Groth16BW6_633GnarkProver` |
+| Triple | Description |
+|--------|-------------|
+| `groth16-bn254-gnark` | Groth16 with BN254 curve using Gnark backend |
+| `groth16-bls12-381-gnark` | Groth16 with BLS12-381 curve using Gnark backend |
+| `groth16-bls24-317-gnark` | Groth16 with BLS24-317 curve using Gnark backend |
+| `groth16-bls12-377-gnark` | Groth16 with BLS12-377 curve using Gnark backend |
+| `groth16-bw6-761-gnark` | Groth16 with BW6-761 curve using Gnark backend |
+| `groth16-bls24-315-gnark` | Groth16 with BLS24-315 curve using Gnark backend |
+| `groth16-bw6-633-gnark` | Groth16 with BW6-633 curve using Gnark backend |
 
 ## Project Structure
 
