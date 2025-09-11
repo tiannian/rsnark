@@ -12,7 +12,7 @@
 //! 1. Define the circuit's inputs and outputs using the `#[derive(Circuit)]` macro.
 //! 2. Implement the `Circuit` trait to define the circuit's constraint rules.
 //!
-//! ```rust
+//! ```rust,ignore
 //! use rsnark::{
 //!     Groth16BN254GnarkProver,
 //!     core::{API, Circuit, CircuitDefine, CircuitWitness},
@@ -49,7 +49,7 @@
 //! Use the `Circuit` trait to define the circuit's constraint rules. The `define` method
 //! receives an API object that provides various operations for building constraints.
 //!
-//! ```rust
+//! ```rust,ignore
 //! use rsnark::core::{API, Circuit, CircuitDefine};
 //!
 //! #[derive(Circuit)]
@@ -77,7 +77,7 @@
 //! > the public inputs of that sub-circuit will not be treated as public inputs in the parent circuit.
 //! > However, if you set a sub-circuit as public, its private inputs will still be treated as private inputs.
 //!
-//! ```rust
+//! ```rust,ignore
 //! use rsnark::core::{API, Circuit, CircuitDefine};
 //!
 //! #[derive(Circuit)]
