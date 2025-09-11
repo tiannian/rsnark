@@ -16,9 +16,6 @@ authors = ["rsnark-dev", "tiannian <dtiannian@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 description = "A Rust library to write Zero-Knowledge circuits for multiple prover systems"
-repository = "https://github.com/tiannian/rsnark"
-homepage = "https://github.com/tiannian/rsnark"
-documentation = "https://docs.rs/rsnark"
 
 [workspace.dependencies]
 ruint = "1.16.0"
