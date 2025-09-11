@@ -8,11 +8,13 @@ use syn::{Data, DeriveInput, Fields, Visibility, parse_macro_input};
 /// for the annotated struct.
 ///
 /// Usage:
-/// ```rust
+/// ```rust, ignore
+/// use rsnark_macros::Circuit;
+///
 /// #[derive(Circuit)]
 /// pub struct MyCircuit {
-///     a: u32,        // private field -> PrivateCircuitElement
-///     pub b: u32,    // public field -> PublicCircuitElement  
+///     a: u32,        // private field
+///     pub b: u32,    // public field
 /// }
 /// ```
 #[proc_macro_derive(Circuit)]

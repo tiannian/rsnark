@@ -66,7 +66,7 @@ where
     /// - The backend cannot represent the circuit
     /// - Internal compilation errors occur
     ///
-    pub fn compile_circuit<C>(&self) -> Result<CircuitProver<B, C>>
+    pub fn compile_circuit<C>(self) -> Result<CircuitProver<B, C>>
     where
         C: CircuitWitness,
         C::PublicElement: Circuit,
@@ -80,7 +80,7 @@ where
         let cs = self.backend.compile(&define)?;
 
         Ok(CircuitProver {
-            backend: self.backend.clone(),
+            backend: self.backend,
             constraint: cs,
             marker: PhantomData,
         })

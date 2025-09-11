@@ -24,7 +24,7 @@ use crate::Proof;
 /// 4. Generate proofs with [`Backend::prove()`]
 /// 5. Verify proofs with [`Backend::verify()`]
 ///
-pub trait Backend: Clone {
+pub trait Backend {
     type CircuitConstraint;
     type ProvingKey;
     type VerifyingKey;
