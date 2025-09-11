@@ -996,7 +996,7 @@ dependencies = [
 
 [[package]]
 name = "rsnark"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "rsnark-core",
  "rsnark-provers-core",
@@ -1006,7 +1006,7 @@ dependencies = [
 
 [[package]]
 name = "rsnark-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "rsnark-macros",
  "ruint",
@@ -1016,7 +1016,7 @@ dependencies = [
 
 [[package]]
 name = "rsnark-macros"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1025,7 +1025,7 @@ dependencies = [
 
 [[package]]
 name = "rsnark-provers-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "rsnark-core",
@@ -1033,7 +1033,7 @@ dependencies = [
 
 [[package]]
 name = "rsnark-provers-gnark"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "rsnark-core",
  "rsnark-provers-core",
@@ -1044,7 +1044,7 @@ dependencies = [
 
 [[package]]
 name = "rsnark-provers-mock"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "rsnark-core",
  "rsnark-provers-core",

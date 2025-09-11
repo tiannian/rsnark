@@ -1,5 +1,8 @@
 # rSnark
 
+[![Crates.io](https://img.shields.io/crates/v/rsnark.svg)](https://crates.io/crates/rsnark)
+[![Documentation](https://docs.rs/rsnark/badge.svg)](https://docs.rs/rsnark)
+
 > Write zero-knowledge circuits in Rust for multiple prover systems.
 
 rSnark is a Rust library for writing zero-knowledge circuits and generating proofs. It provides a core library to write circuits and a provers library to generate proofs using various backend implementations like Gnark.
