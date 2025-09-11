@@ -17,26 +17,34 @@ pub trait Variable {
     fn ty(&self) -> VariableType;
 }
 
-macro_rules! define_variable {
-    ($t:ident, $ty:ident) => {
-        #[derive(Debug, Clone)]
-        pub struct $t {
-            pub(crate) index: u64,
-        }
-
-        impl Variable for $t {
-            fn ty(&self) -> VariableType {
-                VariableType::$ty(self.index)
-            }
-        }
-    };
+/// Represents a variable within a circuit during construction.
+///
+/// A `CircuitVariable` is created during circuit building and encapsulates a specific
+/// variable type (public, private, local, or constant). It serves as a handle to reference
+/// variables in circuit operations and maintains the variable's type information internally.
+///
+/// # Usage
+///
+/// Circuit variables are typically created through:
+/// - [`VariableIniter`](crate::VariableIniter) methods for creating new variables
+/// - API operations that return intermediate results
+/// - Circuit builder operations that allocate local variables
+///
+/// # Implementation Details
+///
+/// The struct contains a [`VariableType`] that specifies whether
+/// the variable is public input, private witness, local intermediate value, or a constant.
+/// This type information is used by the circuit builder to generate proper constraints.
+#[derive(Debug, Clone)]
+pub struct CircuitVariable {
+    pub(crate) ty: VariableType,
 }
 
-define_variable!(PublicVariable, Public);
-
-define_variable!(PrivateVariable, Private);
-
-define_variable!(LocalVariable, Local);
+impl Variable for CircuitVariable {
+    fn ty(&self) -> VariableType {
+        self.ty.clone()
+    }
+}
 
 macro_rules! define_variable_for_from_u256 {
     ($t:ident) => {

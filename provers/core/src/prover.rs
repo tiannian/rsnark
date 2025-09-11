@@ -63,10 +63,10 @@ where
     pub fn compile_circuit<C>(&self) -> Result<CircuitProver<B, C>>
     where
         C: CircuitWitness,
-        C::PrivateElement: Circuit,
+        C::PublicElement: Circuit,
     {
         let mut builder = CircuitBuilder::default();
-        let circuit = C::create_private(builder.variable_initer_mut());
+        let circuit = C::create_public(builder.variable_initer_mut(), false);
         circuit.define(&mut builder);
 
         let define = builder.build();

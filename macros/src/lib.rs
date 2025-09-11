@@ -97,12 +97,12 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
         match &field.vis {
             Visibility::Public(_) => {
                 quote! {
-                    let #field_name = <#field_type as ::rsnark_core::CircuitWitness>::create_public(initer);
+                    let #field_name = #field_type::create_public(initer, is_private);
                 }
             }
             _ => {
                 quote! {
-                    let #field_name = <#field_type as ::rsnark_core::CircuitWitness>::create_private(initer);
+                    let #field_name = #field_type::create_private(initer);
                 }
             }
         }
@@ -132,7 +132,7 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
             Visibility::Public(_) => {
                 // Public fields: is_private = false
                 quote! {
-                    self.#field_name.append_witness(public, private, false);
+                    self.#field_name.append_witness(public, private, false || _is_private);
                 }
             }
             _ => {
@@ -147,14 +147,14 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
     // Generate public witness fields for into_public_witness method
     let public_witness_fields = public_fields.iter().map(|(field_name, _)| {
         quote! {
-            #field_name: self.#field_name
+            #field_name: self.#field_name.into_public_witness()
         }
     });
 
     // Generate PublicWitness struct fields
     let public_witness_struct_fields = public_fields.iter().map(|(field_name, field_type)| {
         quote! {
-            pub #field_name: #field_type
+            pub #field_name: ::rsnark_core::PublicWitness<#field_type>
         }
     });
 
@@ -171,12 +171,12 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
                 type PublicElement = #define_name;
                 type PublicWitness = #public_witness_name;
 
-                fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
-                    #define_name::new(initer)
+                fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::PublicElement {
+                    #define_name::new(initer, is_private)
                 }
 
                 fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {
-                    #define_name::new(initer)
+                    #define_name::new(initer, true)
                 }
 
                 fn append_witness(&self, public: &mut Vec<U256>, private: &mut Vec<U256>, _is_private: bool) {
@@ -196,7 +196,7 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
             }
 
             impl #define_name {
-                fn new(initer: &mut VariableIniter) -> Self {
+                fn new(initer: &mut VariableIniter, is_private: bool) -> Self {
                     #(#new_field_inits)*
 
                     Self {

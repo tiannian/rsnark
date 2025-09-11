@@ -28,12 +28,12 @@ mod __rsnark_generated_demo {
         type PublicElement = DemoCircuitDefine;
         type PublicWitness = DemoCircuitPublicWitness;
 
-        fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
-            DemoCircuitDefine::new(initer)
+        fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::PublicElement {
+            DemoCircuitDefine::new(initer, is_private)
         }
 
         fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {
-            DemoCircuitDefine::new(initer)
+            DemoCircuitDefine::new(initer, true)
         }
 
         fn append_witness(
@@ -66,10 +66,10 @@ mod __rsnark_generated_demo {
     }
 
     impl DemoCircuitDefine {
-        fn new(initer: &mut VariableIniter) -> Self {
+        fn new(initer: &mut VariableIniter, is_private: bool) -> Self {
             let a = u32::create_private(initer);
             let b = u32::create_private(initer);
-            let c = u32::create_public(initer);
+            let c = u32::create_public(initer, is_private);
 
             Self { a, b, c }
         }

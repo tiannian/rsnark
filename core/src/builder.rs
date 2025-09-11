@@ -1,7 +1,7 @@
 use crate::{
     API, Variable, VariableIniter,
     types::{CircuitDefinition, OpCode, Operation, VariableType},
-    variable::LocalVariable,
+    variable::CircuitVariable,
 };
 
 #[doc(hidden)]
@@ -24,7 +24,7 @@ impl CircuitBuilder {
         &mut self,
         op: OpCode,
         inputs: Vec<VariableType>,
-        outputs: Vec<LocalVariable>,
+        outputs: Vec<CircuitVariable>,
     ) {
         let mut _outs = Vec::with_capacity(outputs.len());
         for output in outputs {
@@ -40,11 +40,11 @@ impl CircuitBuilder {
         self.operations.push(operation);
     }
 
-    fn _allocate_local_variable(&mut self) -> LocalVariable {
+    fn _allocate_local_variable(&mut self) -> CircuitVariable {
         self.variable_initer.new_local()
     }
 
-    fn _allocate_local_variable_n(&mut self, n: u64) -> Vec<LocalVariable> {
+    fn _allocate_local_variable_n(&mut self, n: u64) -> Vec<CircuitVariable> {
         let mut res = Vec::with_capacity(n as usize);
         for _ in 0..n {
             res.push(self._allocate_local_variable());
@@ -68,7 +68,7 @@ impl API for CircuitBuilder {
         x1: &impl Variable,
         x2: &impl Variable,
         xn: &[&dyn Variable],
-    ) -> LocalVariable {
+    ) -> CircuitVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(
@@ -85,7 +85,7 @@ impl API for CircuitBuilder {
         a: &impl Variable,
         b: &impl Variable,
         c: &impl Variable,
-    ) -> LocalVariable {
+    ) -> CircuitVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(
@@ -97,7 +97,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn neg(&mut self, x: &impl Variable) -> LocalVariable {
+    fn neg(&mut self, x: &impl Variable) -> CircuitVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(OpCode::Neg, vec![x.ty()], vec![res.clone()]);
@@ -110,7 +110,7 @@ impl API for CircuitBuilder {
         x1: &impl Variable,
         x2: &impl Variable,
         xn: &[&dyn Variable],
-    ) -> LocalVariable {
+    ) -> CircuitVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(
@@ -127,7 +127,7 @@ impl API for CircuitBuilder {
         x1: &impl Variable,
         x2: &impl Variable,
         xn: &[&dyn Variable],
-    ) -> LocalVariable {
+    ) -> CircuitVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(
@@ -139,7 +139,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn div_unchecked(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
+    fn div_unchecked(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(
@@ -151,7 +151,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn div(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
+    fn div(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(OpCode::Div, vec![x1.ty(), x2.ty()], vec![res.clone()]);
@@ -159,7 +159,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn inverse(&mut self, x: &impl Variable) -> LocalVariable {
+    fn inverse(&mut self, x: &impl Variable) -> CircuitVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(OpCode::Inverse, vec![x.ty()], vec![res.clone()]);
@@ -167,7 +167,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn variable_to_binary(&mut self, x: &impl Variable, n: u64) -> Vec<LocalVariable> {
+    fn variable_to_binary(&mut self, x: &impl Variable, n: u64) -> Vec<CircuitVariable> {
         let res = self._allocate_local_variable_n(n);
 
         self._append_operation(OpCode::ToBinary, vec![x.ty(), n.ty()], res.clone());
@@ -175,7 +175,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn variable_from_binary(&mut self, b: &[&dyn Variable]) -> LocalVariable {
+    fn variable_from_binary(&mut self, b: &[&dyn Variable]) -> CircuitVariable {
         let res = self._allocate_local_variable();
 
         let inputs = b.iter().map(|x| x.ty()).collect();
@@ -185,7 +185,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn xor(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
+    fn xor(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(OpCode::Xor, vec![x1.ty(), x2.ty()], vec![res.clone()]);
@@ -193,7 +193,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn or(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
+    fn or(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(OpCode::Or, vec![x1.ty(), x2.ty()], vec![res.clone()]);
@@ -201,7 +201,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn and(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
+    fn and(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(OpCode::And, vec![x1.ty(), x2.ty()], vec![res.clone()]);
@@ -214,7 +214,7 @@ impl API for CircuitBuilder {
         x1: &impl Variable,
         x2: &impl Variable,
         x3: &impl Variable,
-    ) -> LocalVariable {
+    ) -> CircuitVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(
@@ -234,7 +234,7 @@ impl API for CircuitBuilder {
         y2: &impl Variable,
         y3: &impl Variable,
         y4: &impl Variable,
-    ) -> LocalVariable {
+    ) -> CircuitVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(
@@ -246,7 +246,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn is_zero(&mut self, x: &impl Variable) -> LocalVariable {
+    fn is_zero(&mut self, x: &impl Variable) -> CircuitVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(OpCode::IsZero, vec![x.ty()], vec![res.clone()]);
@@ -254,7 +254,7 @@ impl API for CircuitBuilder {
         res
     }
 
-    fn cmp(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
+    fn cmp(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable {
         let res = self._allocate_local_variable();
 
         self._append_operation(OpCode::Cmp, vec![x1.ty(), x2.ty()], vec![res.clone()]);

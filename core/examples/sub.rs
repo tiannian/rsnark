@@ -15,12 +15,12 @@ impl CircuitWitness for ExampleSubCircuit {
     type PublicElement = ExampleSubCircuitDefine;
     type PublicWitness = ExampleSubCircuitPublicWitness;
 
-    fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
-        ExampleSubCircuitDefine::new(initer)
+    fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::PublicElement {
+        ExampleSubCircuitDefine::new(initer, is_private)
     }
 
     fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {
-        ExampleSubCircuitDefine::new(initer)
+        ExampleSubCircuitDefine::new(initer, true)
     }
 
     fn append_witness(&self, public: &mut Vec<U256>, private: &mut Vec<U256>, _is_private: bool) {
@@ -47,8 +47,8 @@ pub struct ExampleSubCircuitDefine {
 }
 
 impl ExampleSubCircuitDefine {
-    pub fn new(initer: &mut VariableIniter) -> Self {
-        let x2 = u64::create_public(initer);
+    pub fn new(initer: &mut VariableIniter, is_private: bool) -> Self {
+        let x2 = u64::create_public(initer, is_private);
         let x0 = u64::create_private(initer);
         let x1 = u64::create_private(initer);
 
@@ -83,12 +83,12 @@ impl CircuitWitness for ExampleCircuit {
     type PublicElement = ExampleCircuitDefine;
     type PublicWitness = ExampleCircuitPublicWitness;
 
-    fn create_public(initer: &mut VariableIniter) -> Self::PublicElement {
-        ExampleCircuitDefine::new(initer)
+    fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::PublicElement {
+        ExampleCircuitDefine::new(initer, is_private)
     }
 
     fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {
-        ExampleCircuitDefine::new(initer)
+        ExampleCircuitDefine::new(initer, true)
     }
 
     fn append_witness(&self, public: &mut Vec<U256>, private: &mut Vec<U256>, _is_private: bool) {
@@ -113,8 +113,8 @@ pub struct ExampleCircuitDefine {
 }
 
 impl ExampleCircuitDefine {
-    pub fn new(initer: &mut VariableIniter) -> Self {
-        let y = u64::create_public(initer);
+    pub fn new(initer: &mut VariableIniter, is_private: bool) -> Self {
+        let y = u64::create_public(initer, is_private);
         let sub_circuit = ExampleSubCircuit::create_private(initer);
 
         Self { y, sub_circuit }

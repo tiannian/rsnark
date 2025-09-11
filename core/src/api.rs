@@ -1,4 +1,4 @@
-use crate::{Variable, variable::LocalVariable};
+use crate::{Variable, variable::CircuitVariable};
 
 /// The main API trait for building arithmetic circuits in zero-knowledge proof systems.
 ///
@@ -17,7 +17,7 @@ pub trait API {
     ///
     /// # Returns
     /// A new local variable containing the sum
-    fn add(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
+    fn add(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable {
         self.add_multi(x1, x2, &[])
     }
 
@@ -35,7 +35,7 @@ pub trait API {
         x1: &impl Variable,
         x2: &impl Variable,
         xn: &[&dyn Variable],
-    ) -> LocalVariable;
+    ) -> CircuitVariable;
 
     /// Performs multiply-accumulate operation: res = a + (b * c)
     ///
@@ -49,8 +49,12 @@ pub trait API {
     ///
     /// # Returns
     /// A new local variable containing the result a + (b * c)
-    fn mul_acc(&mut self, a: &impl Variable, b: &impl Variable, c: &impl Variable)
-    -> LocalVariable;
+    fn mul_acc(
+        &mut self,
+        a: &impl Variable,
+        b: &impl Variable,
+        c: &impl Variable,
+    ) -> CircuitVariable;
 
     /// Performs negation: res = -x
     ///
@@ -59,7 +63,7 @@ pub trait API {
     ///
     /// # Returns
     /// A new local variable containing the negated value
-    fn neg(&mut self, x: &impl Variable) -> LocalVariable;
+    fn neg(&mut self, x: &impl Variable) -> CircuitVariable;
 
     /// Performs subtraction of two variables: res = x1 - x2
     ///
@@ -71,7 +75,7 @@ pub trait API {
     ///
     /// # Returns
     /// A new local variable containing the difference
-    fn sub(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
+    fn sub(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable {
         self.sub_multi(x1, x2, &[])
     }
 
@@ -89,7 +93,7 @@ pub trait API {
         x1: &impl Variable,
         x2: &impl Variable,
         xn: &[&dyn Variable],
-    ) -> LocalVariable;
+    ) -> CircuitVariable;
 
     /// Performs multiplication of two variables: res = x1 * x2
     ///
@@ -101,7 +105,7 @@ pub trait API {
     ///
     /// # Returns
     /// A new local variable containing the product
-    fn mul(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable {
+    fn mul(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable {
         self.mul_multi(x1, x2, &[])
     }
 
@@ -119,7 +123,7 @@ pub trait API {
         x1: &impl Variable,
         x2: &impl Variable,
         xn: &[&dyn Variable],
-    ) -> LocalVariable;
+    ) -> CircuitVariable;
 
     /// Performs unchecked division: res = x1 / x2
     ///
@@ -135,7 +139,7 @@ pub trait API {
     ///
     /// # Safety
     /// This operation does not verify that x2 ≠ 0. Use `div` for checked division.
-    fn div_unchecked(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable;
+    fn div_unchecked(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable;
 
     /// Performs checked division: res = x1 / x2
     ///
@@ -151,7 +155,7 @@ pub trait API {
     ///
     /// # Panics
     /// The circuit will be unsatisfiable if x2 == 0
-    fn div(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable;
+    fn div(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable;
 
     /// Computes the multiplicative inverse: res = 1 / x
     ///
@@ -166,7 +170,7 @@ pub trait API {
     ///
     /// # Panics
     /// The circuit will be unsatisfiable if x == 0
-    fn inverse(&mut self, x: &impl Variable) -> LocalVariable;
+    fn inverse(&mut self, x: &impl Variable) -> CircuitVariable;
 
     /// Converts a variable to its binary representation
     ///
@@ -180,7 +184,7 @@ pub trait API {
     /// # Returns
     /// A vector of local variables representing the binary decomposition,
     /// where index 0 is the least significant bit
-    fn variable_to_binary(&mut self, x: &impl Variable, n: u64) -> Vec<LocalVariable>;
+    fn variable_to_binary(&mut self, x: &impl Variable, n: u64) -> Vec<CircuitVariable>;
 
     /// Reconstructs a variable from its binary representation
     ///
@@ -192,7 +196,7 @@ pub trait API {
     ///
     /// # Returns
     /// A local variable representing the packed binary value
-    fn variable_from_binary(&mut self, b: &[&dyn Variable]) -> LocalVariable;
+    fn variable_from_binary(&mut self, b: &[&dyn Variable]) -> CircuitVariable;
 
     /// Performs bitwise XOR operation: res = x1 ^ x2
     ///
@@ -202,7 +206,7 @@ pub trait API {
     ///
     /// # Returns
     /// A new local variable containing the XOR result
-    fn xor(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable;
+    fn xor(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable;
 
     /// Performs bitwise OR operation: res = x1 | x2
     ///
@@ -212,7 +216,7 @@ pub trait API {
     ///
     /// # Returns
     /// A new local variable containing the OR result
-    fn or(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable;
+    fn or(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable;
 
     /// Performs bitwise AND operation: res = x1 & x2
     ///
@@ -222,7 +226,7 @@ pub trait API {
     ///
     /// # Returns
     /// A new local variable containing the AND result
-    fn and(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable;
+    fn and(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable;
 
     /// Performs conditional selection: res = x1 ? x2 : x3
     ///
@@ -241,7 +245,7 @@ pub trait API {
         x1: &impl Variable,
         x2: &impl Variable,
         x3: &impl Variable,
-    ) -> LocalVariable;
+    ) -> CircuitVariable;
 
     /// Performs a 2-bit lookup table operation
     ///
@@ -266,7 +270,7 @@ pub trait API {
         y2: &impl Variable,
         y3: &impl Variable,
         y4: &impl Variable,
-    ) -> LocalVariable;
+    ) -> CircuitVariable;
 
     /// Tests if a variable is zero
     ///
@@ -278,7 +282,7 @@ pub trait API {
     ///
     /// # Returns
     /// A boolean variable (1 if x == 0, 0 if x != 0)
-    fn is_zero(&mut self, x: &impl Variable) -> LocalVariable;
+    fn is_zero(&mut self, x: &impl Variable) -> CircuitVariable;
 
     /// Compares two variables and returns the comparison result
     ///
@@ -293,7 +297,7 @@ pub trait API {
     ///
     /// # Returns
     /// A local variable containing the comparison result (-1, 0, or 1)
-    fn cmp(&mut self, x1: &impl Variable, x2: &impl Variable) -> LocalVariable;
+    fn cmp(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable;
 
     /// Asserts that two variables are equal
     ///
