@@ -1033,7 +1033,7 @@ dependencies = [
 
 [[package]]
 name = "rsnark-provers-gnark"
-version = "0.1.4"
+version = "0.1.5"
 dependencies = [
  "rsnark-core",
  "rsnark-provers-core",
