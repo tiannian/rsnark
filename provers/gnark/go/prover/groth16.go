@@ -118,6 +118,8 @@ func (p *Groth16Prover) Verify(proofBytes []byte, vk *types.Groth16VerifyingKey,
 	// Create a template circuit with only public variables for verification
 	templateCircuit := &circuit.TemplateCircuit{
 		PublicVariables: make([]frontend.Variable, len(publicWitness.PublicVariables)),
+		// I think this initialization is unnecessary, but it's here to avoid warnings. I don't know why it's needed.
+		PrivateVariables: make([]frontend.Variable, 1),
 	}
 
 	// Assign public variables
@@ -126,15 +128,18 @@ func (p *Groth16Prover) Verify(proofBytes []byte, vk *types.Groth16VerifyingKey,
 	}
 
 	// Create gnark public witness
-	gnarkWitness, err := frontend.NewWitness(templateCircuit, p.curve.ToECC().ScalarField())
+	gnarkWitness, err := frontend.NewWitness(templateCircuit, p.curve.ToECC().ScalarField(), frontend.PublicOnly())
 	if err != nil {
 		return fmt.Errorf("failed to create gnark witness: %w", err)
 	}
+	fmt.Printf("gnarkWitness: %#v\n", gnarkWitness)
 
 	publicGnarkWitness, err := gnarkWitness.Public()
 	if err != nil {
 		return fmt.Errorf("failed to extract public witness: %w", err)
 	}
+
+	fmt.Printf("publicGnarkWitness: %#v\n", publicGnarkWitness)
 
 	err = groth16.Verify(proof, vk.Key, publicGnarkWitness)
 	if err != nil {

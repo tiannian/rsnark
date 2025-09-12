@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/binary"
-	"fmt"
 	"log"
 	"sync"
 
@@ -130,8 +129,6 @@ func (p Groth16ProverCall) prove(prover_id *uint64, compiled_circuit_id *int64, 
 		log.Fatalf("failed to deserialize witness: %v", err)
 		return int64ToBytes(-20007)
 	}
-
-	fmt.Printf("witness: %#v\n", witness)
 
 	proof, err := prover.Prove(compiled, pk, &witness)
 	if err != nil {
