@@ -132,14 +132,10 @@ func (p *Groth16Prover) Verify(proofBytes []byte, vk *types.Groth16VerifyingKey,
 	if err != nil {
 		return fmt.Errorf("failed to create gnark witness: %w", err)
 	}
-	fmt.Printf("gnarkWitness: %#v\n", gnarkWitness)
-
 	publicGnarkWitness, err := gnarkWitness.Public()
 	if err != nil {
 		return fmt.Errorf("failed to extract public witness: %w", err)
 	}
-
-	fmt.Printf("publicGnarkWitness: %#v\n", publicGnarkWitness)
 
 	err = groth16.Verify(proof, vk.Key, publicGnarkWitness)
 	if err != nil {
