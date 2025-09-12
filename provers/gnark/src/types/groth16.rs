@@ -8,6 +8,12 @@ use rsnark_provers_core::{CurveId, curve::BN254};
 
 macro_rules! impl_groth16_object {
     ($name:ident, $type_id:expr) => {
+        impl<C> Drop for $name<C> {
+            fn drop(&mut self) {
+                ffi::object::remove_object(self.go_ref_id);
+            }
+        }
+
         impl<C> GoInnerRef for $name<C> {
             fn go_inner_ref(&self) -> i64 {
                 self.go_ref_id

@@ -32,6 +32,12 @@ pub struct Groth16Backend<C> {
     marker: PhantomData<C>,
 }
 
+impl<C> Drop for Groth16Backend<C> {
+    fn drop(&mut self) {
+        ffi::groth16_prover::remove_prover(self.go_ref_id);
+    }
+}
+
 impl<C> Clone for Groth16Backend<C>
 where
     C: CurveId,

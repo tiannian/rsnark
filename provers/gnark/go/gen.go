@@ -35,6 +35,7 @@ type Groth16Prover interface {
 	setup(prover *uint64, compiled_circuit *int64) []uint8
 	prove(prover *uint64, compiled_circuit *int64, pk *int64, witness *[]uint8) []uint8
 	verify(prover *uint64, vk *int64, proof *[]uint8, public_witness *[]uint8) int64
+	remove_prover(prover *uint64)
 }
 
 //export CGroth16Prover_create
@@ -100,6 +101,12 @@ func CGroth16Prover_verify(prover C.uint64_t, vk C.int64_t, proof C.ListRef, pub
 	runtime.KeepAlive(buffer)
 }
 
+//export CGroth16Prover_remove_prover
+func CGroth16Prover_remove_prover(prover C.uint64_t) {
+	_new_prover := newC_uint64_t(prover)
+	Groth16ProverImpl.remove_prover(&_new_prover)
+}
+
 var ObjectImpl Object
 
 type Object interface {
@@ -108,6 +115,7 @@ type Object interface {
 	write_to_file(object_id *int64, path *string) int64
 	read_from_file(ty *uint64, curve_id *uint64, path *string) int64
 	export_solidity(object_id *int64) []uint8
+	remove_object(object_id *int64)
 }
 
 //export CObject_serialize
@@ -168,6 +176,12 @@ func CObject_export_solidity(object_id C.int64_t, slot *C.void, cb *C.void) {
 	runtime.KeepAlive(resp_ref)
 	runtime.KeepAlive(resp)
 	runtime.KeepAlive(buffer)
+}
+
+//export CObject_remove_object
+func CObject_remove_object(object_id C.int64_t) {
+	_new_object_id := newC_int64_t(object_id)
+	ObjectImpl.remove_object(&_new_object_id)
 }
 
 // An alternative impl of unsafe.String for go1.18

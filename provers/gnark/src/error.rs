@@ -54,6 +54,12 @@ pub enum Error {
     #[error("failed to export solidity")]
     ExportSolidityError,
 
+    #[error("prover not found")]
+    ProverNotFoundError,
+
+    #[error("object not found")]
+    ObjectNotFoundError,
+
     #[error(transparent)]
     ConvertToStringError(#[from] std::string::FromUtf8Error),
 }
@@ -88,6 +94,8 @@ impl Error {
             -20008 => Self::ProveError,
             -20009 => Self::ConvertVkError,
             -20010 => Self::VerifyError,
+            -20011 => Self::ProverNotFoundError,
+            -20012 => Self::ObjectNotFoundError,
             -10006 => Self::ExportSolidityError,
             _ => Self::UnknownGoError(code),
         }

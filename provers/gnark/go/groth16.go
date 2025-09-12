@@ -13,24 +13,33 @@ import (
 type Groth16ProverCall struct{}
 
 var (
-	provers     []*prover.Groth16Prover
-	proverMutex sync.Mutex
+	provers         map[uint64]*prover.Groth16Prover
+	proverMutex     sync.Mutex
+	proverIDCounter uint64
 )
 
 func init() {
 	Groth16ProverImpl = Groth16ProverCall{}
+	provers = make(map[uint64]*prover.Groth16Prover)
+}
+
+// addProver 添加一个新的prover到map中，返回分配的ID
+func addProver(p *prover.Groth16Prover) uint64 {
+	proverMutex.Lock()
+	defer proverMutex.Unlock()
+
+	proverIDCounter++
+	id := proverIDCounter
+	provers[id] = p
+
+	return id
 }
 
 func (p Groth16ProverCall) create(curve *uint64) uint64 {
 	curveType := types.CurveType(*curve)
 
 	prover := prover.NewGroth16Prover(curveType)
-	proverMutex.Lock()
-	defer proverMutex.Unlock()
-
-	provers = append(provers, prover)
-
-	return uint64(len(provers) - 1)
+	return addProver(prover)
 }
 
 func (p Groth16ProverCall) compile(prover_id *uint64, circuitData *[]byte) int64 {
@@ -41,32 +50,41 @@ func (p Groth16ProverCall) compile(prover_id *uint64, circuitData *[]byte) int64
 	}
 
 	proverMutex.Lock()
-	defer proverMutex.Unlock()
+	prover, exists := provers[*prover_id]
+	proverMutex.Unlock()
+	if !exists {
+		log.Fatalf("prover with id %d not found", *prover_id)
+		return -20011
+	}
 
-	prover := provers[*prover_id]
 	compiled, err := prover.Compile(circuitDef)
 	if err != nil {
 		log.Fatalf("failed to compile circuit: %v", err)
 		return -20002
 	}
 
-	objectMutex.Lock()
-	defer objectMutex.Unlock()
-
-	objects = append(objects, compiled)
-
-	return int64(len(objects) - 1)
+	return addObject(compiled)
 }
 
 func (p Groth16ProverCall) setup(prover_id *uint64, compiled_circuit_id *int64) []byte {
 	proverMutex.Lock()
-	defer proverMutex.Unlock()
+	prover, proverExists := provers[*prover_id]
+	proverMutex.Unlock()
+	if !proverExists {
+		log.Fatalf("prover with id %d not found", *prover_id)
+		return int64ToBytes2(-20011, 0)
+	}
 
 	objectMutex.Lock()
-	defer objectMutex.Unlock()
+	compiledObj, objExists := objects[*compiled_circuit_id]
+	objectMutex.Unlock()
 
-	prover := provers[*prover_id]
-	compiled, ok := objects[*compiled_circuit_id].(*types.CompiledCircuit)
+	if !objExists {
+		log.Fatalf("compiled circuit with id %d not found", *compiled_circuit_id)
+		return int64ToBytes2(-20012, 0)
+	}
+
+	compiled, ok := compiledObj.(*types.CompiledCircuit)
 	if !ok {
 		log.Fatalf("failed to cast compiled circuit to types.CompiledCircuit")
 		return int64ToBytes2(-20003, 0)
@@ -79,13 +97,10 @@ func (p Groth16ProverCall) setup(prover_id *uint64, compiled_circuit_id *int64) 
 		return int64ToBytes2(-20004, 0)
 	}
 
-	objects = append(objects, pk)
-	res0 := int64(len(objects) - 1)
+	pkID := addObject(pk)
+	vkID := addObject(vk)
 
-	objects = append(objects, vk)
-	res1 := int64(len(objects) - 1)
-
-	return int64ToBytes2(res0, res1)
+	return int64ToBytes2(pkID, vkID)
 }
 
 func int64ToBytes2(i0 int64, i1 int64) []byte {
@@ -105,19 +120,35 @@ func int64ToBytes(i0 int64) []byte {
 
 func (p Groth16ProverCall) prove(prover_id *uint64, compiled_circuit_id *int64, pk_id *int64, witness_data *[]byte) []byte {
 	proverMutex.Lock()
-	defer proverMutex.Unlock()
+	prover, proverExists := provers[*prover_id]
+	proverMutex.Unlock()
+	if !proverExists {
+		log.Fatalf("prover with id %d not found", *prover_id)
+		return int64ToBytes(-20011)
+	}
 
 	objectMutex.Lock()
 	defer objectMutex.Unlock()
 
-	prover := provers[*prover_id]
-	pk, ok := objects[*pk_id].(*types.Groth16ProvingKey)
+	pkObj, pkExists := objects[*pk_id]
+	if !pkExists {
+		log.Fatalf("proving key with id %d not found", *pk_id)
+		return int64ToBytes(-20012)
+	}
+
+	pk, ok := pkObj.(*types.Groth16ProvingKey)
 	if !ok {
 		log.Fatalf("failed to cast pk to types.Groth16ProvingKey")
 		return int64ToBytes(-20005)
 	}
 
-	compiled, ok := objects[*compiled_circuit_id].(*types.CompiledCircuit)
+	compiledObj, compiledExists := objects[*compiled_circuit_id]
+	if !compiledExists {
+		log.Fatalf("compiled circuit with id %d not found", *compiled_circuit_id)
+		return int64ToBytes(-20012)
+	}
+
+	compiled, ok := compiledObj.(*types.CompiledCircuit)
 	if !ok {
 		log.Fatalf("failed to cast compiled circuit to types.CompiledCircuit")
 		return int64ToBytes(-20006)
@@ -143,13 +174,23 @@ func (p Groth16ProverCall) prove(prover_id *uint64, compiled_circuit_id *int64, 
 
 func (p Groth16ProverCall) verify(prover_id *uint64, vk_id *int64, proof_data *[]byte, public_witness_data *[]byte) int64 {
 	proverMutex.Lock()
-	defer proverMutex.Unlock()
+	prover, proverExists := provers[*prover_id]
+	proverMutex.Unlock()
+	if !proverExists {
+		log.Fatalf("prover with id %d not found", *prover_id)
+		return -20011
+	}
 
 	objectMutex.Lock()
 	defer objectMutex.Unlock()
 
-	prover := provers[*prover_id]
-	vk, ok := objects[*vk_id].(*types.Groth16VerifyingKey)
+	vkObj, vkExists := objects[*vk_id]
+	if !vkExists {
+		log.Fatalf("verifying key with id %d not found", *vk_id)
+		return -20012
+	}
+
+	vk, ok := vkObj.(*types.Groth16VerifyingKey)
 	if !ok {
 		log.Fatalf("failed to cast vk to types.Groth16VerifyingKey")
 		return -20009
@@ -169,4 +210,11 @@ func (p Groth16ProverCall) verify(prover_id *uint64, vk_id *int64, proof_data *[
 	}
 
 	return int64(0)
+}
+
+func (p Groth16ProverCall) remove_prover(prover_id *uint64) {
+	proverMutex.Lock()
+	defer proverMutex.Unlock()
+
+	delete(provers, *prover_id)
 }

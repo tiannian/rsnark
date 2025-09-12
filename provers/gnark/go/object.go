@@ -11,19 +11,37 @@ import (
 type ObjectCall struct{}
 
 var (
-	objects     []types.SerializableObject
-	objectMutex sync.Mutex
+	objects         map[int64]types.SerializableObject
+	objectMutex     sync.Mutex
+	objectIDCounter int64
 )
 
 func init() {
 	ObjectImpl = ObjectCall{}
+	objects = make(map[int64]types.SerializableObject)
+}
+
+// addObject 添加一个新的object到map中，返回分配的ID
+func addObject(obj types.SerializableObject) int64 {
+	objectMutex.Lock()
+	defer objectMutex.Unlock()
+
+	objectIDCounter++
+	id := objectIDCounter
+	objects[id] = obj
+
+	return id
 }
 
 func (o ObjectCall) serialize(object_id *int64) []byte {
 	objectMutex.Lock()
 	defer objectMutex.Unlock()
 
-	object := objects[*object_id]
+	object, exists := objects[*object_id]
+	if !exists {
+		log.Fatalf("object with id %d not found", *object_id)
+		return []byte{}
+	}
 
 	data, err := object.Serialize()
 	if err != nil {
@@ -50,7 +68,11 @@ func (o ObjectCall) deserialize(ty *uint64, curve_id *uint64, data *[]byte) int6
 func (o ObjectCall) write_to_file(object_id *int64, path *string) int64 {
 	objectMutex.Lock()
 	defer objectMutex.Unlock()
-	object := objects[*object_id]
+	object, exists := objects[*object_id]
+	if !exists {
+		log.Fatalf("object with id %d not found", *object_id)
+		return -20012
+	}
 
 	data, err := object.Serialize()
 	if err != nil {
@@ -99,17 +121,17 @@ func deserializeObject[T types.SerializableObject](curve_id uint64, data *[]byte
 		return -10001
 	}
 
-	objectMutex.Lock()
-	defer objectMutex.Unlock()
-	objects = append(objects, object)
-
-	return int64(len(objects) - 1)
+	return addObject(object)
 }
 
 func (o ObjectCall) export_solidity(object_id *int64) []byte {
 	objectMutex.Lock()
 	defer objectMutex.Unlock()
-	object := objects[*object_id]
+	object, exists := objects[*object_id]
+	if !exists {
+		log.Fatalf("object with id %d not found", *object_id)
+		return int64ToBytes(-20012)
+	}
 
 	pk, ok := object.(*types.Groth16VerifyingKey)
 	if !ok {
@@ -124,4 +146,11 @@ func (o ObjectCall) export_solidity(object_id *int64) []byte {
 	}
 
 	return append(int64ToBytes(0), solidity...)
+}
+
+func (o ObjectCall) remove_object(object_id *int64) {
+	objectMutex.Lock()
+	defer objectMutex.Unlock()
+
+	delete(objects, *object_id)
 }

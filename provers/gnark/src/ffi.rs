@@ -15,6 +15,8 @@ pub trait Groth16Prover {
     fn prove(prover: u64, compiled_circuit: i64, pk: i64, witness: Vec<u8>) -> Vec<u8>;
 
     fn verify(prover: u64, vk: i64, proof: Vec<u8>, public_witness: Vec<u8>) -> i64;
+
+    fn remove_prover(prover: u64);
 }
 
 #[cfg(not(docsrs))]
@@ -29,6 +31,8 @@ pub trait Object {
     fn read_from_file(ty: u64, curve_id: u64, path: String) -> i64;
 
     fn export_solidity(object_id: i64) -> Vec<u8>;
+
+    fn remove_object(object_id: i64);
 }
 
 #[cfg(docsrs)]
@@ -52,6 +56,10 @@ pub mod groth16_prover {
     pub fn verify(_prover: u64, _vk: i64, _proof: Vec<u8>, _public_witness: Vec<u8>) -> i64 {
         unimplemented!()
     }
+
+    pub fn remove_prover(_prover: u64) {
+        unimplemented!()
+    }
 }
 
 #[cfg(docsrs)]
@@ -73,6 +81,10 @@ pub mod object {
     }
 
     pub fn export_solidity(_object_id: i64) -> Vec<u8> {
+        unimplemented!()
+    }
+
+    pub fn remove_object(_object_id: i64) {
         unimplemented!()
     }
 }
@@ -100,6 +112,10 @@ pub mod groth16_prover {
     pub fn verify(prover: u64, vk: i64, proof: Vec<u8>, public_witness: Vec<u8>) -> i64 {
         super::Groth16ProverImpl::verify(prover, vk, proof, public_witness)
     }
+
+    pub fn remove_prover(prover: u64) {
+        super::Groth16ProverImpl::remove_prover(prover)
+    }
 }
 
 #[cfg(not(docsrs))]
@@ -124,5 +140,9 @@ pub mod object {
 
     pub fn export_solidity(object_id: i64) -> Vec<u8> {
         super::ObjectImpl::export_solidity(object_id)
+    }
+
+    pub fn remove_object(object_id: i64) {
+        super::ObjectImpl::remove_object(object_id)
     }
 }
