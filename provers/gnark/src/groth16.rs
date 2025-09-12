@@ -68,7 +68,9 @@ where
     fn _compile(&self, circuit: &CircuitDefinition) -> Result<CompiledCircuit<C>> {
         let circuit = serde_json::to_vec(circuit)?;
 
-        let res = ffi::groth16_prover::compile(self.go_ref_id, circuit);
+        let curve = C::curve_id();
+
+        let res = ffi::object::compile(curve, circuit);
 
         if res >= 0 {
             Ok(CompiledCircuit::from_go_inner_ref(res))
@@ -186,15 +188,11 @@ where
 
         let proof_len = proof.len() - 8;
 
-        if proof_len < 256 {
-            return Err(Error::ProofLengthWrong);
-        }
-
-        let proof = &proof[8..];
+        let proof = &proof[8..proof.len() - 4];
 
         let mut res = Vec::with_capacity(8);
 
-        for i in 0..8 {
+        for i in 0..proof_len / 32 {
             let mut bytes = [0u8; 32];
             bytes.copy_from_slice(&proof[i * 32..(i + 1) * 32]);
             res.push(U256::from_be_bytes(bytes));
@@ -209,7 +207,7 @@ where
         proof: &Proof,
         public_witness: &PublicWitness,
     ) -> Result<bool> {
-        let proof_len = proof.0.len() * 32 + 68;
+        let proof_len = proof.0.len() * 32 + 4;
 
         let mut proof_bytes = Vec::with_capacity(proof_len);
         for value in &proof.0 {

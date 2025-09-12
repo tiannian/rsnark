@@ -48,9 +48,6 @@ pub enum Error {
     #[error(transparent)]
     SerdeJsonError(#[from] serde_json::Error),
 
-    #[error("proof length is wrong")]
-    ProofLengthWrong,
-
     #[error("failed to export solidity")]
     ExportSolidityError,
 

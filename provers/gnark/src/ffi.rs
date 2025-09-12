@@ -8,8 +8,6 @@ pub mod binding {
 pub trait Groth16Prover {
     fn create(curve_id: u64) -> u64;
 
-    fn compile(prover: u64, circuit: Vec<u8>) -> i64;
-
     fn setup(prover: u64, compiled_circuit: i64) -> Vec<u8>;
 
     fn prove(prover: u64, compiled_circuit: i64, pk: i64, witness: Vec<u8>) -> Vec<u8>;
@@ -22,6 +20,8 @@ pub trait Groth16Prover {
 #[cfg(not(docsrs))]
 #[rust2go::r2g]
 pub trait Object {
+    fn compile(curve_id: u64, circuit: Vec<u8>) -> i64;
+
     fn serialize(object_id: i64) -> Vec<u8>;
 
     fn deserialize(ty: u64, curve_id: u64, data: Vec<u8>) -> i64;
@@ -38,10 +38,6 @@ pub trait Object {
 #[cfg(docsrs)]
 pub mod groth16_prover {
     pub fn create(_curve_id: u64) -> u64 {
-        unimplemented!()
-    }
-
-    pub fn compile(_prover: u64, _circuit: Vec<u8>) -> i64 {
         unimplemented!()
     }
 
@@ -64,6 +60,10 @@ pub mod groth16_prover {
 
 #[cfg(docsrs)]
 pub mod object {
+    pub fn compile(_curve_id: u64, _circuit: Vec<u8>) -> i64 {
+        unimplemented!()
+    }
+
     pub fn serialize(_object_id: i64) -> Vec<u8> {
         unimplemented!()
     }
@@ -97,10 +97,6 @@ pub mod groth16_prover {
         super::Groth16ProverImpl::create(curve_id)
     }
 
-    pub fn compile(prover: u64, circuit: Vec<u8>) -> i64 {
-        super::Groth16ProverImpl::compile(prover, circuit)
-    }
-
     pub fn setup(prover: u64, compiled_circuit: i64) -> Vec<u8> {
         super::Groth16ProverImpl::setup(prover, compiled_circuit)
     }
@@ -121,6 +117,10 @@ pub mod groth16_prover {
 #[cfg(not(docsrs))]
 pub mod object {
     use crate::ffi::Object;
+
+    pub fn compile(curve_id: u64, circuit: Vec<u8>) -> i64 {
+        super::ObjectImpl::compile(curve_id, circuit)
+    }
 
     pub fn serialize(object_id: i64) -> Vec<u8> {
         super::ObjectImpl::serialize(object_id)

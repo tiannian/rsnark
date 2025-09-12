@@ -1,7 +1,9 @@
-use rsnark::{
-    Groth16BN254GnarkProver,
-    core::{API, Circuit, CircuitDefine, CircuitWitness},
+use rsnark::core::{API, Circuit, CircuitDefine, CircuitWitness};
+use rsnark_provers_core::{
+    Backend, Prover,
+    curve::{BLS12_377, BLS12_381, BLS24_315, BLS24_317, BN254, BW6_633, BW6_761},
 };
+use rsnark_provers_gnark::Groth16Backend;
 
 #[derive(Circuit)]
 pub struct TestCircuit {
@@ -18,7 +20,17 @@ impl Circuit for CircuitDefine<TestCircuit> {
 }
 
 fn main() {
-    let prover = Groth16BN254GnarkProver::new();
+    run::<Groth16Backend<BN254>>();
+    run::<Groth16Backend<BLS12_377>>();
+    run::<Groth16Backend<BLS12_381>>();
+    run::<Groth16Backend<BLS24_315>>();
+    run::<Groth16Backend<BLS24_317>>();
+    run::<Groth16Backend<BW6_761>>();
+    run::<Groth16Backend<BW6_633>>();
+}
+
+fn run<B: Backend>() {
+    let prover = Prover::<B>::new();
 
     let circuit_prover = prover.compile_circuit::<TestCircuit>().unwrap();
     let (pk, vk) = circuit_prover.setup().unwrap();

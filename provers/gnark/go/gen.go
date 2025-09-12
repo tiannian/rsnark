@@ -31,7 +31,6 @@ var Groth16ProverImpl Groth16Prover
 
 type Groth16Prover interface {
 	create(curve_id *uint64) uint64
-	compile(prover *uint64, circuit *[]uint8) int64
 	setup(prover *uint64, compiled_circuit *int64) []uint8
 	prove(prover *uint64, compiled_circuit *int64, pk *int64, witness *[]uint8) []uint8
 	verify(prover *uint64, vk *int64, proof *[]uint8, public_witness *[]uint8) int64
@@ -43,18 +42,6 @@ func CGroth16Prover_create(curve_id C.uint64_t, slot *C.void, cb *C.void) {
 	_new_curve_id := newC_uint64_t(curve_id)
 	resp := Groth16ProverImpl.create(&_new_curve_id)
 	resp_ref, buffer := cvt_ref(cntC_uint64_t, refC_uint64_t)(&resp)
-	asmcall.CallFuncG0P2(unsafe.Pointer(cb), unsafe.Pointer(&resp_ref), unsafe.Pointer(slot))
-	runtime.KeepAlive(resp_ref)
-	runtime.KeepAlive(resp)
-	runtime.KeepAlive(buffer)
-}
-
-//export CGroth16Prover_compile
-func CGroth16Prover_compile(prover C.uint64_t, circuit C.ListRef, slot *C.void, cb *C.void) {
-	_new_prover := newC_uint64_t(prover)
-	_new_circuit := new_list_mapper_primitive(newC_uint8_t)(circuit)
-	resp := Groth16ProverImpl.compile(&_new_prover, &_new_circuit)
-	resp_ref, buffer := cvt_ref(cntC_int64_t, refC_int64_t)(&resp)
 	asmcall.CallFuncG0P2(unsafe.Pointer(cb), unsafe.Pointer(&resp_ref), unsafe.Pointer(slot))
 	runtime.KeepAlive(resp_ref)
 	runtime.KeepAlive(resp)
@@ -110,12 +97,25 @@ func CGroth16Prover_remove_prover(prover C.uint64_t) {
 var ObjectImpl Object
 
 type Object interface {
+	compile(curve_id *uint64, circuit *[]uint8) int64
 	serialize(object_id *int64) []uint8
 	deserialize(ty *uint64, curve_id *uint64, data *[]uint8) int64
 	write_to_file(object_id *int64, path *string) int64
 	read_from_file(ty *uint64, curve_id *uint64, path *string) int64
 	export_solidity(object_id *int64) []uint8
 	remove_object(object_id *int64)
+}
+
+//export CObject_compile
+func CObject_compile(curve_id C.uint64_t, circuit C.ListRef, slot *C.void, cb *C.void) {
+	_new_curve_id := newC_uint64_t(curve_id)
+	_new_circuit := new_list_mapper_primitive(newC_uint8_t)(circuit)
+	resp := ObjectImpl.compile(&_new_curve_id, &_new_circuit)
+	resp_ref, buffer := cvt_ref(cntC_int64_t, refC_int64_t)(&resp)
+	asmcall.CallFuncG0P2(unsafe.Pointer(cb), unsafe.Pointer(&resp_ref), unsafe.Pointer(slot))
+	runtime.KeepAlive(resp_ref)
+	runtime.KeepAlive(resp)
+	runtime.KeepAlive(buffer)
 }
 
 //export CObject_serialize

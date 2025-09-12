@@ -5,6 +5,10 @@ import (
 	"os"
 	"sync"
 
+	"github.com/consensys/gnark/frontend"
+	"github.com/consensys/gnark/frontend/cs/r1cs"
+
+	"github.com/tiannian/rsnark/provers-gnark/circuit"
 	"github.com/tiannian/rsnark/provers-gnark/prover/types"
 )
 
@@ -146,6 +150,37 @@ func (o ObjectCall) export_solidity(object_id *int64) []byte {
 	}
 
 	return append(int64ToBytes(0), solidity...)
+}
+
+func (o ObjectCall) compile(curve_id *uint64, circuit_data *[]byte) int64 {
+	curveType := types.CurveType(*curve_id)
+
+	// Parse CircuitDefinition from JSON
+	cd, err := circuit.ParseCircuitDefinition(*circuit_data)
+	if err != nil {
+		log.Fatalf("failed to parse circuit definition: %v", err)
+		return -20013
+	}
+
+	// Create TemplateCircuit from CircuitDefinition
+	templateCircuit, err := circuit.NewTemplateCircuit(cd)
+	if err != nil {
+		log.Fatalf("failed to create template circuit: %v", err)
+		return -20014
+	}
+
+	// Compile to R1CS
+	r1cs, err := frontend.Compile(curveType.ToECC().ScalarField(), r1cs.NewBuilder, templateCircuit)
+	if err != nil {
+		log.Fatalf("failed to compile circuit to R1CS: %v", err)
+		return -20015
+	}
+
+	compiled := &types.CompiledCircuit{
+		CS: r1cs,
+	}
+
+	return addObject(compiled)
 }
 
 func (o ObjectCall) remove_object(object_id *int64) {

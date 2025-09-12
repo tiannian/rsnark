@@ -5,7 +5,6 @@ import (
 	"log"
 	"sync"
 
-	"github.com/tiannian/rsnark/provers-gnark/circuit"
 	"github.com/tiannian/rsnark/provers-gnark/prover"
 	"github.com/tiannian/rsnark/provers-gnark/prover/types"
 )
@@ -40,30 +39,6 @@ func (p Groth16ProverCall) create(curve *uint64) uint64 {
 
 	prover := prover.NewGroth16Prover(curveType)
 	return addProver(prover)
-}
-
-func (p Groth16ProverCall) compile(prover_id *uint64, circuitData *[]byte) int64 {
-	circuitDef, err := circuit.ParseCircuitDefinition(*circuitData)
-	if err != nil {
-		log.Fatalf("failed to parse circuit definition: %v", err)
-		return -20001
-	}
-
-	proverMutex.Lock()
-	prover, exists := provers[*prover_id]
-	proverMutex.Unlock()
-	if !exists {
-		log.Fatalf("prover with id %d not found", *prover_id)
-		return -20011
-	}
-
-	compiled, err := prover.Compile(circuitDef)
-	if err != nil {
-		log.Fatalf("failed to compile circuit: %v", err)
-		return -20002
-	}
-
-	return addObject(compiled)
 }
 
 func (p Groth16ProverCall) setup(prover_id *uint64, compiled_circuit_id *int64) []byte {
@@ -210,6 +185,11 @@ func (p Groth16ProverCall) verify(prover_id *uint64, vk_id *int64, proof_data *[
 	}
 
 	return int64(0)
+}
+
+func (p Groth16ProverCall) compile(curve_id *uint64, circuit_data *[]byte) int64 {
+	// Delegate to object's compile function
+	return ObjectImpl.compile(curve_id, circuit_data)
 }
 
 func (p Groth16ProverCall) remove_prover(prover_id *uint64) {
