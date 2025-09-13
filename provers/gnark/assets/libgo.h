@@ -110,8 +110,8 @@ extern void CObject_serialize(int64_t object_id, void* slot, void* cb);
 extern void CObject_deserialize(uint64_t ty, uint64_t curve_id, ListRef data, void* slot, void* cb);
 extern void CObject_write_to_file(int64_t object_id, StringRef path, void* slot, void* cb);
 extern void CObject_read_from_file(uint64_t ty, uint64_t curve_id, StringRef path, void* slot, void* cb);
-extern void CObject_export_solidity(int64_t object_id, void* slot, void* cb);
 extern void CObject_remove_object(int64_t object_id);
+extern void CObject_export_solidity(int64_t object_id, uint64_t type_id, void* slot, void* cb);
 
 #ifdef __cplusplus
 }

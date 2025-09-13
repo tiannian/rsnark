@@ -96,7 +96,7 @@ pub mod object {
         unimplemented!()
     }
 
-    pub fn export_solidity(_object_id: i64) -> Vec<u8> {
+    pub fn export_solidity(_object_id: i64, _type_id: u64) -> Vec<u8> {
         unimplemented!()
     }
 
