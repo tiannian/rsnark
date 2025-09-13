@@ -1,7 +1,10 @@
 use std::marker::PhantomData;
 
-use rsnark_core::types::{CircuitDefinition, PublicWitness, Witness};
-use rsnark_provers_core::{Backend, CurveId};
+use rsnark_core::{
+    CurveId, MetadataInfo, ProvingSystem,
+    types::{CircuitDefinition, PublicWitness, Witness},
+};
+use rsnark_provers_core::Backend;
 
 use crate::{
     Error, Result, ffi,
@@ -147,6 +150,14 @@ where
 
     fn new() -> Self {
         Self::_new()
+    }
+
+    fn metadata(&self) -> MetadataInfo {
+        MetadataInfo {
+            field: C::field(),
+            curve: C::curve_type(),
+            proving_system: ProvingSystem::Plonk,
+        }
     }
 
     fn compile(&self, circuit: &CircuitDefinition) -> Result<Self::CircuitConstraint> {

@@ -422,7 +422,7 @@ func TestPlonkDifferentCurves(t *testing.T) {
 		curve types.CurveType
 	}{
 		{"BN254", types.CurveBN254},
-		{"BLS12-381", types.CurveBLS12381},
+		{"BLS12-381", types.CurveBLS12_381},
 		// Note: Other curves might have different requirements for PLONK
 		// so we test them separately if needed
 	}

@@ -1,4 +1,4 @@
-use rsnark_provers_core::CurveId;
+use rsnark_core::CurveId;
 
 use crate::{Error, Result, ffi};
 

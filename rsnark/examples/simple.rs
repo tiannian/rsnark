@@ -1,8 +1,8 @@
-use rsnark::core::{API, Circuit, CircuitDefine, CircuitWitness};
-use rsnark_provers_core::{
-    Backend, Prover,
+use rsnark::core::{
+    API, Circuit, CircuitDefine, CircuitWitness,
     curve::{BLS12_377, BLS12_381, BLS24_315, BLS24_317, BN254, BW6_633, BW6_761},
 };
+use rsnark_provers_core::{Backend, Prover};
 use rsnark_provers_gnark::{Groth16Backend, PlonkBackend};
 
 #[derive(Circuit)]

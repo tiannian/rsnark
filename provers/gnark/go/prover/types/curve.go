@@ -6,39 +6,32 @@ import "github.com/consensys/gnark-crypto/ecc"
 type CurveType int
 
 const (
-	CurveBN254    CurveType = 1
-	CurveBLS12381 CurveType = 2
-	CurveBLS12377 CurveType = 3
-	CurveBW6761   CurveType = 4
+	CurveBN254     CurveType = 1
+	CurveBLS12_381 CurveType = 2
+	CurveBLS24_317 CurveType = 3
+	CurveBLS12_377 CurveType = 4
+	CurveBW6_761   CurveType = 5
+	CurveBLS24_315 CurveType = 6
+	CurveBW6_633   CurveType = 7
 )
-
-// String returns the string representation of the curve type
-func (c CurveType) String() string {
-	switch c {
-	case CurveBN254:
-		return "bn254"
-	case CurveBLS12381:
-		return "bls12-381"
-	case CurveBLS12377:
-		return "bls12-377"
-	case CurveBW6761:
-		return "bw6-761"
-	default:
-		return "unknown"
-	}
-}
 
 // ToECC converts CurveType to gnark's ecc.ID
 func (c CurveType) ToECC() ecc.ID {
 	switch c {
 	case CurveBN254:
 		return ecc.BN254
-	case CurveBLS12381:
+	case CurveBLS12_381:
 		return ecc.BLS12_381
-	case CurveBLS12377:
+	case CurveBLS12_377:
 		return ecc.BLS12_377
-	case CurveBW6761:
+	case CurveBW6_761:
 		return ecc.BW6_761
+	case CurveBLS24_315:
+		return ecc.BLS24_315
+	case CurveBLS24_317:
+		return ecc.BLS24_317
+	case CurveBW6_633:
+		return ecc.BW6_633
 	default:
 		return ecc.BN254 // default to BN254
 	}

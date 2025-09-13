@@ -21,7 +21,7 @@
 //! and development purposes.
 
 use rsnark_core::{
-    U256,
+    CurveType, MetadataInfo, ProvingSystem, U256,
     types::{CircuitDefinition, PublicWitness, Witness},
 };
 use rsnark_provers_core::Backend;
@@ -58,6 +58,14 @@ impl Backend for MockProverBackend {
 
     fn new() -> Self {
         Self
+    }
+
+    fn metadata(&self) -> MetadataInfo {
+        MetadataInfo {
+            field: U256::MAX,
+            curve: CurveType::Mock,
+            proving_system: ProvingSystem::Mock,
+        }
     }
 
     /// Returns a copy of the circuit definition as the "compiled" constraint.

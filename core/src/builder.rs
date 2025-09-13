@@ -1,17 +1,26 @@
 use crate::{
-    API, Variable, VariableIniter,
+    API, Metadata, MetadataInfo, Variable, VariableIniter,
     types::{CircuitDefinition, OpCode, Operation, VariableType},
     variable::CircuitVariable,
 };
 
 #[doc(hidden)]
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct CircuitBuilder {
     operations: Vec<Operation>,
     variable_initer: VariableIniter,
+    metadata: MetadataInfo,
 }
 
 impl CircuitBuilder {
+    pub fn new(metadata: MetadataInfo) -> Self {
+        Self {
+            operations: Vec::new(),
+            variable_initer: VariableIniter::default(),
+            metadata,
+        }
+    }
+
     pub fn variable_initer(&self) -> &VariableIniter {
         &self.variable_initer
     }
@@ -63,6 +72,10 @@ impl CircuitBuilder {
 }
 
 impl API for CircuitBuilder {
+    fn metadata(&self) -> &impl Metadata {
+        &self.metadata
+    }
+
     fn add_multi(
         &mut self,
         x1: &impl Variable,

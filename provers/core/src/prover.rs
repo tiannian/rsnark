@@ -71,7 +71,8 @@ where
         C: CircuitWitness,
         C::PublicElement: Circuit,
     {
-        let mut builder = CircuitBuilder::default();
+        let metadata = self.backend.metadata();
+        let mut builder = CircuitBuilder::new(metadata);
         let circuit = C::create_public(builder.variable_initer_mut(), false);
         circuit.define(&mut builder);
 

@@ -1,4 +1,4 @@
-use crate::{Variable, variable::CircuitVariable};
+use crate::{Metadata, Variable, variable::CircuitVariable};
 
 /// The main API trait for building arithmetic circuits in zero-knowledge proof systems.
 ///
@@ -7,6 +7,8 @@ use crate::{Variable, variable::CircuitVariable};
 /// All operations work with variables that implement the `Variable` trait, enabling flexible
 /// circuit construction with different variable types.
 pub trait API {
+    fn metadata(&self) -> &impl Metadata;
+
     /// Performs addition of two variables: res = x1 + x2
     ///
     /// This is a convenience method that calls `add_multi` with no additional variables.

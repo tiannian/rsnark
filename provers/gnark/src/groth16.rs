@@ -1,7 +1,10 @@
 use std::marker::PhantomData;
 
-use rsnark_core::types::{CircuitDefinition, PublicWitness, Witness};
-use rsnark_provers_core::{Backend, CurveId};
+use rsnark_core::{
+    CurveId, MetadataInfo, ProvingSystem, U256,
+    types::{CircuitDefinition, PublicWitness, Witness},
+};
+use rsnark_provers_core::Backend;
 
 use crate::{
     Error, Result, ffi,
@@ -161,6 +164,14 @@ where
         Self::_new()
     }
 
+    fn metadata(&self) -> MetadataInfo {
+        MetadataInfo {
+            field: C::field(),
+            curve: C::curve_type(),
+            proving_system: ProvingSystem::Groth16,
+        }
+    }
+
     fn compile(&self, circuit: &CircuitDefinition) -> Result<Self::CircuitConstraint> {
         self._compile(circuit)
     }
@@ -196,8 +207,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rsnark_core::{API, Circuit, CircuitDefine, CircuitWitness};
-    use rsnark_provers_core::{Prover, curve::BN254};
+    use rsnark_core::{API, Circuit, CircuitDefine, CircuitWitness, curve::BN254};
+    use rsnark_provers_core::Prover;
 
     #[derive(rsnark_core::Circuit)]
     pub struct TestCircuit {

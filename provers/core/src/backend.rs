@@ -1,4 +1,7 @@
-use rsnark_core::types::{CircuitDefinition, PublicWitness, Witness};
+use rsnark_core::{
+    MetadataInfo,
+    types::{CircuitDefinition, PublicWitness, Witness},
+};
 
 /// Core trait defining the interface for zero-knowledge proof backends.
 ///
@@ -35,6 +38,8 @@ pub trait Backend {
     ///
     /// This is typically used to initialize any backend-specific state or configuration.
     fn new() -> Self;
+
+    fn metadata(&self) -> MetadataInfo;
 
     /// Compiles a circuit definition into the backend's internal constraint representation.
     ///

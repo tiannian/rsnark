@@ -1,10 +1,11 @@
 use std::marker::PhantomData;
 
+use rsnark_core::{CurveId, curve::BN254};
+
 use crate::{
     Error, Result, ffi,
     types::{GoInnerRef, InnerSerializableObject},
 };
-use rsnark_provers_core::{CurveId, curve::BN254};
 
 macro_rules! impl_groth16_object {
     ($name:ident, $type_id:expr) => {

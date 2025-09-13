@@ -170,56 +170,55 @@ pub mod provers {
 
 /// Provers with backend triple `groth16-bn254-gnark`
 pub type Groth16BN254GnarkProver =
-    provers::Prover<provers::gnark::Groth16Backend<provers::curve::BN254>>;
+    provers::Prover<provers::gnark::Groth16Backend<core::curve::BN254>>;
 
 /// Provers with backend triple `groth16-bls12-381-gnark`
 pub type Groth16BLS12_381GnarkProver =
-    provers::Prover<provers::gnark::Groth16Backend<provers::curve::BLS12_381>>;
+    provers::Prover<provers::gnark::Groth16Backend<core::curve::BLS12_381>>;
 
 /// Provers with backend triple `groth16-bls24-317-gnark`
 pub type Groth16BLS24_317GnarkProver =
-    provers::Prover<provers::gnark::Groth16Backend<provers::curve::BLS24_317>>;
+    provers::Prover<provers::gnark::Groth16Backend<core::curve::BLS24_317>>;
 
 /// Provers with backend triple `groth16-bls12-377-gnark`
 pub type Groth16BLS12_377GnarkProver =
-    provers::Prover<provers::gnark::Groth16Backend<provers::curve::BLS12_377>>;
+    provers::Prover<provers::gnark::Groth16Backend<core::curve::BLS12_377>>;
 
 /// Provers with backend triple `groth16-bw6-761-gnark`
 pub type Groth16BW6_761GnarkProver =
-    provers::Prover<provers::gnark::Groth16Backend<provers::curve::BW6_761>>;
+    provers::Prover<provers::gnark::Groth16Backend<core::curve::BW6_761>>;
 
 /// Provers with backend triple `groth16-bls24-315-gnark`
 pub type Groth16BLS24_315GnarkProver =
-    provers::Prover<provers::gnark::Groth16Backend<provers::curve::BLS24_315>>;
+    provers::Prover<provers::gnark::Groth16Backend<core::curve::BLS24_315>>;
 
 /// Provers with backend triple `groth16-bw6-633-gnark`
 pub type Groth16BW6_633GnarkProver =
-    provers::Prover<provers::gnark::Groth16Backend<provers::curve::BW6_633>>;
+    provers::Prover<provers::gnark::Groth16Backend<core::curve::BW6_633>>;
 
 /// Provers with backend triple `plonk-bn254-gnark`
-pub type PlonkBN254GnarkProver =
-    provers::Prover<provers::gnark::PlonkBackend<provers::curve::BN254>>;
+pub type PlonkBN254GnarkProver = provers::Prover<provers::gnark::PlonkBackend<core::curve::BN254>>;
 
 /// Provers with backend triple `plonk-bls12-381-gnark`
 pub type PlonkBLS12_381GnarkProver =
-    provers::Prover<provers::gnark::PlonkBackend<provers::curve::BLS12_381>>;
+    provers::Prover<provers::gnark::PlonkBackend<core::curve::BLS12_381>>;
 
 /// Provers with backend triple `plonk-bls24-317-gnark`
 pub type PlonkBLS24_317GnarkProver =
-    provers::Prover<provers::gnark::PlonkBackend<provers::curve::BLS24_317>>;
+    provers::Prover<provers::gnark::PlonkBackend<core::curve::BLS24_317>>;
 
 /// Provers with backend triple `plonk-bls12-377-gnark`
 pub type PlonkBLS12_377GnarkProver =
-    provers::Prover<provers::gnark::PlonkBackend<provers::curve::BLS12_377>>;
+    provers::Prover<provers::gnark::PlonkBackend<core::curve::BLS12_377>>;
 
 /// Provers with backend triple `plonk-bw6-761-gnark`
 pub type PlonkBW6_761GnarkProver =
-    provers::Prover<provers::gnark::PlonkBackend<provers::curve::BW6_761>>;
+    provers::Prover<provers::gnark::PlonkBackend<core::curve::BW6_761>>;
 
 /// Provers with backend triple `plonk-bls24-315-gnark`
 pub type PlonkBLS24_315GnarkProver =
-    provers::Prover<provers::gnark::PlonkBackend<provers::curve::BLS24_315>>;
+    provers::Prover<provers::gnark::PlonkBackend<core::curve::BLS24_315>>;
 
 /// Provers with backend triple `plonk-bw6-633-gnark`
 pub type PlonkBW6_633GnarkProver =
-    provers::Prover<provers::gnark::PlonkBackend<provers::curve::BW6_633>>;
+    provers::Prover<provers::gnark::PlonkBackend<core::curve::BW6_633>>;
