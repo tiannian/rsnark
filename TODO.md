@@ -17,3 +17,4 @@
   - [ ] Rangechecker
   - [ ] Poseidon2
   - [ ] twistededwards
+- [ ] Crypto (Use go ffi now)
