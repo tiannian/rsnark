@@ -136,12 +136,19 @@
 //! Currently supported backend triples:
 //!
 //! - [`groth16-bn254-gnark`](Groth16BN254GnarkProver) - Groth16 with BN254 curve using Gnark backend
-//! - [`groth16-bls12-381-gnark`](Groth16BLS12_381GnarkProver) - Groth16 with BLS12-381 curve
-//! - [`groth16-bls24-317-gnark`](Groth16BLS24_317GnarkProver) - Groth16 with BLS24-317 curve  
-//! - [`groth16-bls12-377-gnark`](Groth16BLS12_377GnarkProver) - Groth16 with BLS12-377 curve
-//! - [`groth16-bw6-761-gnark`](Groth16BW6_761GnarkProver) - Groth16 with BW6-761 curve
-//! - [`groth16-bls24-315-gnark`](Groth16BLS24_315GnarkProver) - Groth16 with BLS24-315 curve
-//! - [`groth16-bw6-633-gnark`](Groth16BW6_633GnarkProver) - Groth16 with BW6-633 curve
+//! - [`groth16-bls12-381-gnark`](Groth16BLS12_381GnarkProver) - Groth16 with BLS12-381 curve using Gnark backend
+//! - [`groth16-bls24-317-gnark`](Groth16BLS24_317GnarkProver) - Groth16 with BLS24-317 curve using Gnark backend
+//! - [`groth16-bls12-377-gnark`](Groth16BLS12_377GnarkProver) - Groth16 with BLS12-377 curve using Gnark backend
+//! - [`groth16-bw6-761-gnark`](Groth16BW6_761GnarkProver) - Groth16 with BW6-761 curve using Gnark backend
+//! - [`groth16-bls24-315-gnark`](Groth16BLS24_315GnarkProver) - Groth16 with BLS24-315 curve using Gnark backend
+//! - [`groth16-bw6-633-gnark`](Groth16BW6_633GnarkProver) - Groth16 with BW6-633 curve using Gnark backend
+//! - [`plonk-bn254-gnark`](PlonkBN254GnarkProver) - PLONK with BN254 curve using Gnark backend
+//! - [`plonk-bls12-381-gnark`](PlonkBLS12_381GnarkProver) - PLONK with BLS12-381 curve using Gnark backend
+//! - [`plonk-bls24-317-gnark`](PlonkBLS24_317GnarkProver) - PLONK with BLS24-317 curve using Gnark backend
+//! - [`plonk-bls12-377-gnark`](PlonkBLS12_377GnarkProver) - PLONK with BLS12-377 curve using Gnark backend
+//! - [`plonk-bw6-761-gnark`](PlonkBW6_761GnarkProver) - PLONK with BW6-761 curve using Gnark backend
+//! - [`plonk-bls24-315-gnark`](PlonkBLS24_315GnarkProver) - PLONK with BLS24-315 curve using Gnark backend
+//! - [`plonk-bw6-633-gnark`](PlonkBW6_633GnarkProver) - PLONK with BW6-633 curve using Gnark backend
 //!
 
 #[doc(inline)]
@@ -188,3 +195,31 @@ pub type Groth16BLS24_315GnarkProver =
 /// Provers with backend triple `groth16-bw6-633-gnark`
 pub type Groth16BW6_633GnarkProver =
     provers::Prover<provers::gnark::Groth16Backend<provers::curve::BW6_633>>;
+
+/// Provers with backend triple `plonk-bn254-gnark`
+pub type PlonkBN254GnarkProver =
+    provers::Prover<provers::gnark::PlonkBackend<provers::curve::BN254>>;
+
+/// Provers with backend triple `plonk-bls12-381-gnark`
+pub type PlonkBLS12_381GnarkProver =
+    provers::Prover<provers::gnark::PlonkBackend<provers::curve::BLS12_381>>;
+
+/// Provers with backend triple `plonk-bls24-317-gnark`
+pub type PlonkBLS24_317GnarkProver =
+    provers::Prover<provers::gnark::PlonkBackend<provers::curve::BLS24_317>>;
+
+/// Provers with backend triple `plonk-bls12-377-gnark`
+pub type PlonkBLS12_377GnarkProver =
+    provers::Prover<provers::gnark::PlonkBackend<provers::curve::BLS12_377>>;
+
+/// Provers with backend triple `plonk-bw6-761-gnark`
+pub type PlonkBW6_761GnarkProver =
+    provers::Prover<provers::gnark::PlonkBackend<provers::curve::BW6_761>>;
+
+/// Provers with backend triple `plonk-bls24-315-gnark`
+pub type PlonkBLS24_315GnarkProver =
+    provers::Prover<provers::gnark::PlonkBackend<provers::curve::BLS24_315>>;
+
+/// Provers with backend triple `plonk-bw6-633-gnark`
+pub type PlonkBW6_633GnarkProver =
+    provers::Prover<provers::gnark::PlonkBackend<provers::curve::BW6_633>>;

@@ -20,7 +20,7 @@ Add rSnark to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-rsnark = "0.1.0"
+rsnark = "0.1.3"
 ```
 
 or use `cargo add`:
@@ -55,6 +55,23 @@ impl Circuit for CircuitDefine<TestCircuit> {
         api.assert_is_equal(&c, &self.c);
     }
 }
+
+// Usage example
+fn main() {
+    let prover = Groth16BN254GnarkProver::new();
+    let circuit_prover = prover.compile_circuit::<TestCircuit>().unwrap();
+    let (pk, vk) = circuit_prover.setup().unwrap();
+
+    let circuit_witness = TestCircuit {
+        a: 3,
+        b: 4,
+        c: 7, // 3 + 4 = 7
+    };
+
+    let proof = circuit_prover.prove(&pk, &circuit_witness).unwrap();
+    let public_witness = circuit_witness.into_public_witness();
+    circuit_prover.verify(&vk, &proof, public_witness).unwrap();
+}
 ```
 
 ### Circuit Visibility Rules
@@ -70,6 +87,8 @@ Similar to compiler target triples, rSnark uses backend triples to define which 
 
 Currently supported backend triples:
 
+### Groth16 Proof System
+
 | Triple | Description |
 |--------|-------------|
 | `groth16-bn254-gnark` | Groth16 with BN254 curve using Gnark backend |
@@ -79,6 +98,13 @@ Currently supported backend triples:
 | `groth16-bw6-761-gnark` | Groth16 with BW6-761 curve using Gnark backend |
 | `groth16-bls24-315-gnark` | Groth16 with BLS24-315 curve using Gnark backend |
 | `groth16-bw6-633-gnark` | Groth16 with BW6-633 curve using Gnark backend |
+| `plonk-bn254-gnark` | PLONK with BN254 curve using Gnark backend |
+| `plonk-bls12-381-gnark` | PLONK with BLS12-381 curve using Gnark backend |
+| `plonk-bls24-317-gnark` | PLONK with BLS24-317 curve using Gnark backend |
+| `plonk-bls12-377-gnark` | PLONK with BLS12-377 curve using Gnark backend |
+| `plonk-bw6-761-gnark` | PLONK with BW6-761 curve using Gnark backend |
+| `plonk-bls24-315-gnark` | PLONK with BLS24-315 curve using Gnark backend |
+| `plonk-bw6-633-gnark` | PLONK with BW6-633 curve using Gnark backend |
 
 ## Project Structure
 

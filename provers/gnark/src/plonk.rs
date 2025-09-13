@@ -8,6 +8,22 @@ use crate::{
     types::{CompiledCircuit, GoInnerRef, PlonkProof, PlonkProvingKey, PlonkVerifyingKey},
 };
 
+/// PLONK backend implementation using the Gnark library.
+///
+/// This backend provides a Rust interface to Gnark's PLONK implementation,
+/// offering high-performance zero-knowledge proof generation and verification.
+/// The backend manages Go-side resources through FFI and supports multiple
+/// elliptic curves.
+///
+/// # Type Parameters
+///
+/// * `C` - The elliptic curve type that implements [`CurveId`]
+///
+/// # Resource Management
+///
+/// The backend maintains a reference to Go-side objects through `go_ref_id`.
+/// These resources are managed by the Gnark library and cleaned up automatically
+/// when no longer referenced.
 pub struct PlonkBackend<C> {
     go_ref_id: u64,
     marker: PhantomData<C>,
@@ -114,6 +130,10 @@ where
     }
 }
 
+/// Implementation of the [`Backend`] trait for PLONK using Gnark.
+///
+/// This implementation bridges Rust's type system with Gnark's Go implementation,
+/// providing compile-time curve selection and runtime proof operations.
 impl<C> Backend for PlonkBackend<C>
 where
     C: CurveId,

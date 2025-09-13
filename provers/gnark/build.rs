@@ -11,7 +11,7 @@ impl GoCompiler for NoBuildCompiler {
         _link: rust2go::LinkType,
         output: &std::path::Path,
     ) {
-        let h_file = include_str!("./assets/provers-gnark.h");
+        let h_file = include_str!("./assets/libgo.h");
 
         fs::create_dir_all(output).unwrap();
 

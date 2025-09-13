@@ -94,16 +94,24 @@ typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 extern "C" {
 #endif
 
-extern void CGroth16Prover_create(uint64_t curve_id, void* slot, void* cb);
-extern void CGroth16Prover_compile(uint64_t prover, ListRef circuit, void* slot, void* cb);
-extern void CGroth16Prover_setup(uint64_t prover, int64_t compiled_circuit, void* slot, void* cb);
-extern void CGroth16Prover_prove(uint64_t prover, int64_t compiled_circuit, int64_t pk, ListRef witness, void* slot, void* cb);
-extern void CGroth16Prover_verify(uint64_t prover, int64_t vk, ListRef proof, ListRef public_witness, void* slot, void* cb);
+extern void CGroth16Prover_groth16_create(uint64_t curve_id, void* slot, void* cb);
+extern void CGroth16Prover_groth16_compile(uint64_t curve_id, ListRef circuit, void* slot, void* cb);
+extern void CGroth16Prover_groth16_setup(uint64_t prover, int64_t compiled_circuit, void* slot, void* cb);
+extern void CGroth16Prover_groth16_prove(uint64_t prover, int64_t compiled_circuit, int64_t pk, ListRef witness, void* slot, void* cb);
+extern void CGroth16Prover_groth16_verify(uint64_t prover, int64_t vk, int64_t proof, ListRef public_witness, void* slot, void* cb);
+extern void CGroth16Prover_groth16_remove_prover(uint64_t prover);
+extern void CPlonkProver_plonk_create(uint64_t curve_id, void* slot, void* cb);
+extern void CPlonkProver_plonk_compile(uint64_t curve_id, ListRef circuit, void* slot, void* cb);
+extern void CPlonkProver_plonk_setup(uint64_t prover, int64_t compiled_circuit, void* slot, void* cb);
+extern void CPlonkProver_plonk_prove(uint64_t prover, int64_t compiled_circuit, int64_t pk, ListRef witness, void* slot, void* cb);
+extern void CPlonkProver_plonk_verify(uint64_t prover, int64_t vk, int64_t proof, ListRef public_witness, void* slot, void* cb);
+extern void CPlonkProver_plonk_remove_prover(uint64_t prover);
 extern void CObject_serialize(int64_t object_id, void* slot, void* cb);
 extern void CObject_deserialize(uint64_t ty, uint64_t curve_id, ListRef data, void* slot, void* cb);
 extern void CObject_write_to_file(int64_t object_id, StringRef path, void* slot, void* cb);
 extern void CObject_read_from_file(uint64_t ty, uint64_t curve_id, StringRef path, void* slot, void* cb);
 extern void CObject_export_solidity(int64_t object_id, void* slot, void* cb);
+extern void CObject_remove_object(int64_t object_id);
 
 #ifdef __cplusplus
 }

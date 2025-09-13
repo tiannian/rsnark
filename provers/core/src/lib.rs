@@ -11,7 +11,6 @@
 //! - [`Backend`]: The core trait that defines the interface for ZK-SNARK backends
 //! - [`Prover`]: High-level prover that orchestrates the proof generation process
 //! - [`CircuitProver`]: Circuit-specific prover for generating and verifying proofs
-//! - [`Proof`]: Representation of a generated zero-knowledge proof
 //!
 
 mod backend;
