@@ -6,22 +6,38 @@ pub mod binding {
 #[cfg(not(docsrs))]
 #[rust2go::r2g]
 pub trait Groth16Prover {
-    fn create(curve_id: u64) -> u64;
+    fn groth16_create(curve_id: u64) -> u64;
 
-    fn setup(prover: u64, compiled_circuit: i64) -> Vec<u8>;
+    fn groth16_compile(curve_id: u64, circuit: Vec<u8>) -> i64;
 
-    fn prove(prover: u64, compiled_circuit: i64, pk: i64, witness: Vec<u8>) -> Vec<u8>;
+    fn groth16_setup(prover: u64, compiled_circuit: i64) -> Vec<u8>;
 
-    fn verify(prover: u64, vk: i64, proof: Vec<u8>, public_witness: Vec<u8>) -> i64;
+    fn groth16_prove(prover: u64, compiled_circuit: i64, pk: i64, witness: Vec<u8>) -> i64;
 
-    fn remove_prover(prover: u64);
+    fn groth16_verify(prover: u64, vk: i64, proof: i64, public_witness: Vec<u8>) -> i64;
+
+    fn groth16_remove_prover(prover: u64);
+}
+
+#[cfg(not(docsrs))]
+#[rust2go::r2g]
+pub trait PlonkProver {
+    fn plonk_create(curve_id: u64) -> u64;
+
+    fn plonk_compile(curve_id: u64, circuit: Vec<u8>) -> i64;
+
+    fn plonk_setup(prover: u64, compiled_circuit: i64) -> Vec<u8>;
+
+    fn plonk_prove(prover: u64, compiled_circuit: i64, pk: i64, witness: Vec<u8>) -> i64;
+
+    fn plonk_verify(prover: u64, vk: i64, proof: i64, public_witness: Vec<u8>) -> i64;
+
+    fn plonk_remove_prover(prover: u64);
 }
 
 #[cfg(not(docsrs))]
 #[rust2go::r2g]
 pub trait Object {
-    fn compile(curve_id: u64, circuit: Vec<u8>) -> i64;
-
     fn serialize(object_id: i64) -> Vec<u8>;
 
     fn deserialize(ty: u64, curve_id: u64, data: Vec<u8>) -> i64;
@@ -36,8 +52,12 @@ pub trait Object {
 }
 
 #[cfg(docsrs)]
-pub mod groth16_prover {
+pub mod groth16 {
     pub fn create(_curve_id: u64) -> u64 {
+        unimplemented!()
+    }
+
+    pub fn compile(_curve_id: u64, _circuit: Vec<u8>) -> i64 {
         unimplemented!()
     }
 
@@ -45,11 +65,11 @@ pub mod groth16_prover {
         unimplemented!()
     }
 
-    pub fn prove(_prover: u64, _compiled_circuit: i64, _pk: i64, _witness: Vec<u8>) -> Vec<u8> {
+    pub fn prove(_prover: u64, _compiled_circuit: i64, _pk: i64, _witness: Vec<u8>) -> i64 {
         unimplemented!()
     }
 
-    pub fn verify(_prover: u64, _vk: i64, _proof: Vec<u8>, _public_witness: Vec<u8>) -> i64 {
+    pub fn verify(_prover: u64, _vk: i64, _proof: i64, _public_witness: Vec<u8>) -> i64 {
         unimplemented!()
     }
 
@@ -60,10 +80,6 @@ pub mod groth16_prover {
 
 #[cfg(docsrs)]
 pub mod object {
-    pub fn compile(_curve_id: u64, _circuit: Vec<u8>) -> i64 {
-        unimplemented!()
-    }
-
     pub fn serialize(_object_id: i64) -> Vec<u8> {
         unimplemented!()
     }
@@ -89,38 +105,65 @@ pub mod object {
     }
 }
 
+#[cfg(docsrs)]
+pub mod plonk {
+    pub fn create(_curve_id: u64) -> u64 {
+        unimplemented!()
+    }
+
+    pub fn compile(_curve_id: u64, _circuit: Vec<u8>) -> i64 {
+        unimplemented!()
+    }
+
+    pub fn setup(_prover: u64, _compiled_circuit: i64) -> Vec<u8> {
+        unimplemented!()
+    }
+
+    pub fn prove(_prover: u64, _compiled_circuit: i64, _pk: i64, _witness: Vec<u8>) -> i64 {
+        unimplemented!()
+    }
+
+    pub fn verify(_prover: u64, _vk: i64, _proof: i64, _public_witness: Vec<u8>) -> i64 {
+        unimplemented!()
+    }
+
+    pub fn remove_prover(_prover: u64) {
+        unimplemented!()
+    }
+}
+
 #[cfg(not(docsrs))]
-pub mod groth16_prover {
+pub mod groth16 {
     use crate::ffi::Groth16Prover;
 
     pub fn create(curve_id: u64) -> u64 {
-        super::Groth16ProverImpl::create(curve_id)
+        super::Groth16ProverImpl::groth16_create(curve_id)
+    }
+
+    pub fn compile(curve_id: u64, circuit: Vec<u8>) -> i64 {
+        super::Groth16ProverImpl::groth16_compile(curve_id, circuit)
     }
 
     pub fn setup(prover: u64, compiled_circuit: i64) -> Vec<u8> {
-        super::Groth16ProverImpl::setup(prover, compiled_circuit)
+        super::Groth16ProverImpl::groth16_setup(prover, compiled_circuit)
     }
 
-    pub fn prove(prover: u64, compiled_circuit: i64, pk: i64, witness: Vec<u8>) -> Vec<u8> {
-        super::Groth16ProverImpl::prove(prover, compiled_circuit, pk, witness)
+    pub fn prove(prover: u64, compiled_circuit: i64, pk: i64, witness: Vec<u8>) -> i64 {
+        super::Groth16ProverImpl::groth16_prove(prover, compiled_circuit, pk, witness)
     }
 
-    pub fn verify(prover: u64, vk: i64, proof: Vec<u8>, public_witness: Vec<u8>) -> i64 {
-        super::Groth16ProverImpl::verify(prover, vk, proof, public_witness)
+    pub fn verify(prover: u64, vk: i64, proof: i64, public_witness: Vec<u8>) -> i64 {
+        super::Groth16ProverImpl::groth16_verify(prover, vk, proof, public_witness)
     }
 
     pub fn remove_prover(prover: u64) {
-        super::Groth16ProverImpl::remove_prover(prover)
+        super::Groth16ProverImpl::groth16_remove_prover(prover)
     }
 }
 
 #[cfg(not(docsrs))]
 pub mod object {
     use crate::ffi::Object;
-
-    pub fn compile(curve_id: u64, circuit: Vec<u8>) -> i64 {
-        super::ObjectImpl::compile(curve_id, circuit)
-    }
 
     pub fn serialize(object_id: i64) -> Vec<u8> {
         super::ObjectImpl::serialize(object_id)
@@ -144,5 +187,34 @@ pub mod object {
 
     pub fn remove_object(object_id: i64) {
         super::ObjectImpl::remove_object(object_id)
+    }
+}
+
+#[cfg(not(docsrs))]
+pub mod plonk {
+    use crate::ffi::PlonkProver;
+
+    pub fn create(curve_id: u64) -> u64 {
+        super::PlonkProverImpl::plonk_create(curve_id)
+    }
+
+    pub fn compile(curve_id: u64, circuit: Vec<u8>) -> i64 {
+        super::PlonkProverImpl::plonk_compile(curve_id, circuit)
+    }
+
+    pub fn setup(prover: u64, compiled_circuit: i64) -> Vec<u8> {
+        super::PlonkProverImpl::plonk_setup(prover, compiled_circuit)
+    }
+
+    pub fn prove(prover: u64, compiled_circuit: i64, pk: i64, witness: Vec<u8>) -> i64 {
+        super::PlonkProverImpl::plonk_prove(prover, compiled_circuit, pk, witness)
+    }
+
+    pub fn verify(prover: u64, vk: i64, proof: i64, public_witness: Vec<u8>) -> i64 {
+        super::PlonkProverImpl::plonk_verify(prover, vk, proof, public_witness)
+    }
+
+    pub fn remove_prover(prover: u64) {
+        super::PlonkProverImpl::plonk_remove_prover(prover)
     }
 }

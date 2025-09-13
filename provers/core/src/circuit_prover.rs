@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 use anyhow::Result;
 use rsnark_core::{CircuitPublicWitness, CircuitWitness, types};
 
-use crate::{Backend, Proof};
+use crate::Backend;
 
 /// Circuit-specific prover for generating and verifying zero-knowledge proofs.
 ///
@@ -89,14 +89,13 @@ where
     /// - Cryptographic operations fail during proof generation
     /// - The witness values are malformed or invalid
     ///
-    pub fn prove(&self, proving_key: &B::ProvingKey, circuit_witness: &C) -> Result<Proof> {
+    pub fn prove(&self, proving_key: &B::ProvingKey, circuit_witness: &C) -> Result<B::Proof> {
         let mut public = Vec::new();
         let mut private = Vec::new();
 
         circuit_witness.append_witness(&mut public, &mut private, false);
 
         let witness = types::Witness::from((public, private));
-
         let proof = self
             .backend
             .prove(&self.constraint, proving_key, &witness)?;
@@ -136,7 +135,7 @@ where
     pub fn verify(
         &self,
         verifying_key: &B::VerifyingKey,
-        proof: &Proof,
+        proof: &B::Proof,
         public_witness: C::PublicWitness,
     ) -> Result<()>
     where

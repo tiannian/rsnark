@@ -34,3 +34,6 @@ pub use error::*;
 
 mod groth16;
 pub use groth16::*;
+
+mod plonk;
+pub use plonk::*;

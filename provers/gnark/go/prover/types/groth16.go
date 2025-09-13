@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/consensys/gnark/backend/groth16"
+	"github.com/consensys/gnark/constraint"
 )
 
 // Groth16ProvingKey wraps gnark Groth16 proving key with basic serialization
@@ -82,4 +83,71 @@ func (vk *Groth16VerifyingKey) ExportSolidity() ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
+}
+
+// CompiledCircuit represents a compiled circuit
+type Groth16CompiledCircuit struct {
+	CS constraint.ConstraintSystem // Generic constraint system (R1CS)
+}
+
+// NewCompiledCircuit creates a new CompiledCircuit
+func NewGroth16CompiledCircuit() *Groth16CompiledCircuit {
+	return &Groth16CompiledCircuit{}
+}
+
+// Serialize serializes the compiled circuit to bytes
+func (cc *Groth16CompiledCircuit) Serialize() ([]byte, error) {
+	var buf bytes.Buffer
+	_, err := cc.CS.WriteTo(&buf)
+	if err != nil {
+		return nil, fmt.Errorf("failed to serialize compiled circuit: %w", err)
+	}
+	return buf.Bytes(), nil
+}
+
+// Deserialize deserializes the compiled circuit from bytes
+func (cc *Groth16CompiledCircuit) Deserialize(data []byte, curve CurveType) error {
+	// Initialize a new constraint system based on the curve using groth16.NewCS
+	cs := groth16.NewCS(curve.ToECC())
+
+	buf := bytes.NewReader(data)
+	_, err := cs.ReadFrom(buf)
+	if err != nil {
+		return fmt.Errorf("failed to deserialize compiled circuit: %w", err)
+	}
+
+	cc.CS = cs
+	return nil
+}
+
+// Groth16Proof represents a Groth16 proof
+type Groth16Proof struct {
+	Proof groth16.Proof
+}
+
+// NewGroth16Proof creates a new Groth16Proof
+func NewGroth16Proof() *Groth16Proof {
+	return &Groth16Proof{}
+}
+
+// Serialize serializes the proof to bytes
+func (p *Groth16Proof) Serialize() ([]byte, error) {
+	var buf bytes.Buffer
+	_, err := p.Proof.WriteTo(&buf)
+	if err != nil {
+		return nil, fmt.Errorf("failed to serialize proof: %w", err)
+	}
+	return buf.Bytes(), nil
+}
+
+// Deserialize deserializes the proof from bytes
+func (p *Groth16Proof) Deserialize(data []byte, curve CurveType) error {
+	p.Proof = groth16.NewProof(curve.ToECC())
+
+	buf := bytes.NewReader(data)
+	_, err := p.Proof.ReadFrom(buf)
+	if err != nil {
+		return fmt.Errorf("failed to deserialize proof: %w", err)
+	}
+	return nil
 }

@@ -24,7 +24,7 @@ use rsnark_core::{
     U256,
     types::{CircuitDefinition, PublicWitness, Witness},
 };
-use rsnark_provers_core::{Backend, Proof};
+use rsnark_provers_core::Backend;
 use sha3::{Digest, Sha3_256};
 
 /// Error type for mock backend operations.
@@ -52,6 +52,7 @@ impl Backend for MockProverBackend {
     type CircuitConstraint = CircuitDefinition;
     type ProvingKey = ();
     type VerifyingKey = ();
+    type Proof = U256;
 
     type Error = Error;
 
@@ -88,9 +89,9 @@ impl Backend for MockProverBackend {
         _cs: &Self::CircuitConstraint,
         _pk: &Self::ProvingKey,
         witness: &Witness,
-    ) -> Result<Proof, Self::Error> {
+    ) -> Result<Self::Proof, Self::Error> {
         let res_hash = hash_public_witness(witness.public());
-        Ok(Proof(vec![res_hash]))
+        Ok(res_hash)
     }
 
     /// Verifies a mock proof by comparing hashes.
@@ -100,11 +101,11 @@ impl Backend for MockProverBackend {
     fn verify(
         &self,
         _vk: &Self::VerifyingKey,
-        proof: &Proof,
+        proof: &Self::Proof,
         public_witness: &PublicWitness,
     ) -> Result<bool, Self::Error> {
         let res_hash = hash_public_witness(&public_witness.public);
-        if res_hash == proof.0[0] {
+        if res_hash == *proof {
             Ok(true)
         } else {
             Ok(false)

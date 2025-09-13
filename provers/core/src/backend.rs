@@ -1,7 +1,5 @@
 use rsnark_core::types::{CircuitDefinition, PublicWitness, Witness};
 
-use crate::Proof;
-
 /// Core trait defining the interface for zero-knowledge proof backends.
 ///
 /// This trait abstracts over different ZK-SNARK implementations (such as Groth16, PLONK, Marlin, etc.)
@@ -28,6 +26,7 @@ pub trait Backend {
     type CircuitConstraint;
     type ProvingKey;
     type VerifyingKey;
+    type Proof;
 
     /// Error type for backend operations that must implement standard error traits.
     type Error: std::error::Error + Send + Sync + 'static;
@@ -107,7 +106,7 @@ pub trait Backend {
         cs: &Self::CircuitConstraint,
         pk: &Self::ProvingKey,
         witness: &Witness,
-    ) -> Result<Proof, Self::Error>;
+    ) -> Result<Self::Proof, Self::Error>;
 
     /// Verifies a zero-knowledge proof against public inputs.
     ///
@@ -133,7 +132,7 @@ pub trait Backend {
     fn verify(
         &self,
         vk: &Self::VerifyingKey,
-        proof: &Proof,
+        proof: &Self::Proof,
         public_witness: &PublicWitness,
     ) -> Result<bool, Self::Error>;
 }

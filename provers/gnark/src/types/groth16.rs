@@ -113,3 +113,43 @@ impl Groth16VerifyingKey<BN254> {
         }
     }
 }
+
+pub struct Groth16Proof<C> {
+    go_ref_id: i64,
+    marker: PhantomData<C>,
+}
+
+impl_groth16_object!(Groth16Proof, 4);
+
+pub struct PlonkProvingKey<C> {
+    go_ref_id: i64,
+    marker: PhantomData<C>,
+}
+impl_groth16_object!(PlonkProvingKey, 5);
+
+pub struct PlonkVerifyingKey<C> {
+    go_ref_id: i64,
+    marker: PhantomData<C>,
+}
+impl_groth16_object!(PlonkVerifyingKey, 6);
+
+impl PlonkVerifyingKey<BN254> {
+    pub fn export_solidity(&self) -> Result<String> {
+        let res = ffi::object::export_solidity(self.go_ref_id);
+
+        let code = i64::from_be_bytes(res[0..8].try_into().unwrap());
+
+        if code != 0 {
+            Err(Error::from_go_error(code))
+        } else {
+            let string = String::from_utf8(res[8..].to_vec())?;
+            Ok(string)
+        }
+    }
+}
+
+pub struct PlonkProof<C> {
+    go_ref_id: i64,
+    marker: PhantomData<C>,
+}
+impl_groth16_object!(PlonkProof, 7);

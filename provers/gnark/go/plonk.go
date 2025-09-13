@@ -1,50 +1,49 @@
 package main
 
 import (
-	"encoding/binary"
 	"log"
 	"sync"
 
 	"github.com/consensys/gnark/frontend"
-	"github.com/consensys/gnark/frontend/cs/r1cs"
+	"github.com/consensys/gnark/frontend/cs/scs"
 	"github.com/tiannian/rsnark/provers-gnark/circuit"
 	"github.com/tiannian/rsnark/provers-gnark/prover"
 	"github.com/tiannian/rsnark/provers-gnark/prover/types"
 )
 
-type Groth16ProverCall struct{}
+type PlonkProverCall struct{}
 
 var (
-	provers         map[uint64]*prover.Groth16Prover
-	proverMutex     sync.Mutex
-	proverIDCounter uint64
+	plonkProvers         map[uint64]*prover.PlonkProver
+	plonkProverMutex     sync.Mutex
+	plonkProverIDCounter uint64
 )
 
 func init() {
-	Groth16ProverImpl = Groth16ProverCall{}
-	provers = make(map[uint64]*prover.Groth16Prover)
+	PlonkProverImpl = PlonkProverCall{}
+	plonkProvers = make(map[uint64]*prover.PlonkProver)
 }
 
-// addProver 添加一个新的prover到map中，返回分配的ID
-func addProver(p *prover.Groth16Prover) uint64 {
-	proverMutex.Lock()
-	defer proverMutex.Unlock()
+// addPlonkProver 添加一个新的PLONK prover到map中，返回分配的ID
+func addPlonkProver(p *prover.PlonkProver) uint64 {
+	plonkProverMutex.Lock()
+	defer plonkProverMutex.Unlock()
 
-	proverIDCounter++
-	id := proverIDCounter
-	provers[id] = p
+	plonkProverIDCounter++
+	id := plonkProverIDCounter
+	plonkProvers[id] = p
 
 	return id
 }
 
-func (p Groth16ProverCall) groth16_create(curve *uint64) uint64 {
+func (p PlonkProverCall) plonk_create(curve *uint64) uint64 {
 	curveType := types.CurveType(*curve)
 
-	prover := prover.NewGroth16Prover(curveType)
-	return addProver(prover)
+	prover := prover.NewPlonkProver(curveType)
+	return addPlonkProver(prover)
 }
 
-func (p Groth16ProverCall) groth16_compile(curve_id *uint64, circuit_data *[]byte) int64 {
+func (p PlonkProverCall) plonk_compile(curve_id *uint64, circuit_data *[]byte) int64 {
 	curveType := types.CurveType(*curve_id)
 
 	// Parse CircuitDefinition from JSON
@@ -61,26 +60,25 @@ func (p Groth16ProverCall) groth16_compile(curve_id *uint64, circuit_data *[]byt
 		return -20014
 	}
 
-	r1cs, err := frontend.Compile(curveType.ToECC().ScalarField(), r1cs.NewBuilder, templateCircuit)
+	scs, err := frontend.Compile(curveType.ToECC().ScalarField(), scs.NewBuilder, templateCircuit)
 	if err != nil {
 		log.Fatalf("failed to compile circuit to R1CS: %v", err)
 		return -20015
 	}
 
-	compiled := &types.Groth16CompiledCircuit{
-		CS: r1cs,
+	compiled := &types.PlonkCompiledCircuit{
+		CS: scs,
 	}
 
 	return addObject(compiled)
-
 }
 
-func (p Groth16ProverCall) groth16_setup(prover_id *uint64, compiled_circuit_id *int64) []byte {
-	proverMutex.Lock()
-	prover, proverExists := provers[*prover_id]
-	proverMutex.Unlock()
+func (p PlonkProverCall) plonk_setup(prover_id *uint64, compiled_circuit_id *int64) []byte {
+	plonkProverMutex.Lock()
+	prover, proverExists := plonkProvers[*prover_id]
+	plonkProverMutex.Unlock()
 	if !proverExists {
-		log.Fatalf("prover with id %d not found", *prover_id)
+		log.Fatalf("PLONK prover with id %d not found", *prover_id)
 		return int64ToBytes2(-20011, 0)
 	}
 
@@ -93,16 +91,16 @@ func (p Groth16ProverCall) groth16_setup(prover_id *uint64, compiled_circuit_id 
 		return int64ToBytes2(-20012, 0)
 	}
 
-	compiled, ok := compiledObj.(*types.Groth16CompiledCircuit)
+	compiled, ok := compiledObj.(*types.PlonkCompiledCircuit)
 	if !ok {
-		log.Fatalf("failed to cast compiled circuit to types.CompiledCircuit")
+		log.Fatalf("failed to cast compiled circuit to types.PlonkCompiledCircuit")
 		return int64ToBytes2(-20003, 0)
 	}
 
 	pk, vk, err := prover.Setup(compiled)
 
 	if err != nil {
-		log.Fatalf("failed to setup Groth16: %v", err)
+		log.Fatalf("failed to setup PLONK: %v", err)
 		return int64ToBytes2(-20004, 0)
 	}
 
@@ -112,27 +110,12 @@ func (p Groth16ProverCall) groth16_setup(prover_id *uint64, compiled_circuit_id 
 	return int64ToBytes2(pkID, vkID)
 }
 
-func int64ToBytes2(i0 int64, i1 int64) []byte {
-	bigEndian := make([]byte, 16)
-	binary.BigEndian.PutUint64(bigEndian, uint64(i0))
-	binary.BigEndian.PutUint64(bigEndian[8:], uint64(i1))
-
-	return bigEndian
-}
-
-func int64ToBytes(i0 int64) []byte {
-	bigEndian := make([]byte, 8)
-	binary.BigEndian.PutUint64(bigEndian, uint64(i0))
-
-	return bigEndian
-}
-
-func (p Groth16ProverCall) groth16_prove(prover_id *uint64, compiled_circuit_id *int64, pk_id *int64, witness_data *[]byte) int64 {
-	proverMutex.Lock()
-	prover, proverExists := provers[*prover_id]
-	proverMutex.Unlock()
+func (p PlonkProverCall) plonk_prove(prover_id *uint64, compiled_circuit_id *int64, pk_id *int64, witness_data *[]byte) int64 {
+	plonkProverMutex.Lock()
+	prover, proverExists := plonkProvers[*prover_id]
+	plonkProverMutex.Unlock()
 	if !proverExists {
-		log.Fatalf("prover with id %d not found", *prover_id)
+		log.Fatalf("PLONK prover with id %d not found", *prover_id)
 		return -20011
 	}
 
@@ -141,13 +124,13 @@ func (p Groth16ProverCall) groth16_prove(prover_id *uint64, compiled_circuit_id 
 
 	pkObj, pkExists := objects[*pk_id]
 	if !pkExists {
-		log.Fatalf("proving key with id %d not found", *pk_id)
+		log.Fatalf("PLONK proving key with id %d not found", *pk_id)
 		return -20012
 	}
 
-	pk, ok := pkObj.(*types.Groth16ProvingKey)
+	pk, ok := pkObj.(*types.PlonkProvingKey)
 	if !ok {
-		log.Fatalf("failed to cast pk to types.Groth16ProvingKey")
+		log.Fatalf("failed to cast pk to types.PlonkProvingKey")
 		return -20005
 	}
 
@@ -157,7 +140,7 @@ func (p Groth16ProverCall) groth16_prove(prover_id *uint64, compiled_circuit_id 
 		return -20012
 	}
 
-	compiled, ok := compiledObj.(*types.Groth16CompiledCircuit)
+	compiled, ok := compiledObj.(*types.PlonkCompiledCircuit)
 	if !ok {
 		log.Fatalf("failed to cast compiled circuit to types.CompiledCircuit")
 		return -20006
@@ -179,12 +162,12 @@ func (p Groth16ProverCall) groth16_prove(prover_id *uint64, compiled_circuit_id 
 	return addObjectWithoutLock(proof)
 }
 
-func (p Groth16ProverCall) groth16_verify(prover_id *uint64, vk_id *int64, proof_id *int64, public_witness_data *[]byte) int64 {
-	proverMutex.Lock()
-	prover, proverExists := provers[*prover_id]
-	proverMutex.Unlock()
+func (p PlonkProverCall) plonk_verify(prover_id *uint64, vk_id *int64, proof_id *int64, public_witness_data *[]byte) int64 {
+	plonkProverMutex.Lock()
+	prover, proverExists := plonkProvers[*prover_id]
+	plonkProverMutex.Unlock()
 	if !proverExists {
-		log.Fatalf("prover with id %d not found", *prover_id)
+		log.Fatalf("PLONK prover with id %d not found", *prover_id)
 		return -20011
 	}
 
@@ -193,13 +176,13 @@ func (p Groth16ProverCall) groth16_verify(prover_id *uint64, vk_id *int64, proof
 
 	vkObj, vkExists := objects[*vk_id]
 	if !vkExists {
-		log.Fatalf("verifying key with id %d not found", *vk_id)
+		log.Fatalf("PLONK verifying key with id %d not found", *vk_id)
 		return -20012
 	}
 
-	vk, ok := vkObj.(*types.Groth16VerifyingKey)
+	vk, ok := vkObj.(*types.PlonkVerifyingKey)
 	if !ok {
-		log.Fatalf("failed to cast vk to types.Groth16VerifyingKey")
+		log.Fatalf("failed to cast vk to types.PlonkVerifyingKey")
 		return -20009
 	}
 
@@ -216,9 +199,9 @@ func (p Groth16ProverCall) groth16_verify(prover_id *uint64, vk_id *int64, proof
 		return -20013
 	}
 
-	proof, ok := proofObj.(*types.Groth16Proof)
+	proof, ok := proofObj.(*types.PlonkProof)
 	if !ok {
-		log.Fatalf("failed to cast proof to types.Groth16Proof")
+		log.Fatalf("failed to cast proof to types.PlonkProof")
 		return -20014
 	}
 
@@ -231,9 +214,9 @@ func (p Groth16ProverCall) groth16_verify(prover_id *uint64, vk_id *int64, proof
 	return int64(0)
 }
 
-func (p Groth16ProverCall) groth16_remove_prover(prover_id *uint64) {
-	proverMutex.Lock()
-	defer proverMutex.Unlock()
+func (p PlonkProverCall) plonk_remove_prover(prover_id *uint64) {
+	plonkProverMutex.Lock()
+	defer plonkProverMutex.Unlock()
 
-	delete(provers, *prover_id)
+	delete(plonkProvers, *prover_id)
 }

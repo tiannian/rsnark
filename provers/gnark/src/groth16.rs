@@ -1,14 +1,11 @@
 use std::marker::PhantomData;
 
-use rsnark_core::{
-    U256,
-    types::{CircuitDefinition, PublicWitness, Witness},
-};
-use rsnark_provers_core::{Backend, CurveId, Proof};
+use rsnark_core::types::{CircuitDefinition, PublicWitness, Witness};
+use rsnark_provers_core::{Backend, CurveId};
 
 use crate::{
     Error, Result, ffi,
-    types::{CompiledCircuit, GoInnerRef, Groth16ProvingKey, Groth16VerifyingKey},
+    types::{CompiledCircuit, GoInnerRef, Groth16Proof, Groth16ProvingKey, Groth16VerifyingKey},
 };
 
 /// Groth16 backend implementation using the Gnark library.
@@ -34,7 +31,7 @@ pub struct Groth16Backend<C> {
 
 impl<C> Drop for Groth16Backend<C> {
     fn drop(&mut self) {
-        ffi::groth16_prover::remove_prover(self.go_ref_id);
+        ffi::groth16::remove_prover(self.go_ref_id);
     }
 }
 
@@ -57,7 +54,7 @@ where
     fn _new() -> Self {
         let curve = C::curve_id();
 
-        let prover = ffi::groth16_prover::create(curve);
+        let prover = ffi::groth16::create(curve);
 
         Self {
             go_ref_id: prover,
@@ -70,7 +67,7 @@ where
 
         let curve = C::curve_id();
 
-        let res = ffi::object::compile(curve, circuit);
+        let res = ffi::groth16::compile(curve, circuit);
 
         if res >= 0 {
             Ok(CompiledCircuit::from_go_inner_ref(res))
@@ -83,7 +80,7 @@ where
         &self,
         compiled_circuit: &CompiledCircuit<C>,
     ) -> Result<(Groth16ProvingKey<C>, Groth16VerifyingKey<C>)> {
-        let res = ffi::groth16_prover::setup(self.go_ref_id, compiled_circuit.go_inner_ref());
+        let res = ffi::groth16::setup(self.go_ref_id, compiled_circuit.go_inner_ref());
 
         let res0 = i64::from_be_bytes(res[0..8].try_into().unwrap());
         let res1 = i64::from_be_bytes(res[8..16].try_into().unwrap());
@@ -103,39 +100,35 @@ where
         compiled_circuit: &CompiledCircuit<C>,
         pk: &Groth16ProvingKey<C>,
         witness: &Witness,
-    ) -> Result<Vec<u8>> {
-        // TODO: Compect go side witness
+    ) -> Result<Groth16Proof<C>> {
         let witness_bytes = serde_json::to_vec(witness)?;
 
-        let res = ffi::groth16_prover::prove(
+        let res = ffi::groth16::prove(
             self.go_ref_id,
             compiled_circuit.go_inner_ref(),
             pk.go_inner_ref(),
             witness_bytes,
         );
 
-        let code = i64::from_be_bytes(res[0..8].try_into().unwrap());
-
-        if code != 0 {
-            Err(Error::from_go_error(code))
+        if res < 0 {
+            Err(Error::from_go_error(res))
         } else {
-            Ok(res)
+            Ok(Groth16Proof::from_go_inner_ref(res))
         }
     }
 
     fn _verify(
         &self,
         vk: &Groth16VerifyingKey<C>,
-        proof: Vec<u8>,
+        proof: &Groth16Proof<C>,
         public_witness: &PublicWitness,
     ) -> Result<bool> {
-        // TODO: Compect go side public witness
         let public_witness_bytes = serde_json::to_vec(public_witness)?;
 
-        let res = ffi::groth16_prover::verify(
+        let res = ffi::groth16::verify(
             self.go_ref_id,
             vk.go_inner_ref(),
-            proof,
+            proof.go_inner_ref(),
             public_witness_bytes,
         );
 
@@ -160,6 +153,7 @@ where
     type CircuitConstraint = CompiledCircuit<C>;
     type ProvingKey = Groth16ProvingKey<C>;
     type VerifyingKey = Groth16VerifyingKey<C>;
+    type Proof = Groth16Proof<C>;
 
     type Error = Error;
 
@@ -183,41 +177,19 @@ where
         compiled_circuit: &Self::CircuitConstraint,
         pk: &Self::ProvingKey,
         witness: &Witness,
-    ) -> Result<Proof> {
+    ) -> Result<Self::Proof> {
         let proof = self._prove(compiled_circuit, pk, witness)?;
 
-        let proof_len = proof.len() - 8;
-
-        let proof = &proof[8..proof.len() - 4];
-
-        let mut res = Vec::with_capacity(8);
-
-        for i in 0..proof_len / 32 {
-            let mut bytes = [0u8; 32];
-            bytes.copy_from_slice(&proof[i * 32..(i + 1) * 32]);
-            res.push(U256::from_be_bytes(bytes));
-        }
-
-        Ok(Proof(res))
+        Ok(proof)
     }
 
     fn verify(
         &self,
         vk: &Self::VerifyingKey,
-        proof: &Proof,
+        proof: &Self::Proof,
         public_witness: &PublicWitness,
     ) -> Result<bool> {
-        let proof_len = proof.0.len() * 32 + 4;
-
-        let mut proof_bytes = Vec::with_capacity(proof_len);
-        for value in &proof.0 {
-            let bytes: [u8; 32] = value.to_be_bytes();
-            proof_bytes.extend_from_slice(&bytes);
-        }
-
-        proof_bytes.resize(proof_len, 0u8);
-
-        self._verify(vk, proof_bytes, public_witness)
+        self._verify(vk, proof, public_witness)
     }
 }
 
