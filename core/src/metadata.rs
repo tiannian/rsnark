@@ -1,4 +1,4 @@
-use ruint::aliases::U256;
+use num::{BigInt, Num};
 
 /// Trait for identifying elliptic curves used in zero-knowledge proof systems.
 ///
@@ -19,7 +19,7 @@ pub trait CurveId {
 
     fn curve_type() -> CurveType;
 
-    fn field() -> U256;
+    fn field() -> BigInt;
 }
 
 macro_rules! define_curve {
@@ -35,8 +35,8 @@ macro_rules! define_curve {
                 CurveType::$name
             }
 
-            fn field() -> U256 {
-                U256::from_str_radix($field, 10).unwrap()
+            fn field() -> BigInt {
+                BigInt::from_str_radix($field, 10).unwrap()
             }
         }
     };
@@ -120,13 +120,13 @@ pub enum ProvingSystem {
 
 #[derive(Debug, Clone)]
 pub struct MetadataInfo {
-    pub field: U256,
+    pub field: BigInt,
     pub curve: CurveType,
     pub proving_system: ProvingSystem,
 }
 
 pub trait Metadata {
-    fn field(&self) -> &U256;
+    fn field(&self) -> &BigInt;
 
     fn curve(&self) -> &CurveType;
 
@@ -134,7 +134,7 @@ pub trait Metadata {
 }
 
 impl Metadata for MetadataInfo {
-    fn field(&self) -> &U256 {
+    fn field(&self) -> &BigInt {
         &self.field
     }
 

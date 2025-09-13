@@ -61,13 +61,12 @@ func (pw *TemplatePublicWitness) FromJSON(data []byte) error {
 	for i, v := range temp.PublicVariables {
 		switch val := v.(type) {
 		case string:
-			bigInt, err := parseHexStringToBigIntPW(val)
-			if err != nil {
-				return fmt.Errorf("error parsing public variable %d: %v", i, err)
+			bigInt := new(big.Int)
+			bigInt, ok := bigInt.SetString(val, 10)
+			if !ok {
+				return fmt.Errorf("invalid hex string: %s", val)
 			}
 			pw.PublicVariables[i] = bigInt
-		case float64:
-			pw.PublicVariables[i] = big.NewInt(int64(val))
 		default:
 			return fmt.Errorf("unsupported type for public variable %d: %T", i, v)
 		}

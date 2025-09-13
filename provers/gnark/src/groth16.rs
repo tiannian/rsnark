@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 use rsnark_core::{
-    CurveId, MetadataInfo, ProvingSystem, U256,
+    CurveId, MetadataInfo, ProvingSystem,
     types::{CircuitDefinition, PublicWitness, Witness},
 };
 use rsnark_provers_core::Backend;

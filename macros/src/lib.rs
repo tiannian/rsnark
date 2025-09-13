@@ -165,7 +165,7 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
             use super::*;
 
             use ::rsnark_core::{
-                CircuitWitness, CircuitPublicWitness, U256, VariableIniter,
+                CircuitWitness, CircuitPublicWitness, BigInt, VariableIniter,
             };
 
             impl CircuitWitness for #name {
@@ -181,7 +181,7 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
                     #define_name::new(initer, true)
                 }
 
-                fn append_witness(&self, public: &mut Vec<U256>, private: &mut Vec<U256>, _is_private: bool) {
+                fn append_witness(&self, public: &mut Vec<BigInt>, private: &mut Vec<BigInt>, _is_private: bool) {
                     #(#append_witness_impl)*
                 }
 
@@ -208,7 +208,7 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
             }
 
             impl CircuitPublicWitness for #name {
-                fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {
+                fn append_public_witness(&self, witness: &mut Vec<BigInt>, _is_private: bool) {
                     #(#append_public_impl_orig)*
                 }
             }
@@ -219,7 +219,7 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
             }
 
             impl CircuitPublicWitness for #public_witness_name {
-                fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {
+                fn append_public_witness(&self, witness: &mut Vec<BigInt>, _is_private: bool) {
                     #(#append_public_impl_witness)*
                 }
             }

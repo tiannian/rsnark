@@ -21,6 +21,6 @@ pub use initer::*;
 mod metadata;
 pub use metadata::*;
 
-pub use ruint::aliases::U256;
+pub use num::BigInt;
 
 pub use rsnark_macros::Circuit;

@@ -2,8 +2,9 @@
 //!
 //! Note: These types are used for build prover, so they are not part of the public API.
 
-use ruint::aliases::U256;
+use num::BigInt;
 use serde::{Deserialize, Serialize};
+use serde_with::{DisplayFromStr, serde_as};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CircuitDefinition {
@@ -56,14 +57,17 @@ pub struct Operation {
 pub enum VariableType {
     Public(u64),
     Private(u64),
-    Constant(U256),
+    Constant(BigInt),
     Local(u64),
 }
 
+#[serde_as]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Witness {
-    public: Vec<U256>,
-    private: Vec<U256>,
+    #[serde_as(as = "Vec<DisplayFromStr>")]
+    public: Vec<BigInt>,
+    #[serde_as(as = "Vec<DisplayFromStr>")]
+    private: Vec<BigInt>,
 }
 
 impl Default for Witness {
@@ -72,8 +76,8 @@ impl Default for Witness {
     }
 }
 
-impl From<(Vec<U256>, Vec<U256>)> for Witness {
-    fn from((public, private): (Vec<U256>, Vec<U256>)) -> Self {
+impl From<(Vec<BigInt>, Vec<BigInt>)> for Witness {
+    fn from((public, private): (Vec<BigInt>, Vec<BigInt>)) -> Self {
         Self { public, private }
     }
 }
@@ -92,26 +96,28 @@ impl Witness {
         }
     }
 
-    pub fn public_mut(&mut self) -> &mut Vec<U256> {
+    pub fn public_mut(&mut self) -> &mut Vec<BigInt> {
         &mut self.public
     }
 
-    pub fn private_mut(&mut self) -> &mut Vec<U256> {
+    pub fn private_mut(&mut self) -> &mut Vec<BigInt> {
         &mut self.private
     }
 
-    pub fn public(&self) -> &[U256] {
+    pub fn public(&self) -> &[BigInt] {
         &self.public
     }
 
-    pub fn private(&self) -> &[U256] {
+    pub fn private(&self) -> &[BigInt] {
         &self.private
     }
 }
 
+#[serde_as]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PublicWitness {
-    pub public: Vec<U256>,
+    #[serde_as(as = "Vec<DisplayFromStr>")]
+    pub public: Vec<BigInt>,
 }
 
 impl Default for PublicWitness {
@@ -125,7 +131,7 @@ impl PublicWitness {
         Self { public: Vec::new() }
     }
 
-    pub fn public_mut(&mut self) -> &mut Vec<U256> {
+    pub fn public_mut(&mut self) -> &mut Vec<BigInt> {
         &mut self.public
     }
 }

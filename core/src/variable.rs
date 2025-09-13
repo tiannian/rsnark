@@ -2,7 +2,7 @@
 //!
 //! These types can used in API to define circuit.
 
-use ruint::aliases::U256;
+use num::BigInt;
 
 use crate::types::VariableType;
 
@@ -50,14 +50,13 @@ macro_rules! define_variable_for_from_u256 {
     ($t:ident) => {
         impl Variable for $t {
             fn ty(&self) -> VariableType {
-                let x = U256::from(*self);
+                let x = BigInt::from(*self);
                 VariableType::Constant(x)
             }
         }
     };
 }
 
-define_variable_for_from_u256!(U256);
 define_variable_for_from_u256!(u128);
 define_variable_for_from_u256!(u64);
 define_variable_for_from_u256!(u32);

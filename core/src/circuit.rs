@@ -1,4 +1,4 @@
-use ruint::aliases::U256;
+use num::BigInt;
 
 use crate::{API, VariableIniter, variable::CircuitVariable};
 
@@ -41,7 +41,7 @@ pub trait CircuitWitness: CircuitPublicWitness {
     fn into_public_witness(self) -> Self::PublicWitness;
 
     #[doc(hidden)]
-    fn append_witness(&self, public: &mut Vec<U256>, private: &mut Vec<U256>, is_private: bool);
+    fn append_witness(&self, public: &mut Vec<BigInt>, private: &mut Vec<BigInt>, is_private: bool);
 }
 
 /// Represents the public witness portion of a circuit.
@@ -50,7 +50,7 @@ pub trait CircuitWitness: CircuitPublicWitness {
 /// `#[derive(Circuit)]` macro to automatically generate the implementation.
 /// It handles serialization of public inputs for the circuit.
 pub trait CircuitPublicWitness {
-    fn append_public_witness(&self, witness: &mut Vec<U256>, is_private: bool);
+    fn append_public_witness(&self, witness: &mut Vec<BigInt>, is_private: bool);
 }
 
 #[doc(hidden)]
@@ -87,11 +87,11 @@ macro_rules! define_circuit_element_for_from_u256 {
 
             fn append_witness(
                 &self,
-                public: &mut Vec<U256>,
-                private: &mut Vec<U256>,
+                public: &mut Vec<BigInt>,
+                private: &mut Vec<BigInt>,
                 is_private: bool,
             ) {
-                let x = U256::from(*self);
+                let x = BigInt::from(*self);
                 if is_private {
                     private.push(x);
                 } else {
@@ -105,8 +105,8 @@ macro_rules! define_circuit_element_for_from_u256 {
         }
 
         impl CircuitPublicWitness for $t {
-            fn append_public_witness(&self, witness: &mut Vec<U256>, is_private: bool) {
-                let x = U256::from(*self);
+            fn append_public_witness(&self, witness: &mut Vec<BigInt>, is_private: bool) {
+                let x = BigInt::from(*self);
                 if !is_private {
                     witness.push(x);
                 }
@@ -115,7 +115,6 @@ macro_rules! define_circuit_element_for_from_u256 {
     };
 }
 
-define_circuit_element_for_from_u256!(U256);
 define_circuit_element_for_from_u256!(u128);
 define_circuit_element_for_from_u256!(u64);
 define_circuit_element_for_from_u256!(u32);

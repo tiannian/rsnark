@@ -1,5 +1,5 @@
 use rsnark::Groth16BN254GnarkProver;
-use rsnark_core::{API, Circuit, CircuitDefine, CircuitWitness};
+use rsnark_core::{API, BigInt, Circuit, CircuitDefine, CircuitWitness};
 pub struct AdderCircuit {
     a: u32,
     b: u32,
@@ -7,7 +7,7 @@ pub struct AdderCircuit {
 }
 mod __rsnark_generated_addercircuit {
     use super::*;
-    use ::rsnark_core::{CircuitPublicWitness, CircuitWitness, U256, VariableIniter};
+    use ::rsnark_core::{CircuitPublicWitness, CircuitWitness, VariableIniter};
     impl CircuitWitness for AdderCircuit {
         type PrivateElement = AdderCircuitCircuitDefine;
         type PublicElement = AdderCircuitCircuitDefine;
@@ -20,8 +20,8 @@ mod __rsnark_generated_addercircuit {
         }
         fn append_witness(
             &self,
-            public: &mut Vec<U256>,
-            private: &mut Vec<U256>,
+            public: &mut Vec<BigInt>,
+            private: &mut Vec<BigInt>,
             _is_private: bool,
         ) {
             self.a.append_witness(public, private, true);
@@ -50,7 +50,7 @@ mod __rsnark_generated_addercircuit {
         }
     }
     impl CircuitPublicWitness for AdderCircuit {
-        fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {
+        fn append_public_witness(&self, witness: &mut Vec<BigInt>, _is_private: bool) {
             self.sum.append_public_witness(witness, false);
         }
     }
@@ -59,7 +59,7 @@ mod __rsnark_generated_addercircuit {
         pub sum: ::rsnark_core::PublicWitness<u32>,
     }
     impl CircuitPublicWitness for AdderCircuitPublicWitness {
-        fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {
+        fn append_public_witness(&self, witness: &mut Vec<BigInt>, _is_private: bool) {
             self.sum.append_public_witness(witness, false);
         }
     }
@@ -77,7 +77,7 @@ pub struct MultiplierCircuit {
 }
 mod __rsnark_generated_multipliercircuit {
     use super::*;
-    use ::rsnark_core::{CircuitPublicWitness, CircuitWitness, U256, VariableIniter};
+    use ::rsnark_core::{CircuitPublicWitness, CircuitWitness, VariableIniter};
     impl CircuitWitness for MultiplierCircuit {
         type PrivateElement = MultiplierCircuitCircuitDefine;
         type PublicElement = MultiplierCircuitCircuitDefine;
@@ -90,8 +90,8 @@ mod __rsnark_generated_multipliercircuit {
         }
         fn append_witness(
             &self,
-            public: &mut Vec<U256>,
-            private: &mut Vec<U256>,
+            public: &mut Vec<BigInt>,
+            private: &mut Vec<BigInt>,
             _is_private: bool,
         ) {
             self.x.append_witness(public, private, true);
@@ -120,7 +120,7 @@ mod __rsnark_generated_multipliercircuit {
         }
     }
     impl CircuitPublicWitness for MultiplierCircuit {
-        fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {
+        fn append_public_witness(&self, witness: &mut Vec<BigInt>, _is_private: bool) {
             self.product.append_public_witness(witness, false);
         }
     }
@@ -129,7 +129,7 @@ mod __rsnark_generated_multipliercircuit {
         pub product: ::rsnark_core::PublicWitness<u32>,
     }
     impl CircuitPublicWitness for MultiplierCircuitPublicWitness {
-        fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {
+        fn append_public_witness(&self, witness: &mut Vec<BigInt>, _is_private: bool) {
             self.product.append_public_witness(witness, false);
         }
     }
@@ -147,7 +147,7 @@ pub struct CompositeCircuit {
 }
 mod __rsnark_generated_compositecircuit {
     use super::*;
-    use ::rsnark_core::{CircuitPublicWitness, CircuitWitness, U256, VariableIniter};
+    use ::rsnark_core::{CircuitPublicWitness, CircuitWitness, VariableIniter};
     impl CircuitWitness for CompositeCircuit {
         type PrivateElement = CompositeCircuitCircuitDefine;
         type PublicElement = CompositeCircuitCircuitDefine;
@@ -160,8 +160,8 @@ mod __rsnark_generated_compositecircuit {
         }
         fn append_witness(
             &self,
-            public: &mut Vec<U256>,
-            private: &mut Vec<U256>,
+            public: &mut Vec<BigInt>,
+            private: &mut Vec<BigInt>,
             _is_private: bool,
         ) {
             self.adder.append_witness(public, private, true);
@@ -194,7 +194,7 @@ mod __rsnark_generated_compositecircuit {
         }
     }
     impl CircuitPublicWitness for CompositeCircuit {
-        fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {
+        fn append_public_witness(&self, witness: &mut Vec<BigInt>, _is_private: bool) {
             self.final_result.append_public_witness(witness, false);
         }
     }
@@ -203,7 +203,7 @@ mod __rsnark_generated_compositecircuit {
         pub final_result: ::rsnark_core::PublicWitness<u32>,
     }
     impl CircuitPublicWitness for CompositeCircuitPublicWitness {
-        fn append_public_witness(&self, witness: &mut Vec<U256>, _is_private: bool) {
+        fn append_public_witness(&self, witness: &mut Vec<BigInt>, _is_private: bool) {
             self.final_result.append_public_witness(witness, false);
         }
     }

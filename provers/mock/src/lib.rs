@@ -20,8 +20,9 @@
 //! never be used in production environments. It's designed solely for testing
 //! and development purposes.
 
+use num::traits::{FromBytes, ToBytes};
 use rsnark_core::{
-    CurveType, MetadataInfo, ProvingSystem, U256,
+    BigInt, CurveType, MetadataInfo, ProvingSystem,
     types::{CircuitDefinition, PublicWitness, Witness},
 };
 use rsnark_provers_core::Backend;
@@ -52,7 +53,7 @@ impl Backend for MockProverBackend {
     type CircuitConstraint = CircuitDefinition;
     type ProvingKey = ();
     type VerifyingKey = ();
-    type Proof = U256;
+    type Proof = BigInt;
 
     type Error = Error;
 
@@ -62,7 +63,7 @@ impl Backend for MockProverBackend {
 
     fn metadata(&self) -> MetadataInfo {
         MetadataInfo {
-            field: U256::MAX,
+            field: BigInt::from(u128::MAX),
             curve: CurveType::Mock,
             proving_system: ProvingSystem::Mock,
         }
@@ -121,14 +122,14 @@ impl Backend for MockProverBackend {
     }
 }
 
-fn hash_public_witness(public_witness: &[U256]) -> U256 {
+fn hash_public_witness(public_witness: &[BigInt]) -> BigInt {
     let mut hasher = Sha3_256::new();
 
     for value in public_witness {
-        let bytes: [u8; 32] = value.to_be_bytes();
+        let bytes = value.to_be_bytes();
         hasher.update(bytes);
     }
 
     let res_bytes = hasher.finalize();
-    U256::from_be_slice(&res_bytes)
+    BigInt::from_be_bytes(&res_bytes)
 }
