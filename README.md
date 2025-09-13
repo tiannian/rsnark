@@ -36,6 +36,8 @@ Defining a circuit requires two simple steps:
 1. Define the circuit's inputs and outputs using the `#[derive(Circuit)]` macro
 2. Implement the `Circuit` trait to define the circuit's constraint rules
 
+Use the following way to define circuit:
+
 ```rust
 use rsnark::{
     Groth16BN254GnarkProver,
@@ -55,31 +57,52 @@ impl Circuit for CircuitDefine<TestCircuit> {
         api.assert_is_equal(&c, &self.c);
     }
 }
-
-// Usage example
-fn main() {
-    let prover = Groth16BN254GnarkProver::new();
-    let circuit_prover = prover.compile_circuit::<TestCircuit>().unwrap();
-    let (pk, vk) = circuit_prover.setup().unwrap();
-
-    let circuit_witness = TestCircuit {
-        a: 3,
-        b: 4,
-        c: 7, // 3 + 4 = 7
-    };
-
-    let proof = circuit_prover.prove(&pk, &circuit_witness).unwrap();
-    let public_witness = circuit_witness.into_public_witness();
-    circuit_prover.verify(&vk, &proof, public_witness).unwrap();
-}
 ```
 
-### Circuit Visibility Rules
+Use these code to generate proof:
+
+```rust
+let prover = Groth16BN254GnarkProver::new();
+let circuit_prover = prover.compile_circuit::<TestCircuit>().unwrap();
+let (pk, vk) = circuit_prover.setup().unwrap();
+
+let circuit_witness = TestCircuit {
+    a: 3,
+    b: 4,
+    c: 7, // 3 + 4 = 7
+};
+
+let proof = circuit_prover.prove(&pk, &circuit_witness).unwrap();
+let public_witness = circuit_witness.into_public_witness();
+circuit_prover.verify(&vk, &proof, public_witness).unwrap();
+```
+
+### Circuit Private / Public Inputs
 
 The `#[derive(Circuit)]` macro treats Rust's visibility modifiers as indicators:
 
 - Fields **without** `pub` are treated as **private inputs**
 - Fields **with** `pub` are treated as **public inputs**
+
+> Note: Private inputs has higher priority, This will effect with [subcircuit](https://docs.rs/rsnark/latest/rsnark/#nested-circuits) struction.
+
+## Export Verifier and Proof
+
+```rust
+// Export solidity contract from verifying key.
+let solidity_contract = vk.export_solidity().unwrap();
+
+// Export solidity proof.
+let solidity_proof = proof.to_solidity().unwrap();
+```
+
+We will support these following platform:
+
+- Solidity (with BN256 curve)
+- [ ] Solana
+- [ ] Ton
+- [ ] Move
+- [ ] ArkWorks
 
 ## Supported Prover Triples
 
