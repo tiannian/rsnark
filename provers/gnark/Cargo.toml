@@ -16,5 +16,7 @@ thiserror = { workspace = true }
 rsnark-core = { workspace = true }
 rsnark-provers-core = { workspace = true }
 
+ruint = { workspace = true }
+
 [build-dependencies]
 rust2go = { version = "0.4.1", features = ["build"] }

@@ -1,6 +1,7 @@
 use std::marker::PhantomData;
 
 use rsnark_core::{CurveId, curve::BN254};
+use ruint::aliases::U256;
 
 use crate::{
     Error, Result, ffi,
@@ -102,7 +103,7 @@ impl Groth16VerifyingKey<BN254> {
     ///
     /// This function may return an error if the Solidity export operation fails.
     pub fn export_solidity(&self) -> Result<String> {
-        let res = ffi::object::export_solidity(self.go_ref_id);
+        let res = ffi::object::export_solidity(self.go_ref_id, 1);
 
         let code = i64::from_be_bytes(res[0..8].try_into().unwrap());
 
@@ -122,6 +123,26 @@ pub struct Groth16Proof<C> {
 
 impl_groth16_object!(Groth16Proof, 4);
 
+impl Groth16Proof<BN254> {
+    pub fn to_solidity(&self) -> Result<Vec<U256>> {
+        let res = ffi::object::export_solidity(self.go_ref_id, 3);
+
+        let code = i64::from_be_bytes(res[0..8].try_into().unwrap());
+
+        if code != 0 {
+            Err(Error::from_go_error(code))
+        } else {
+            let mut data = Vec::new();
+
+            let len = res[8..].len();
+            for i in 0..len / 32 {
+                data.push(U256::from_le_slice(&res[8 + i * 32..8 + (i + 1) * 32]));
+            }
+            Ok(data)
+        }
+    }
+}
+
 pub struct PlonkProvingKey<C> {
     go_ref_id: i64,
     marker: PhantomData<C>,
@@ -136,7 +157,7 @@ impl_groth16_object!(PlonkVerifyingKey, 6);
 
 impl PlonkVerifyingKey<BN254> {
     pub fn export_solidity(&self) -> Result<String> {
-        let res = ffi::object::export_solidity(self.go_ref_id);
+        let res = ffi::object::export_solidity(self.go_ref_id, 2);
 
         let code = i64::from_be_bytes(res[0..8].try_into().unwrap());
 
@@ -154,3 +175,23 @@ pub struct PlonkProof<C> {
     marker: PhantomData<C>,
 }
 impl_groth16_object!(PlonkProof, 7);
+
+impl PlonkProof<BN254> {
+    pub fn to_solidity(&self) -> Result<Vec<U256>> {
+        let res = ffi::object::export_solidity(self.go_ref_id, 4);
+
+        let code = i64::from_be_bytes(res[0..8].try_into().unwrap());
+
+        if code != 0 {
+            Err(Error::from_go_error(code))
+        } else {
+            let mut data = Vec::new();
+
+            let len = res[8..].len();
+            for i in 0..len / 32 {
+                data.push(U256::from_le_slice(&res[8 + i * 32..8 + (i + 1) * 32]));
+            }
+            Ok(data)
+        }
+    }
+}

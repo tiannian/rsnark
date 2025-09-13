@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/consensys/gnark/backend/plonk"
+	bn254plonk "github.com/consensys/gnark/backend/plonk/bn254"
 	"github.com/consensys/gnark/constraint"
 )
 
@@ -151,4 +152,15 @@ func (p *PlonkProof) Deserialize(data []byte, curve CurveType) error {
 		return fmt.Errorf("failed to deserialize proof: %w", err)
 	}
 	return nil
+}
+
+func (p *PlonkProof) ExportSolidity() ([]byte, error) {
+	bn254plonkproof, ok := p.Proof.(*bn254plonk.Proof)
+	if !ok {
+		return nil, fmt.Errorf("failed to cast proof to bn254plonk.Proof")
+	}
+
+	bytes := bn254plonkproof.MarshalSolidity()
+
+	return bytes, nil
 }

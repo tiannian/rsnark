@@ -1,4 +1,4 @@
-use rsnark::Groth16BN254GnarkProver;
+use rsnark::PlonkBN254GnarkProver;
 use rsnark_core::{API, Circuit, CircuitDefine, CircuitWitness};
 
 // Sub-circuit: Adder - computes a + b = sum
@@ -56,10 +56,13 @@ impl Circuit for CircuitDefine<CompositeCircuit> {
 }
 
 fn main() {
-    let prover = Groth16BN254GnarkProver::new();
+    let prover = PlonkBN254GnarkProver::new();
 
     let circuit_prover = prover.compile_circuit::<CompositeCircuit>().unwrap();
     let (pk, vk) = circuit_prover.setup().unwrap();
+
+    // let solidity_contract = vk.export_solidity().unwrap();
+    // println!("Solidity contract: {}", solidity_contract);
 
     let circuit_witness = CompositeCircuit {
         adder: AdderCircuit { a: 1, b: 2, sum: 3 },
@@ -72,6 +75,9 @@ fn main() {
     };
 
     let proof = circuit_prover.prove(&pk, &circuit_witness).unwrap();
+
+    let solidity_proof = proof.to_solidity().unwrap();
+    println!("Solidity proof: {:#?}", solidity_proof);
 
     let public_witness = circuit_witness.into_public_witness();
     circuit_prover.verify(&vk, &proof, public_witness).unwrap();

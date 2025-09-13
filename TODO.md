@@ -5,7 +5,7 @@
   - [X] Add Metadata from compiler
   - [X] Use bigint instead of u256
 - Generate verifier and proof for difference platform
-  - [ ] Solidity
+  - [X] Solidity
   - [ ] Solana
   - [ ] Ton
   - [ ] Move

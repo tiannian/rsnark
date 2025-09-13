@@ -29,7 +29,6 @@ func addObjectWithoutLock(obj types.SerializableObject) int64 {
 	return id
 }
 
-// addObject 添加一个新的object到map中，返回分配的ID
 func addObject(obj types.SerializableObject) int64 {
 	objectMutex.Lock()
 	defer objectMutex.Unlock()
@@ -140,7 +139,23 @@ func deserializeObject[T types.SerializableObject](curve_id uint64, data *[]byte
 	return addObject(object)
 }
 
-func (o ObjectCall) export_solidity(object_id *int64) []byte {
+func (o ObjectCall) export_solidity(object_id *int64, type_id *uint64) []byte {
+
+	switch *type_id {
+	case 1:
+		return exportSolidityContract[*types.Groth16VerifyingKey](object_id)
+	case 2:
+		return exportSolidityContract[*types.PlonkVerifyingKey](object_id)
+	case 3:
+		return exportSolidityContract[*types.Groth16Proof](object_id)
+	case 4:
+		return exportSolidityContract[*types.PlonkProof](object_id)
+	}
+
+	return int64ToBytes(-10007)
+}
+
+func exportSolidityContract[T types.ToSolidityObject](object_id *int64) []byte {
 	objectMutex.Lock()
 	defer objectMutex.Unlock()
 	object, exists := objects[*object_id]
@@ -149,7 +164,7 @@ func (o ObjectCall) export_solidity(object_id *int64) []byte {
 		return int64ToBytes(-20012)
 	}
 
-	pk, ok := object.(*types.Groth16VerifyingKey)
+	pk, ok := object.(T)
 	if !ok {
 		log.Fatalf("failed to cast object to types.Groth16VerifyingKey")
 		return int64ToBytes(-10005)

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/consensys/gnark/backend/groth16"
+	bn254groth16 "github.com/consensys/gnark/backend/groth16/bn254"
 	"github.com/consensys/gnark/constraint"
 )
 
@@ -150,4 +151,15 @@ func (p *Groth16Proof) Deserialize(data []byte, curve CurveType) error {
 		return fmt.Errorf("failed to deserialize proof: %w", err)
 	}
 	return nil
+}
+
+func (p *Groth16Proof) ExportSolidity() ([]byte, error) {
+	bn254groth16proof, ok := p.Proof.(*bn254groth16.Proof)
+	if !ok {
+		return nil, fmt.Errorf("failed to cast proof to bn254groth16.Proof")
+	}
+
+	bytes := bn254groth16proof.MarshalSolidity()
+
+	return bytes, nil
 }

@@ -194,8 +194,8 @@ type Object interface {
 	deserialize(ty *uint64, curve_id *uint64, data *[]uint8) int64
 	write_to_file(object_id *int64, path *string) int64
 	read_from_file(ty *uint64, curve_id *uint64, path *string) int64
-	export_solidity(object_id *int64) []uint8
 	remove_object(object_id *int64)
+	export_solidity(object_id *int64, type_id *uint64) []uint8
 }
 
 //export CObject_serialize
@@ -247,21 +247,22 @@ func CObject_read_from_file(ty C.uint64_t, curve_id C.uint64_t, path C.StringRef
 	runtime.KeepAlive(buffer)
 }
 
-//export CObject_export_solidity
-func CObject_export_solidity(object_id C.int64_t, slot *C.void, cb *C.void) {
+//export CObject_remove_object
+func CObject_remove_object(object_id C.int64_t) {
 	_new_object_id := newC_int64_t(object_id)
-	resp := ObjectImpl.export_solidity(&_new_object_id)
+	ObjectImpl.remove_object(&_new_object_id)
+}
+
+//export CObject_export_solidity
+func CObject_export_solidity(object_id C.int64_t, type_id C.uint64_t, slot *C.void, cb *C.void) {
+	_new_object_id := newC_int64_t(object_id)
+	_new_type_id := newC_uint64_t(type_id)
+	resp := ObjectImpl.export_solidity(&_new_object_id, &_new_type_id)
 	resp_ref, buffer := cvt_ref(cnt_list_mapper_primitive(cntC_uint8_t), ref_list_mapper_primitive(refC_uint8_t))(&resp)
 	asmcall.CallFuncG0P2(unsafe.Pointer(cb), unsafe.Pointer(&resp_ref), unsafe.Pointer(slot))
 	runtime.KeepAlive(resp_ref)
 	runtime.KeepAlive(resp)
 	runtime.KeepAlive(buffer)
-}
-
-//export CObject_remove_object
-func CObject_remove_object(object_id C.int64_t) {
-	_new_object_id := newC_int64_t(object_id)
-	ObjectImpl.remove_object(&_new_object_id)
 }
 
 // An alternative impl of unsafe.String for go1.18

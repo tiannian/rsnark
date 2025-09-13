@@ -46,9 +46,9 @@ pub trait Object {
 
     fn read_from_file(ty: u64, curve_id: u64, path: String) -> i64;
 
-    fn export_solidity(object_id: i64) -> Vec<u8>;
-
     fn remove_object(object_id: i64);
+
+    fn export_solidity(object_id: i64, type_id: u64) -> Vec<u8>;
 }
 
 #[cfg(docsrs)]
@@ -181,8 +181,8 @@ pub mod object {
         super::ObjectImpl::read_from_file(ty, curve_id, path)
     }
 
-    pub fn export_solidity(object_id: i64) -> Vec<u8> {
-        super::ObjectImpl::export_solidity(object_id)
+    pub fn export_solidity(object_id: i64, type_id: u64) -> Vec<u8> {
+        super::ObjectImpl::export_solidity(object_id, type_id)
     }
 
     pub fn remove_object(object_id: i64) {
