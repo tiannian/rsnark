@@ -77,7 +77,7 @@ let public_witness = circuit_witness.into_public_witness();
 circuit_prover.verify(&vk, &proof, public_witness).unwrap();
 ```
 
-### Circuit Private / Public Inputs
+## Circuit Private / Public Inputs
 
 The `#[derive(Circuit)]` macro treats Rust's visibility modifiers as indicators:
 
