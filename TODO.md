@@ -9,6 +9,7 @@
   - [ ] Solana
   - [ ] Ton
   - [ ] Move
+  - [ ] ArkWorks
 - More backend
   - [ ] Plonky3
   - [ ] Plonky2

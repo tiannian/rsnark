@@ -92,19 +92,19 @@ Currently supported backend triples:
 | Triple | Description |
 |--------|-------------|
 | `groth16-bn254-gnark` | Groth16 with BN254 curve using Gnark backend |
-| `groth16-bls12-381-gnark` | Groth16 with BLS12-381 curve using Gnark backend |
-| `groth16-bls24-317-gnark` | Groth16 with BLS24-317 curve using Gnark backend |
-| `groth16-bls12-377-gnark` | Groth16 with BLS12-377 curve using Gnark backend |
-| `groth16-bw6-761-gnark` | Groth16 with BW6-761 curve using Gnark backend |
-| `groth16-bls24-315-gnark` | Groth16 with BLS24-315 curve using Gnark backend |
-| `groth16-bw6-633-gnark` | Groth16 with BW6-633 curve using Gnark backend |
+| `groth16-bls12_381-gnark` | Groth16 with BLS12-381 curve using Gnark backend |
+| `groth16-bls12_377-gnark` | Groth16 with BLS12-377 curve using Gnark backend |
+| `groth16-bls24_317-gnark` | Groth16 with BLS24-317 curve using Gnark backend |
+| `groth16-bls24_315-gnark` | Groth16 with BLS24-315 curve using Gnark backend |
+| `groth16-bw6_761-gnark` | Groth16 with BW6-761 curve using Gnark backend |
+| `groth16-bw6_633-gnark` | Groth16 with BW6-633 curve using Gnark backend |
 | `plonk-bn254-gnark` | PLONK with BN254 curve using Gnark backend |
-| `plonk-bls12-381-gnark` | PLONK with BLS12-381 curve using Gnark backend |
-| `plonk-bls24-317-gnark` | PLONK with BLS24-317 curve using Gnark backend |
-| `plonk-bls12-377-gnark` | PLONK with BLS12-377 curve using Gnark backend |
-| `plonk-bw6-761-gnark` | PLONK with BW6-761 curve using Gnark backend |
-| `plonk-bls24-315-gnark` | PLONK with BLS24-315 curve using Gnark backend |
-| `plonk-bw6-633-gnark` | PLONK with BW6-633 curve using Gnark backend |
+| `plonk-bls12_381-gnark` | PLONK with BLS12-381 curve using Gnark backend |
+| `plonk-bls12_377-gnark` | PLONK with BLS12-377 curve using Gnark backend |
+| `plonk-bls24_317-gnark` | PLONK with BLS24-317 curve using Gnark backend |
+| `plonk-bls24_315-gnark` | PLONK with BLS24-315 curve using Gnark backend |
+| `plonk-bw6_761-gnark` | PLONK with BW6-761 curve using Gnark backend |
+| `plonk-bw6_633-gnark` | PLONK with BW6-633 curve using Gnark backend |
 
 ## Project Structure
 
