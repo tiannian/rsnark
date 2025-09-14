@@ -1,4 +1,8 @@
-use crate::{Metadata, Variable, variable::CircuitVariable};
+use crate::{
+    Metadata, Variable,
+    types::{OpCode, VariableType},
+    variable::CircuitVariable,
+};
 
 /// The main API trait for building arithmetic circuits in zero-knowledge proof systems.
 ///
@@ -8,6 +12,23 @@ use crate::{Metadata, Variable, variable::CircuitVariable};
 /// circuit construction with different variable types.
 pub trait API {
     fn metadata(&self) -> &impl Metadata;
+
+    fn append_operation(
+        &mut self,
+        op: OpCode,
+        inputs: Vec<VariableType>,
+        outputs: Vec<CircuitVariable>,
+    );
+
+    fn allocate_local_variable(&mut self) -> CircuitVariable;
+
+    fn allocate_local_variable_n(&mut self, n: u64) -> Vec<CircuitVariable> {
+        let mut res = Vec::with_capacity(n as usize);
+        for _ in 0..n {
+            res.push(self.allocate_local_variable());
+        }
+        res
+    }
 
     /// Performs addition of two variables: res = x1 + x2
     ///
@@ -37,7 +58,17 @@ pub trait API {
         x1: &impl Variable,
         x2: &impl Variable,
         xn: &[&dyn Variable],
-    ) -> CircuitVariable;
+    ) -> CircuitVariable {
+        let res = self.allocate_local_variable();
+
+        self.append_operation(
+            OpCode::Add,
+            get_variable_type_2n(x1, x2, xn),
+            vec![res.clone()],
+        );
+
+        res
+    }
 
     /// Performs multiply-accumulate operation: res = a + (b * c)
     ///
@@ -56,7 +87,17 @@ pub trait API {
         a: &impl Variable,
         b: &impl Variable,
         c: &impl Variable,
-    ) -> CircuitVariable;
+    ) -> CircuitVariable {
+        let res = self.allocate_local_variable();
+
+        self.append_operation(
+            OpCode::MulAcc,
+            vec![a.ty(), b.ty(), c.ty()],
+            vec![res.clone()],
+        );
+
+        res
+    }
 
     /// Performs negation: res = -x
     ///
@@ -65,7 +106,13 @@ pub trait API {
     ///
     /// # Returns
     /// A new local variable containing the negated value
-    fn neg(&mut self, x: &impl Variable) -> CircuitVariable;
+    fn neg(&mut self, x: &impl Variable) -> CircuitVariable {
+        let res = self.allocate_local_variable();
+
+        self.append_operation(OpCode::Neg, vec![x.ty()], vec![res.clone()]);
+
+        res
+    }
 
     /// Performs subtraction of two variables: res = x1 - x2
     ///
@@ -95,7 +142,17 @@ pub trait API {
         x1: &impl Variable,
         x2: &impl Variable,
         xn: &[&dyn Variable],
-    ) -> CircuitVariable;
+    ) -> CircuitVariable {
+        let res = self.allocate_local_variable();
+
+        self.append_operation(
+            OpCode::Sub,
+            get_variable_type_2n(x1, x2, xn),
+            vec![res.clone()],
+        );
+
+        res
+    }
 
     /// Performs multiplication of two variables: res = x1 * x2
     ///
@@ -125,7 +182,17 @@ pub trait API {
         x1: &impl Variable,
         x2: &impl Variable,
         xn: &[&dyn Variable],
-    ) -> CircuitVariable;
+    ) -> CircuitVariable {
+        let res = self.allocate_local_variable();
+
+        self.append_operation(
+            OpCode::Mul,
+            get_variable_type_2n(x1, x2, xn),
+            vec![res.clone()],
+        );
+
+        res
+    }
 
     /// Performs unchecked division: res = x1 / x2
     ///
@@ -141,7 +208,17 @@ pub trait API {
     ///
     /// # Safety
     /// This operation does not verify that x2 ≠ 0. Use `div` for checked division.
-    fn div_unchecked(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable;
+    fn div_unchecked(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable {
+        let res = self.allocate_local_variable();
+
+        self.append_operation(
+            OpCode::DivUnchecked,
+            vec![x1.ty(), x2.ty()],
+            vec![res.clone()],
+        );
+
+        res
+    }
 
     /// Performs checked division: res = x1 / x2
     ///
@@ -157,7 +234,13 @@ pub trait API {
     ///
     /// # Panics
     /// The circuit will be unsatisfiable if x2 == 0
-    fn div(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable;
+    fn div(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable {
+        let res = self.allocate_local_variable();
+
+        self.append_operation(OpCode::Div, vec![x1.ty(), x2.ty()], vec![res.clone()]);
+
+        res
+    }
 
     /// Computes the multiplicative inverse: res = 1 / x
     ///
@@ -172,7 +255,13 @@ pub trait API {
     ///
     /// # Panics
     /// The circuit will be unsatisfiable if x == 0
-    fn inverse(&mut self, x: &impl Variable) -> CircuitVariable;
+    fn inverse(&mut self, x: &impl Variable) -> CircuitVariable {
+        let res = self.allocate_local_variable();
+
+        self.append_operation(OpCode::Inverse, vec![x.ty()], vec![res.clone()]);
+
+        res
+    }
 
     /// Converts a variable to its binary representation
     ///
@@ -186,7 +275,13 @@ pub trait API {
     /// # Returns
     /// A vector of local variables representing the binary decomposition,
     /// where index 0 is the least significant bit
-    fn variable_to_binary(&mut self, x: &impl Variable, n: u64) -> Vec<CircuitVariable>;
+    fn variable_to_binary(&mut self, x: &impl Variable, n: u64) -> Vec<CircuitVariable> {
+        let res = self.allocate_local_variable_n(n);
+
+        self.append_operation(OpCode::ToBinary, vec![x.ty(), n.ty()], res.clone());
+
+        res
+    }
 
     /// Reconstructs a variable from its binary representation
     ///
@@ -198,7 +293,17 @@ pub trait API {
     ///
     /// # Returns
     /// A local variable representing the packed binary value
-    fn variable_from_binary(&mut self, b: &[&dyn Variable]) -> CircuitVariable;
+    fn variable_from_binary(&mut self, b: &[&dyn Variable]) -> CircuitVariable {
+        let res = self.allocate_local_variable();
+
+        self.append_operation(
+            OpCode::FromBinary,
+            b.iter().map(|x| x.ty()).collect(),
+            vec![res.clone()],
+        );
+
+        res
+    }
 
     /// Performs bitwise XOR operation: res = x1 ^ x2
     ///
@@ -208,7 +313,13 @@ pub trait API {
     ///
     /// # Returns
     /// A new local variable containing the XOR result
-    fn xor(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable;
+    fn xor(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable {
+        let res = self.allocate_local_variable();
+
+        self.append_operation(OpCode::Xor, vec![x1.ty(), x2.ty()], vec![res.clone()]);
+
+        res
+    }
 
     /// Performs bitwise OR operation: res = x1 | x2
     ///
@@ -218,7 +329,13 @@ pub trait API {
     ///
     /// # Returns
     /// A new local variable containing the OR result
-    fn or(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable;
+    fn or(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable {
+        let res = self.allocate_local_variable();
+
+        self.append_operation(OpCode::Or, vec![x1.ty(), x2.ty()], vec![res.clone()]);
+
+        res
+    }
 
     /// Performs bitwise AND operation: res = x1 & x2
     ///
@@ -228,7 +345,13 @@ pub trait API {
     ///
     /// # Returns
     /// A new local variable containing the AND result
-    fn and(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable;
+    fn and(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable {
+        let res = self.allocate_local_variable();
+
+        self.append_operation(OpCode::And, vec![x1.ty(), x2.ty()], vec![res.clone()]);
+
+        res
+    }
 
     /// Performs conditional selection: res = x1 ? x2 : x3
     ///
@@ -247,7 +370,17 @@ pub trait API {
         x1: &impl Variable,
         x2: &impl Variable,
         x3: &impl Variable,
-    ) -> CircuitVariable;
+    ) -> CircuitVariable {
+        let res = self.allocate_local_variable();
+
+        self.append_operation(
+            OpCode::Select,
+            vec![x1.ty(), x2.ty(), x3.ty()],
+            vec![res.clone()],
+        );
+
+        res
+    }
 
     /// Performs a 2-bit lookup table operation
     ///
@@ -272,7 +405,17 @@ pub trait API {
         y2: &impl Variable,
         y3: &impl Variable,
         y4: &impl Variable,
-    ) -> CircuitVariable;
+    ) -> CircuitVariable {
+        let res = self.allocate_local_variable();
+
+        self.append_operation(
+            OpCode::Lookup2,
+            vec![b0.ty(), b1.ty(), y1.ty(), y2.ty(), y3.ty(), y4.ty()],
+            vec![res.clone()],
+        );
+
+        res
+    }
 
     /// Tests if a variable is zero
     ///
@@ -284,7 +427,13 @@ pub trait API {
     ///
     /// # Returns
     /// A boolean variable (1 if x == 0, 0 if x != 0)
-    fn is_zero(&mut self, x: &impl Variable) -> CircuitVariable;
+    fn is_zero(&mut self, x: &impl Variable) -> CircuitVariable {
+        let res = self.allocate_local_variable();
+
+        self.append_operation(OpCode::IsZero, vec![x.ty()], vec![res.clone()]);
+
+        res
+    }
 
     /// Compares two variables and returns the comparison result
     ///
@@ -299,7 +448,13 @@ pub trait API {
     ///
     /// # Returns
     /// A local variable containing the comparison result (-1, 0, or 1)
-    fn cmp(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable;
+    fn cmp(&mut self, x1: &impl Variable, x2: &impl Variable) -> CircuitVariable {
+        let res = self.allocate_local_variable();
+
+        self.append_operation(OpCode::Cmp, vec![x1.ty(), x2.ty()], vec![res.clone()]);
+
+        res
+    }
 
     /// Asserts that two variables are equal
     ///
@@ -312,7 +467,9 @@ pub trait API {
     ///
     /// # Panics
     /// The circuit will be unsatisfiable if x1 != x2
-    fn assert_is_equal(&mut self, x1: &impl Variable, x2: &impl Variable);
+    fn assert_is_equal(&mut self, x1: &impl Variable, x2: &impl Variable) {
+        self.append_operation(OpCode::AssertIsEqual, vec![x1.ty(), x2.ty()], vec![]);
+    }
 
     /// Asserts that two variables are different
     ///
@@ -325,7 +482,9 @@ pub trait API {
     ///
     /// # Panics
     /// The circuit will be unsatisfiable if x1 == x2
-    fn assert_is_different(&mut self, x1: &impl Variable, x2: &impl Variable);
+    fn assert_is_different(&mut self, x1: &impl Variable, x2: &impl Variable) {
+        self.append_operation(OpCode::AssertIsDifferent, vec![x1.ty(), x2.ty()], vec![]);
+    }
 
     /// Asserts that a variable is a boolean value
     ///
@@ -337,7 +496,9 @@ pub trait API {
     ///
     /// # Panics
     /// The circuit will be unsatisfiable if x is not 0 or 1
-    fn assert_is_boolean(&mut self, x: &impl Variable);
+    fn assert_is_boolean(&mut self, x: &impl Variable) {
+        self.append_operation(OpCode::AssertIsBoolean, vec![x.ty()], vec![]);
+    }
 
     /// Asserts that a variable is a crumb (2-bit value)
     ///
@@ -349,7 +510,9 @@ pub trait API {
     ///
     /// # Panics
     /// The circuit will be unsatisfiable if x is not in {0, 1, 2, 3}
-    fn assert_is_crumb(&mut self, x: &impl Variable);
+    fn assert_is_crumb(&mut self, x: &impl Variable) {
+        self.append_operation(OpCode::AssertIsCrumb, vec![x.ty()], vec![]);
+    }
 
     /// Asserts that a variable is less than or equal to a bound
     ///
@@ -362,7 +525,13 @@ pub trait API {
     ///
     /// # Panics
     /// The circuit will be unsatisfiable if v > bound
-    fn assert_is_less_or_equal(&mut self, v: &impl Variable, bound: &impl Variable);
+    fn assert_is_less_or_equal(&mut self, v: &impl Variable, bound: &impl Variable) {
+        self.append_operation(
+            OpCode::AssertIsLessOrEqual,
+            vec![v.ty(), bound.ty()],
+            vec![],
+        );
+    }
 
     /// Prints a debug message during circuit execution
     ///
@@ -371,5 +540,21 @@ pub trait API {
     ///
     /// # Arguments
     /// * `message` - The variable value to print
-    fn println(&mut self, message: &impl Variable);
+    fn println(&mut self, message: &impl Variable) {
+        self.append_operation(OpCode::Println, vec![message.ty()], vec![]);
+    }
+}
+
+fn get_variable_type_2n(
+    x1: &impl Variable,
+    x2: &impl Variable,
+    xn: &[&dyn Variable],
+) -> Vec<VariableType> {
+    let mut types = Vec::with_capacity(2 + xn.len());
+    types.push(x1.ty());
+    types.push(x2.ty());
+    for x in xn {
+        types.push(x.ty());
+    }
+    types
 }

@@ -31,6 +31,8 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
     let name = &input.ident;
     let name_str = name.to_string().to_lowercase();
 
+    let generics = &input.generics;
+
     // Generate module name: __rsnark_generated_{name}
     let module_name = format_ident!("__rsnark_generated_{}", name_str);
 
@@ -193,7 +195,7 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
             }
 
             #[doc(hidden)]
-            pub struct #define_name {
+            pub struct #define_name #generics {
                 #(#define_fields,)*
             }
 
@@ -214,7 +216,7 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
             }
 
             #[doc(hidden)]
-            pub struct #public_witness_name {
+            pub struct #public_witness_name #generics {
                 #(#public_witness_struct_fields,)*
             }
 
