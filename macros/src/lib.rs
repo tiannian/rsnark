@@ -162,6 +162,29 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
         }
     });
 
+    // Generate where clause for CircuitWitness bounds
+    let where_clause: Vec<_> = generics
+        .params
+        .iter()
+        .filter_map(|param| match param {
+            syn::GenericParam::Type(type_param) => {
+                let ident = &type_param.ident;
+                Some(quote! { #ident: ::rsnark_core::CircuitWitness })
+            }
+            _ => None,
+        })
+        .collect();
+
+    // Generate generic parameter names for use in type names
+    let generic_names: Vec<_> = generics
+        .params
+        .iter()
+        .filter_map(|param| match param {
+            syn::GenericParam::Type(type_param) => Some(&type_param.ident),
+            _ => None,
+        })
+        .collect();
+
     let expanded = quote! {
         mod #module_name {
             use super::*;
@@ -170,10 +193,13 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
                 CircuitWitness, CircuitPublicWitness, BigInt, VariableIniter,
             };
 
-            impl CircuitWitness for #name {
-                type PrivateElement = #define_name;
-                type PublicElement = #define_name;
-                type PublicWitness = #public_witness_name;
+            impl #generics CircuitWitness for #name<#(#generic_names),*>
+            where
+                #(#where_clause,)*
+            {
+                type PrivateElement = #define_name<#(#generic_names),*>;
+                type PublicElement = #define_name<#(#generic_names),*>;
+                type PublicWitness = #public_witness_name<#(#generic_names),*>;
 
                 fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::PublicElement {
                     #define_name::new(initer, is_private)
@@ -195,11 +221,17 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
             }
 
             #[doc(hidden)]
-            pub struct #define_name #generics {
+            pub struct #define_name #generics
+            where
+                #(#where_clause,)*
+            {
                 #(#define_fields,)*
             }
 
-            impl #define_name {
+            impl #generics #define_name #generics
+            where
+                #(#where_clause,)*
+            {
                 fn new(initer: &mut VariableIniter, is_private: bool) -> Self {
                     #(#new_field_inits)*
 
@@ -209,18 +241,27 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
                 }
             }
 
-            impl CircuitPublicWitness for #name {
+            impl #generics CircuitPublicWitness for #name<#(#generic_names),*>
+            where
+                #(#where_clause,)*
+            {
                 fn append_public_witness(&self, witness: &mut Vec<BigInt>, _is_private: bool) {
                     #(#append_public_impl_orig)*
                 }
             }
 
             #[doc(hidden)]
-            pub struct #public_witness_name #generics {
+            pub struct #public_witness_name #generics
+            where
+                #(#where_clause,)*
+            {
                 #(#public_witness_struct_fields,)*
             }
 
-            impl CircuitPublicWitness for #public_witness_name {
+            impl #generics CircuitPublicWitness for #public_witness_name<#(#generic_names),*>
+            where
+                #(#where_clause,)*
+            {
                 fn append_public_witness(&self, witness: &mut Vec<BigInt>, _is_private: bool) {
                     #(#append_public_impl_witness)*
                 }
