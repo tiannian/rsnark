@@ -88,7 +88,7 @@ mod __rsnark_generated_testcircuit {
     }
 }
 
-impl<T> Circuit for CircuitDefine<TestCircuit<T>>
+impl<T> Circuit for __rsnark_generated_testcircuit::TestCircuitCircuitDefine<T>
 where
     T: CircuitWitness,
     T::PublicElement: Variable,
