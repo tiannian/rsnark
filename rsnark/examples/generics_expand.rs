@@ -1,29 +1,69 @@
 use rsnark::{
     Groth16BN254GnarkProver,
-    core::{API, Circuit, CircuitDefine, CircuitWitness, curve::BN254},
+    core::{API, Circuit, CircuitWitness, curve::BN254},
 };
-use rsnark_core::Variable;
+use rsnark_core::{CircuitElement, Variable, types::VariableType};
 use rsnark_provers_core::Backend;
 use rsnark_provers_gnark::Groth16Backend;
-pub struct TestCircuit<T> {
-    a: T,
-    b: T,
-    pub c: T,
+pub struct TestCircuit<T>
+where
+    T: CircuitWitness,
+{
+    a: T::CircuitElement,
+    b: T::CircuitElement,
+    pub c: T::CircuitElement,
 }
 mod __rsnark_generated_testcircuit {
     use super::*;
-    use ::rsnark_core::{BigInt, CircuitPublicWitness, CircuitWitness, VariableIniter};
-    impl<T> CircuitWitness for TestCircuit<T>
+    use ::rsnark_core::{
+        BigInt, CircuitPublicWitness, CircuitWitness, VariableIniter, types::VariableType,
+    };
+
+    impl<T> TestCircuit<T>
     where
-        T: ::rsnark_core::CircuitWitness,
+        T: CircuitWitness<CircuitElement = VariableType>,
     {
-        type CircuitElement = TestCircuitCircuitDefine<T>;
+        fn new(initer: &mut VariableIniter, is_private: bool) -> Self {
+            let a = u32::create_private(initer);
+            let b = u32::create_private(initer);
+            let c = u32::create_public(initer, is_private);
+            Self { a, b, c }
+        }
+    }
+
+    impl<T> CircuitElement for TestCircuit<T>
+    where
+        T: CircuitWitness<CircuitElement = VariableType>,
+    {
+        type CircuitWitness = TestCircuitWitness<T>;
+    }
+
+    pub struct TestCircuitWitness<T> {
+        pub a: T,
+        pub b: T,
+        pub c: T,
+    }
+
+    impl<T> CircuitPublicWitness for TestCircuitWitness<T>
+    where
+        T: CircuitWitness<CircuitElement = VariableType>,
+    {
+        fn append_public_witness(&self, witness: &mut Vec<BigInt>, _is_private: bool) {
+            self.c.append_public_witness(witness, false);
+        }
+    }
+
+    impl<T> CircuitWitness for TestCircuitWitness<T>
+    where
+        T: CircuitWitness<CircuitElement = VariableType>,
+    {
+        type CircuitElement = TestCircuit<T>;
         type PublicWitness = TestCircuitPublicWitness<T>;
         fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::CircuitElement {
-            TestCircuitCircuitDefine::new(initer, is_private)
+            TestCircuit::new(initer, is_private)
         }
         fn create_private(initer: &mut VariableIniter) -> Self::CircuitElement {
-            TestCircuitCircuitDefine::new(initer, true)
+            TestCircuit::new(initer, true)
         }
         fn append_witness(
             &self,
@@ -33,7 +73,7 @@ mod __rsnark_generated_testcircuit {
         ) {
             self.a.append_witness(public, private, true);
             self.b.append_witness(public, private, true);
-            self.c.append_witness(public, private, false || _is_private);
+            self.c.append_witness(public, private, false);
         }
         fn into_public_witness(self) -> Self::PublicWitness {
             TestCircuitPublicWitness {
@@ -41,44 +81,14 @@ mod __rsnark_generated_testcircuit {
             }
         }
     }
+
     #[doc(hidden)]
-    pub struct TestCircuitCircuitDefine<T>
-    where
-        T: ::rsnark_core::CircuitWitness,
-    {
-        pub a: <T as ::rsnark_core::CircuitWitness>::CircuitElement,
-        pub b: <T as ::rsnark_core::CircuitWitness>::CircuitElement,
-        pub c: <T as ::rsnark_core::CircuitWitness>::CircuitElement,
-    }
-    impl<T> TestCircuitCircuitDefine<T>
-    where
-        T: ::rsnark_core::CircuitWitness,
-    {
-        fn new(initer: &mut VariableIniter, is_private: bool) -> Self {
-            let a = T::create_private(initer);
-            let b = T::create_private(initer);
-            let c = T::create_public(initer, is_private);
-            Self { a, b, c }
-        }
-    }
-    impl<T> CircuitPublicWitness for TestCircuit<T>
-    where
-        T: ::rsnark_core::CircuitWitness,
-    {
-        fn append_public_witness(&self, witness: &mut Vec<BigInt>, _is_private: bool) {
-            self.c.append_public_witness(witness, false);
-        }
-    }
-    #[doc(hidden)]
-    pub struct TestCircuitPublicWitness<T>
-    where
-        T: ::rsnark_core::CircuitWitness,
-    {
-        pub c: ::rsnark_core::PublicWitness<T>,
+    pub struct TestCircuitPublicWitness<T: CircuitWitness> {
+        pub c: T::PublicWitness,
     }
     impl<T> CircuitPublicWitness for TestCircuitPublicWitness<T>
     where
-        T: ::rsnark_core::CircuitWitness,
+        T: CircuitWitness<CircuitElement = VariableType>,
     {
         fn append_public_witness(&self, witness: &mut Vec<BigInt>, _is_private: bool) {
             self.c.append_public_witness(witness, false);
@@ -86,9 +96,9 @@ mod __rsnark_generated_testcircuit {
     }
 }
 
-impl<T: CircuitWitness> Circuit for TestCircuit<T>
+impl<T> Circuit for TestCircuit<T>
 where
-    T: Variable,
+    T: CircuitWitness<CircuitElement = VariableType>,
 {
     fn define(&self, api: &mut impl API) {
         let c = api.add(&self.a, &self.b);

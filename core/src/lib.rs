@@ -23,4 +23,4 @@ pub use metadata::*;
 
 pub use num::BigInt;
 
-pub use rsnark_macros::Circuit;
+pub use rsnark_macros::circuit;

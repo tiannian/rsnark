@@ -52,13 +52,14 @@ pub trait CircuitPublicWitness {
     fn append_public_witness(&self, witness: &mut Vec<BigInt>, is_private: bool);
 }
 
-// /// Type alias for the public witness of a circuit.
-// ///
-// /// This represents the public inputs that are visible to the verifier
-// /// in a zero-knowledge proof system.
-// pub type PublicWitness<T> = <T as CircuitElement>::PublicWitness;
-
 pub type Witness<T> = <T as CircuitElement>::CircuitWitness;
+
+pub type PublicWitness<T> =
+    <<T as CircuitElement>::CircuitWitness as CircuitWitness>::PublicWitness;
+
+#[doc(hidden)]
+pub type CircuitElementInner<T> =
+    <<T as CircuitElement>::CircuitWitness as CircuitWitness>::CircuitElement;
 
 macro_rules! define_circuit_element_for_from_u256 {
     ($t:ty) => {

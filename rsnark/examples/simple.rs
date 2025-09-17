@@ -1,18 +1,19 @@
 use rsnark::core::{
-    API, Circuit, CircuitDefine, CircuitWitness,
+    API, Circuit, CircuitWitness, circuit,
     curve::{BLS12_377, BLS12_381, BLS24_315, BLS24_317, BN254, BW6_633, BW6_761},
 };
+use rsnark_core::Witness;
 use rsnark_provers_core::{Backend, Prover};
 use rsnark_provers_gnark::{Groth16Backend, PlonkBackend};
 
-#[derive(Circuit)]
+#[circuit]
 pub struct TestCircuit {
     a: u32,
     b: u32,
     pub c: u32,
 }
 
-impl Circuit for CircuitDefine<TestCircuit> {
+impl Circuit for TestCircuit {
     fn define(&self, api: &mut impl API) {
         let c = api.add(&self.a, &self.b);
         api.assert_is_equal(&c, &self.c);
@@ -43,7 +44,7 @@ fn run<B: Backend>() {
     let circuit_prover = prover.compile_circuit::<TestCircuit>().unwrap();
     let (pk, vk) = circuit_prover.setup().unwrap();
 
-    let circuit_witness = TestCircuit {
+    let circuit_witness = Witness::<TestCircuit> {
         a: 3,
         b: 4,
         c: 7, // 3 + 4 = 7
