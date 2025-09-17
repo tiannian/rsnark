@@ -1,7 +1,6 @@
 use crate::{
     API, Metadata, MetadataInfo, Variable, VariableIniter,
     types::{CircuitDefinition, OpCode, Operation, VariableType},
-    variable::CircuitVariable,
 };
 
 #[doc(hidden)]
@@ -33,7 +32,7 @@ impl CircuitBuilder {
         &mut self,
         op: OpCode,
         inputs: Vec<VariableType>,
-        outputs: Vec<CircuitVariable>,
+        outputs: Vec<VariableType>,
     ) {
         let mut _outs = Vec::with_capacity(outputs.len());
         for output in outputs {
@@ -49,7 +48,7 @@ impl CircuitBuilder {
         self.operations.push(operation);
     }
 
-    fn _allocate_local_variable(&mut self) -> CircuitVariable {
+    fn _allocate_local_variable(&mut self) -> VariableType {
         self.variable_initer.new_local()
     }
 
@@ -72,12 +71,12 @@ impl API for CircuitBuilder {
         &mut self,
         op: OpCode,
         inputs: Vec<VariableType>,
-        outputs: Vec<CircuitVariable>,
+        outputs: Vec<VariableType>,
     ) {
         self._append_operation(op, inputs, outputs);
     }
 
-    fn allocate_local_variable(&mut self) -> CircuitVariable {
+    fn allocate_local_variable(&mut self) -> VariableType {
         self._allocate_local_variable()
     }
 }

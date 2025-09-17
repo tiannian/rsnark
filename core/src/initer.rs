@@ -1,4 +1,4 @@
-use crate::{types::VariableType, variable::CircuitVariable};
+use crate::types::VariableType;
 
 #[doc(hidden)]
 #[derive(Debug, Default)]
@@ -9,33 +9,29 @@ pub struct VariableIniter {
 }
 
 impl VariableIniter {
-    pub fn new_private(&mut self) -> CircuitVariable {
+    pub fn new_private(&mut self) -> VariableType {
         let idx = self.private_idx;
         self.private_idx += 1;
-        CircuitVariable {
-            ty: VariableType::Private(idx),
-        }
+
+        VariableType::Private(idx)
     }
 
-    pub fn new_public(&mut self, is_private: bool) -> CircuitVariable {
+    pub fn new_public(&mut self, is_private: bool) -> VariableType {
         if is_private {
             self.new_private()
         } else {
             let idx = self.public_idx;
             self.public_idx += 1;
 
-            CircuitVariable {
-                ty: VariableType::Public(idx),
-            }
+            VariableType::Public(idx)
         }
     }
 
-    pub fn new_local(&mut self) -> CircuitVariable {
+    pub fn new_local(&mut self) -> VariableType {
         let idx = self.local_idx;
         self.local_idx += 1;
-        CircuitVariable {
-            ty: VariableType::Local(idx),
-        }
+
+        VariableType::Local(idx)
     }
 
     pub fn private_index(&self) -> u64 {

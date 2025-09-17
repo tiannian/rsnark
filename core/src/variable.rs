@@ -17,32 +17,9 @@ pub trait Variable {
     fn ty(&self) -> VariableType;
 }
 
-/// Represents a variable within a circuit during construction.
-///
-/// A `CircuitVariable` is created during circuit building and encapsulates a specific
-/// variable type (public, private, local, or constant). It serves as a handle to reference
-/// variables in circuit operations and maintains the variable's type information internally.
-///
-/// # Usage
-///
-/// Circuit variables are typically created through:
-/// - [`VariableIniter`](crate::VariableIniter) methods for creating new variables
-/// - API operations that return intermediate results
-/// - Circuit builder operations that allocate local variables
-///
-/// # Implementation Details
-///
-/// The struct contains a [`VariableType`] that specifies whether
-/// the variable is public input, private witness, local intermediate value, or a constant.
-/// This type information is used by the circuit builder to generate proper constraints.
-#[derive(Debug, Clone)]
-pub struct CircuitVariable {
-    pub(crate) ty: VariableType,
-}
-
-impl Variable for CircuitVariable {
+impl Variable for VariableType {
     fn ty(&self) -> VariableType {
-        self.ty.clone()
+        self.clone()
     }
 }
 

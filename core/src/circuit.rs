@@ -1,6 +1,6 @@
 use num::BigInt;
 
-use crate::{API, VariableIniter, variable::CircuitVariable};
+use crate::{API, VariableIniter, types::VariableType};
 
 /// Defines the logic of an arithmetic circuit for zero-knowledge proofs.
 ///
@@ -17,9 +17,7 @@ pub trait Circuit {
 /// `#[derive(Circuit)]` macro to automatically generate the implementation.
 /// It provides methods for creating circuit variables and handling witness data.
 pub trait CircuitWitness: CircuitPublicWitness {
-    #[doc(hidden)]
     type CircuitElement;
-
     /// The type representing the public witness for this circuit.
     type PublicWitness: CircuitPublicWitness;
 
@@ -38,8 +36,11 @@ pub trait CircuitWitness: CircuitPublicWitness {
     /// The public witness containing only public inputs
     fn into_public_witness(self) -> Self::PublicWitness;
 
-    #[doc(hidden)]
     fn append_witness(&self, public: &mut Vec<BigInt>, private: &mut Vec<BigInt>, is_private: bool);
+}
+
+pub trait CircuitElement {
+    type CircuitWitness: CircuitWitness;
 }
 
 /// Represents the public witness portion of a circuit.
@@ -51,22 +52,18 @@ pub trait CircuitPublicWitness {
     fn append_public_witness(&self, witness: &mut Vec<BigInt>, is_private: bool);
 }
 
-/// Type alias for the circuit definition structure.
-///
-/// This represents the private element structure used during circuit construction,
-/// containing all the private variables and intermediate computations.
-pub type CircuitDefine<T> = <T as CircuitWitness>::CircuitElement;
+// /// Type alias for the public witness of a circuit.
+// ///
+// /// This represents the public inputs that are visible to the verifier
+// /// in a zero-knowledge proof system.
+// pub type PublicWitness<T> = <T as CircuitElement>::PublicWitness;
 
-/// Type alias for the public witness of a circuit.
-///
-/// This represents the public inputs that are visible to the verifier
-/// in a zero-knowledge proof system.
-pub type PublicWitness<T> = <T as CircuitWitness>::PublicWitness;
+pub type Witness<T> = <T as CircuitElement>::CircuitWitness;
 
 macro_rules! define_circuit_element_for_from_u256 {
     ($t:ty) => {
         impl CircuitWitness for $t {
-            type CircuitElement = CircuitVariable;
+            type CircuitElement = VariableType;
             type PublicWitness = $t;
 
             fn create_public(
@@ -78,6 +75,10 @@ macro_rules! define_circuit_element_for_from_u256 {
 
             fn create_private(initer: &mut VariableIniter) -> Self::CircuitElement {
                 initer.new_private()
+            }
+
+            fn into_public_witness(self) -> Self::PublicWitness {
+                self
             }
 
             fn append_witness(
@@ -92,10 +93,6 @@ macro_rules! define_circuit_element_for_from_u256 {
                 } else {
                     public.push(x);
                 }
-            }
-
-            fn into_public_witness(self) -> Self::PublicWitness {
-                self
             }
         }
 
