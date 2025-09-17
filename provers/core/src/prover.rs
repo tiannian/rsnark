@@ -69,7 +69,7 @@ where
     pub fn compile_circuit<C>(self) -> Result<CircuitProver<B, C>>
     where
         C: CircuitWitness,
-        C::PublicElement: Circuit,
+        C::CircuitElement: Circuit,
     {
         let metadata = self.backend.metadata();
         let mut builder = CircuitBuilder::new(metadata);

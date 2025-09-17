@@ -18,18 +18,16 @@ pub trait Circuit {
 /// It provides methods for creating circuit variables and handling witness data.
 pub trait CircuitWitness: CircuitPublicWitness {
     #[doc(hidden)]
-    type PrivateElement;
-    #[doc(hidden)]
-    type PublicElement;
+    type CircuitElement;
 
     /// The type representing the public witness for this circuit.
     type PublicWitness: CircuitPublicWitness;
 
     #[doc(hidden)]
-    fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::PublicElement;
+    fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::CircuitElement;
 
     #[doc(hidden)]
-    fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement;
+    fn create_private(initer: &mut VariableIniter) -> Self::CircuitElement;
 
     /// Converts this circuit witness into its public witness representation.
     ///
@@ -53,16 +51,11 @@ pub trait CircuitPublicWitness {
     fn append_public_witness(&self, witness: &mut Vec<BigInt>, is_private: bool);
 }
 
-#[doc(hidden)]
-pub type PrivateCircuitElement<T> = <T as CircuitWitness>::PrivateElement;
-#[doc(hidden)]
-pub type PublicCircuitElement<T> = <T as CircuitWitness>::PublicElement;
-
 /// Type alias for the circuit definition structure.
 ///
 /// This represents the private element structure used during circuit construction,
 /// containing all the private variables and intermediate computations.
-pub type CircuitDefine<T> = <T as CircuitWitness>::PrivateElement;
+pub type CircuitDefine<T> = <T as CircuitWitness>::CircuitElement;
 
 /// Type alias for the public witness of a circuit.
 ///
@@ -73,15 +66,17 @@ pub type PublicWitness<T> = <T as CircuitWitness>::PublicWitness;
 macro_rules! define_circuit_element_for_from_u256 {
     ($t:ty) => {
         impl CircuitWitness for $t {
-            type PrivateElement = CircuitVariable;
-            type PublicElement = CircuitVariable;
+            type CircuitElement = CircuitVariable;
             type PublicWitness = $t;
 
-            fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::PublicElement {
+            fn create_public(
+                initer: &mut VariableIniter,
+                is_private: bool,
+            ) -> Self::CircuitElement {
                 initer.new_public(is_private)
             }
 
-            fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {
+            fn create_private(initer: &mut VariableIniter) -> Self::CircuitElement {
                 initer.new_private()
             }
 

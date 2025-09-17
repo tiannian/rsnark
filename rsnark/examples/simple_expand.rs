@@ -1,7 +1,9 @@
-use rsnark::{
-    Groth16BN254GnarkProver,
-    core::{API, Circuit, CircuitDefine, CircuitWitness},
+use rsnark::core::{
+    API, Circuit, CircuitDefine, CircuitWitness,
+    curve::{BLS12_377, BLS12_381, BLS24_315, BLS24_317, BN254, BW6_633, BW6_761},
 };
+use rsnark_provers_core::{Backend, Prover};
+use rsnark_provers_gnark::{Groth16Backend, PlonkBackend};
 pub struct TestCircuit {
     a: u32,
     b: u32,
@@ -11,13 +13,12 @@ mod __rsnark_generated_testcircuit {
     use super::*;
     use ::rsnark_core::{BigInt, CircuitPublicWitness, CircuitWitness, VariableIniter};
     impl CircuitWitness for TestCircuit {
-        type PrivateElement = TestCircuitCircuitDefine;
-        type PublicElement = TestCircuitCircuitDefine;
+        type CircuitElement = TestCircuitCircuitDefine;
         type PublicWitness = TestCircuitPublicWitness;
-        fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::PublicElement {
+        fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::CircuitElement {
             TestCircuitCircuitDefine::new(initer, is_private)
         }
-        fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {
+        fn create_private(initer: &mut VariableIniter) -> Self::CircuitElement {
             TestCircuitCircuitDefine::new(initer, true)
         }
         fn append_witness(
@@ -28,7 +29,7 @@ mod __rsnark_generated_testcircuit {
         ) {
             self.a.append_witness(public, private, true);
             self.b.append_witness(public, private, true);
-            self.c.append_witness(public, private, false);
+            self.c.append_witness(public, private, false || _is_private);
         }
         fn into_public_witness(self) -> Self::PublicWitness {
             TestCircuitPublicWitness {
@@ -38,9 +39,9 @@ mod __rsnark_generated_testcircuit {
     }
     #[doc(hidden)]
     pub struct TestCircuitCircuitDefine {
-        pub a: ::rsnark_core::PrivateCircuitElement<u32>,
-        pub b: ::rsnark_core::PrivateCircuitElement<u32>,
-        pub c: ::rsnark_core::PublicCircuitElement<u32>,
+        pub a: <u32 as ::rsnark_core::CircuitWitness>::CircuitElement,
+        pub b: <u32 as ::rsnark_core::CircuitWitness>::CircuitElement,
+        pub c: <u32 as ::rsnark_core::CircuitWitness>::CircuitElement,
     }
     impl TestCircuitCircuitDefine {
         fn new(initer: &mut VariableIniter, is_private: bool) -> Self {
@@ -72,7 +73,23 @@ impl Circuit for CircuitDefine<TestCircuit> {
     }
 }
 fn main() {
-    let prover = Groth16BN254GnarkProver::new();
+    run::<Groth16Backend<BN254>>();
+    run::<Groth16Backend<BLS12_377>>();
+    run::<Groth16Backend<BLS12_381>>();
+    run::<Groth16Backend<BLS24_315>>();
+    run::<Groth16Backend<BLS24_317>>();
+    run::<Groth16Backend<BW6_761>>();
+    run::<Groth16Backend<BW6_633>>();
+    run::<PlonkBackend<BN254>>();
+    run::<PlonkBackend<BLS12_377>>();
+    run::<PlonkBackend<BLS12_381>>();
+    run::<PlonkBackend<BLS24_315>>();
+    run::<PlonkBackend<BLS24_317>>();
+    run::<PlonkBackend<BW6_761>>();
+    run::<PlonkBackend<BW6_633>>();
+}
+fn run<B: Backend>() {
+    let prover = Prover::<B>::new();
     let circuit_prover = prover.compile_circuit::<TestCircuit>().unwrap();
     let (pk, vk) = circuit_prover.setup().unwrap();
     let circuit_witness = TestCircuit { a: 3, b: 4, c: 7 };

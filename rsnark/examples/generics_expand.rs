@@ -13,18 +13,16 @@ pub struct TestCircuit<T> {
 mod __rsnark_generated_testcircuit {
     use super::*;
     use ::rsnark_core::{BigInt, CircuitPublicWitness, CircuitWitness, VariableIniter};
-    use rsnark_core::Variable;
     impl<T> CircuitWitness for TestCircuit<T>
     where
         T: ::rsnark_core::CircuitWitness,
     {
-        type PrivateElement = TestCircuitCircuitDefine<T>;
-        type PublicElement = TestCircuitCircuitDefine<T>;
+        type CircuitElement = TestCircuitCircuitDefine<T>;
         type PublicWitness = TestCircuitPublicWitness<T>;
-        fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::PublicElement {
+        fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::CircuitElement {
             TestCircuitCircuitDefine::new(initer, is_private)
         }
-        fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {
+        fn create_private(initer: &mut VariableIniter) -> Self::CircuitElement {
             TestCircuitCircuitDefine::new(initer, true)
         }
         fn append_witness(
@@ -48,9 +46,9 @@ mod __rsnark_generated_testcircuit {
     where
         T: ::rsnark_core::CircuitWitness,
     {
-        pub a: ::rsnark_core::PrivateCircuitElement<T>,
-        pub b: ::rsnark_core::PrivateCircuitElement<T>,
-        pub c: ::rsnark_core::PublicCircuitElement<T>,
+        pub a: <T as ::rsnark_core::CircuitWitness>::CircuitElement,
+        pub b: <T as ::rsnark_core::CircuitWitness>::CircuitElement,
+        pub c: <T as ::rsnark_core::CircuitWitness>::CircuitElement,
     }
     impl<T> TestCircuitCircuitDefine<T>
     where
@@ -88,16 +86,13 @@ mod __rsnark_generated_testcircuit {
     }
 }
 
-impl<T> Circuit for __rsnark_generated_testcircuit::TestCircuitCircuitDefine<T>
+impl<T: CircuitWitness> Circuit for TestCircuit<T>
 where
-    T: CircuitWitness,
-    T::PublicElement: Variable,
-    T::PrivateElement: Variable,
+    T: Variable,
 {
     fn define(&self, api: &mut impl API) {
         let c = api.add(&self.a, &self.b);
         api.assert_is_equal(&c, &self.c);
     }
 }
-
 fn main() {}

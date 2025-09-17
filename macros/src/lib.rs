@@ -82,12 +82,12 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
         match &field.vis {
             Visibility::Public(_) => {
                 quote! {
-                    pub #field_name: ::rsnark_core::PublicCircuitElement<#field_type>
+                    pub #field_name: <#field_type as ::rsnark_core::CircuitWitness>::CircuitElement
                 }
             }
             _ => {
                 quote! {
-                    pub #field_name: ::rsnark_core::PrivateCircuitElement<#field_type>
+                    pub #field_name: <#field_type as ::rsnark_core::CircuitWitness>::CircuitElement
                 }
             }
         }
@@ -197,15 +197,14 @@ fn generate_circuit_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
             where
                 #(#where_clause,)*
             {
-                type PrivateElement = #define_name<#(#generic_names),*>;
-                type PublicElement = #define_name<#(#generic_names),*>;
+                type CircuitElement = #define_name<#(#generic_names),*>;
                 type PublicWitness = #public_witness_name<#(#generic_names),*>;
 
-                fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::PublicElement {
+                fn create_public(initer: &mut VariableIniter, is_private: bool) -> Self::CircuitElement {
                     #define_name::new(initer, is_private)
                 }
 
-                fn create_private(initer: &mut VariableIniter) -> Self::PrivateElement {
+                fn create_private(initer: &mut VariableIniter) -> Self::CircuitElement {
                     #define_name::new(initer, true)
                 }
 
