@@ -37,14 +37,6 @@ mod derive_circuit;
 /// }
 /// ```
 ///
-/// # Generated Code
-///
-/// The macro generates:
-/// - A modified circuit struct with `CircuitElementInner<T>` fields
-/// - A corresponding `{Name}Witness` struct for witness data
-/// - A `{Name}PublicWitness` struct for public witness data
-/// - Implementations of `CircuitElement`, `CircuitWitness`, and `CircuitPublicWitness` traits
-///
 /// # Field Visibility
 ///
 /// - Fields **without** `pub` become **private inputs**

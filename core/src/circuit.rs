@@ -13,9 +13,12 @@ pub trait Circuit {
 
 /// Defines a circuit with witness data structure.
 ///
+/// This trait represents the witness data that corresponds to a `CircuitElement`.
+/// While `CircuitElement` defines the structure used in circuit logic,
+/// `CircuitWitness` contains the actual values used during proof generation.
+///
 /// This trait should not be implemented manually. Instead, use the
 /// `#[circuit]` macro to automatically generate the implementation.
-/// It provides methods for creating circuit variables and handling witness data.
 pub trait CircuitWitness: CircuitPublicWitness {
     type CircuitElement: CircuitElement<CircuitWitness = Self>;
     /// The type representing the public witness for this circuit.
@@ -36,10 +39,21 @@ pub trait CircuitWitness: CircuitPublicWitness {
     /// The public witness containing only public inputs
     fn into_public_witness(self) -> Self::PublicWitness;
 
+    #[doc(hidden)]
     fn append_witness(&self, public: &mut Vec<BigInt>, private: &mut Vec<BigInt>, is_private: bool);
 }
 
+/// Represents a circuit element that can be used in circuit construction.
+///
+/// This trait establishes the relationship between circuit elements and their
+/// corresponding witness data.
+///
+/// # Implementation
+///
+/// This trait should **not** be implemented manually. Instead, it is automatically
+/// implemented when using the `#[circuit]` attribute macro.
 pub trait CircuitElement {
+    /// The witness type associated with this circuit element.
     type CircuitWitness: CircuitWitness;
 }
 

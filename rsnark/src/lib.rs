@@ -9,23 +9,24 @@
 //!
 //! Defining a circuit requires two simple steps:
 //!
-//! 1. Define the circuit's inputs and outputs using the `#[derive(Circuit)]` macro.
+//! 1. Define the circuit's inputs and outputs using the `#[circuit]` attribute.
 //! 2. Implement the `Circuit` trait to define the circuit's constraint rules.
 //!
 //! ```rust,ignore
 //! use rsnark::{
 //!     Groth16BN254GnarkProver,
-//!     core::{API, Circuit, CircuitDefine, CircuitWitness},
+//!     core::{API, Circuit},
+//!     circuit,
 //! };
 //!
-//! #[derive(Circuit)]
+//! #[circuit]
 //! pub struct TestCircuit {
 //!     a: u32,        // private input
 //!     b: u32,        // private input  
 //!     pub c: u32,    // public input
 //! }
 //!
-//! impl Circuit for CircuitDefine<TestCircuit> {
+//! impl Circuit for TestCircuit {
 //!     fn define(&self, api: &mut impl API) {
 //!         let c = api.add(&self.a, &self.b);
 //!         api.assert_is_equal(&c, &self.c);
@@ -35,7 +36,7 @@
 //!
 //! ### Circuit Macro
 //!
-//! The `#[derive(Circuit)]` macro treats Rust's visibility modifiers as indicators of whether
+//! The `#[circuit]` attribute treats Rust's visibility modifiers as indicators of whether
 //! a field is a public input or private input, automatically generating the corresponding structures.
 //!
 //! - Fields without `pub` are treated as **private inputs**
@@ -50,16 +51,17 @@
 //! receives an API object that provides various operations for building constraints.
 //!
 //! ```rust,ignore
-//! use rsnark::core::{API, Circuit, CircuitDefine};
+//! use rsnark::core::{API, Circuit};
+//! use rsnark::circuit;
 //!
-//! #[derive(Circuit)]
+//! #[circuit]
 //! pub struct MultiplyCircuit {
 //!     x: u32,
 //!     y: u32,
 //!     pub result: u32,
 //! }
 //!
-//! impl Circuit for CircuitDefine<MultiplyCircuit> {
+//! impl Circuit for MultiplyCircuit {
 //!     fn define(&self, api: &mut impl API) {
 //!         let product = api.mul(&self.x, &self.y);
 //!         api.assert_is_equal(&product, &self.result);
@@ -78,44 +80,44 @@
 //! > However, if you set a sub-circuit as public, its private inputs will still be treated as private inputs.
 //!
 //! ```rust,ignore
-//! use rsnark::core::{API, Circuit, CircuitDefine};
+//! use rsnark::core::{API, Circuit};
 //!
-//! #[derive(Circuit)]
+//! #[circuit]
 //! pub struct AdderCircuit {
 //!     a: u32,
 //!     b: u32,
 //!     pub sum: u32,
 //! }
 //!
-//! impl Circuit for CircuitDefine<AdderCircuit> {
+//! impl Circuit for AdderCircuit {
 //!     fn define(&self, api: &mut impl API) {
 //!         let result = api.add(&self.a, &self.b);
 //!         api.assert_is_equal(&result, &self.sum);
 //!     }
 //! }
 //!
-//! #[derive(Circuit)]
+//! #[circuit]
 //! pub struct MultiplierCircuit {
 //!     x: u32,
 //!     y: u32,
 //!     pub product: u32,
 //! }
 //!
-//! impl Circuit for CircuitDefine<MultiplierCircuit> {
+//! impl Circuit for MultiplierCircuit {
 //!     fn define(&self, api: &mut impl API) {
 //!         let result = api.mul(&self.x, &self.y);
 //!         api.assert_is_equal(&result, &self.product);
 //!     }
 //! }
 //!
-//! #[derive(Circuit)]
+//! #[circuit]
 //! pub struct CompositeCircuit {
 //!     adder: AdderCircuit,
-//!     multiplier: MultiplierCircuit,
+//!     pub multiplier: MultiplierCircuit,
 //!     pub final_result: u32,
 //! }
 //!
-//! impl Circuit for CircuitDefine<CompositeCircuit> {
+//! impl Circuit for CompositeCircuit {
 //!     fn define(&self, api: &mut impl API) {
 //!         // Execute sub-circuits
 //!         self.adder.define(api);
