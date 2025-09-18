@@ -2,7 +2,7 @@ use rsnark::{
     Groth16BN254GnarkProver,
     core::{API, Circuit, CircuitWitness},
 };
-use rsnark_core::{Witness, circuit, types::VariableType};
+use rsnark_core::{CircuitElement, Witness, circuit, variable::CircuitVariable};
 
 #[circuit]
 pub struct TestCircuit<T> {
@@ -13,7 +13,8 @@ pub struct TestCircuit<T> {
 
 impl<T> Circuit for TestCircuit<T>
 where
-    T: CircuitWitness<CircuitElement = VariableType>,
+    T: CircuitElement,
+    T::CircuitWitness: CircuitWitness<CircuitElement = CircuitVariable<T>>,
 {
     fn define(&self, api: &mut impl API) {
         let c = api.add(&self.a, &self.b);

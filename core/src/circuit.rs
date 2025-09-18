@@ -1,6 +1,6 @@
 use num::BigInt;
 
-use crate::{API, VariableIniter, types::VariableType};
+use crate::{API, VariableIniter, variable::CircuitVariable};
 
 /// Defines the logic of an arithmetic circuit for zero-knowledge proofs.
 ///
@@ -17,7 +17,7 @@ pub trait Circuit {
 /// `#[derive(Circuit)]` macro to automatically generate the implementation.
 /// It provides methods for creating circuit variables and handling witness data.
 pub trait CircuitWitness: CircuitPublicWitness {
-    type CircuitElement;
+    type CircuitElement: CircuitElement<CircuitWitness = Self>;
     /// The type representing the public witness for this circuit.
     type PublicWitness: CircuitPublicWitness;
 
@@ -57,25 +57,24 @@ pub type Witness<T> = <T as CircuitElement>::CircuitWitness;
 pub type PublicWitness<T> =
     <<T as CircuitElement>::CircuitWitness as CircuitWitness>::PublicWitness;
 
-#[doc(hidden)]
 pub type CircuitElementInner<T> =
     <<T as CircuitElement>::CircuitWitness as CircuitWitness>::CircuitElement;
 
 macro_rules! define_circuit_element_for_from_u256 {
     ($t:ty) => {
         impl CircuitWitness for $t {
-            type CircuitElement = VariableType;
+            type CircuitElement = CircuitVariable<$t>;
             type PublicWitness = $t;
 
             fn create_public(
                 initer: &mut VariableIniter,
                 is_private: bool,
             ) -> Self::CircuitElement {
-                initer.new_public(is_private)
+                initer.new_public(is_private).into()
             }
 
             fn create_private(initer: &mut VariableIniter) -> Self::CircuitElement {
-                initer.new_private()
+                initer.new_private().into()
             }
 
             fn into_public_witness(self) -> Self::PublicWitness {
@@ -104,6 +103,14 @@ macro_rules! define_circuit_element_for_from_u256 {
                     witness.push(x);
                 }
             }
+        }
+
+        impl CircuitElement for CircuitVariable<$t> {
+            type CircuitWitness = $t;
+        }
+
+        impl CircuitElement for $t {
+            type CircuitWitness = $t;
         }
     };
 }

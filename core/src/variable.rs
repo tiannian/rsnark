@@ -2,6 +2,8 @@
 //!
 //! These types can used in API to define circuit.
 
+use std::marker::PhantomData;
+
 use num::BigInt;
 
 use crate::types::VariableType;
@@ -20,6 +22,26 @@ pub trait Variable {
 impl Variable for VariableType {
     fn ty(&self) -> VariableType {
         self.clone()
+    }
+}
+
+pub struct CircuitVariable<T> {
+    variable: VariableType,
+    marker: PhantomData<T>,
+}
+
+impl<T> Variable for CircuitVariable<T> {
+    fn ty(&self) -> VariableType {
+        self.variable.clone()
+    }
+}
+
+impl<T> From<VariableType> for CircuitVariable<T> {
+    fn from(variable: VariableType) -> Self {
+        Self {
+            variable,
+            marker: PhantomData,
+        }
     }
 }
 

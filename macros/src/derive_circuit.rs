@@ -45,7 +45,7 @@ pub fn generate_circuit_impl(input: &ItemStruct) -> syn::Result<TokenStream> {
         let vis = &field.vis;
 
         quote! {
-            #vis #field_name: <#field_type as ::rsnark_core::CircuitWitness>::CircuitElement
+            #vis #field_name: ::rsnark_core::CircuitElementInner<#field_type>
         }
     });
 
@@ -55,7 +55,7 @@ pub fn generate_circuit_impl(input: &ItemStruct) -> syn::Result<TokenStream> {
         let field_type = &field.ty;
 
         quote! {
-            pub #field_name: #field_type
+            pub #field_name: ::rsnark_core::Witness<#field_type>
         }
     });
 
@@ -67,12 +67,12 @@ pub fn generate_circuit_impl(input: &ItemStruct) -> syn::Result<TokenStream> {
         match &field.vis {
             Visibility::Public(_) => {
                 quote! {
-                    let #field_name = #field_type::create_public(initer, is_private);
+                    let #field_name = Witness::<#field_type>::create_public(initer, is_private);
                 }
             }
             _ => {
                 quote! {
-                    let #field_name = #field_type::create_private(initer);
+                    let #field_name = Witness::<#field_type>::create_private(initer);
                 }
             }
         }
@@ -124,7 +124,7 @@ pub fn generate_circuit_impl(input: &ItemStruct) -> syn::Result<TokenStream> {
     // Generate PublicWitness struct fields
     let public_witness_struct_fields = public_fields.iter().map(|(field_name, field_type)| {
         quote! {
-            pub #field_name: <#field_type as ::rsnark_core::CircuitWitness>::PublicWitness
+            pub #field_name: ::rsnark_core::PublicWitness<#field_type>
         }
     });
 
@@ -135,7 +135,7 @@ pub fn generate_circuit_impl(input: &ItemStruct) -> syn::Result<TokenStream> {
         .filter_map(|param| match param {
             syn::GenericParam::Type(type_param) => {
                 let ident = &type_param.ident;
-                Some(quote! { #ident: ::rsnark_core::CircuitWitness<CircuitElement = ::rsnark_core::types::VariableType> })
+                Some(quote! { #ident: ::rsnark_core::CircuitElement })
             }
             _ => None,
         })
@@ -156,8 +156,7 @@ pub fn generate_circuit_impl(input: &ItemStruct) -> syn::Result<TokenStream> {
 
         mod #module_name {
             use super::*;
-            use ::rsnark_core::{BigInt, CircuitPublicWitness, CircuitWitness, VariableIniter};
-            use rsnark_core::CircuitElement;
+            use ::rsnark_core::{BigInt, CircuitPublicWitness, CircuitWitness, VariableIniter, CircuitElement, Witness};
 
             impl #generics #name #generics #where_clause_tokens {
                 fn new(initer: &mut VariableIniter, is_private: bool) -> Self {
