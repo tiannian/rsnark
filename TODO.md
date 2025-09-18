@@ -2,7 +2,7 @@
 
 - Core Feature
   - [ ] Add backend special operations
-  - [ ] Test constant value
+  - [X] Test constant value
   - [X] Add Metadata from compiler
   - [X] Use bigint instead of u256
   - [X] Support Generics
