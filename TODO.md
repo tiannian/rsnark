@@ -5,7 +5,7 @@
   - [ ] Test constant value
   - [X] Add Metadata from compiler
   - [X] Use bigint instead of u256
-  - [ ] Support Generics
+  - [X] Support Generics
   - [ ] Add a patten to write circuit and logic at same time
 - Generate verifier and proof for difference platform
   - [X] Solidity
