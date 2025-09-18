@@ -207,17 +207,17 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rsnark_core::{API, Circuit, CircuitDefine, CircuitWitness, curve::BN254};
+    use rsnark_core::{API, Circuit, CircuitWitness, Witness, circuit, curve::BN254};
     use rsnark_provers_core::Prover;
 
-    #[derive(rsnark_core::Circuit)]
+    #[circuit]
     pub struct TestCircuit {
         a: u32,
         b: u32,
         pub c: u32,
     }
 
-    impl Circuit for CircuitDefine<TestCircuit> {
+    impl Circuit for TestCircuit {
         fn define(&self, api: &mut impl API) {
             let c = api.add(&self.a, &self.b);
             api.assert_is_equal(&c, &self.c);
@@ -232,7 +232,7 @@ mod tests {
 
         let (pk, vk) = circuit_prover.setup().unwrap();
 
-        let circuit_witness = TestCircuit {
+        let circuit_witness = Witness::<TestCircuit> {
             a: 3,
             b: 4,
             c: 7, // 3 + 4 = 7
