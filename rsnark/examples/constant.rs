@@ -1,7 +1,10 @@
 use rsnark::core::{API, Circuit, CircuitWitness, circuit, curve::BN254};
-use rsnark_core::Witness;
+use rsnark_core::{
+    Witness,
+    curve::{BLS12_377, BLS12_381, BLS24_315, BLS24_317, BW6_633, BW6_761},
+};
 use rsnark_provers_core::{Backend, Prover};
-use rsnark_provers_gnark::Groth16Backend;
+use rsnark_provers_gnark::{Groth16Backend, PlonkBackend};
 
 #[circuit]
 pub struct TestCircuit {
@@ -22,20 +25,20 @@ impl Circuit for TestCircuit {
 
 fn main() {
     run::<Groth16Backend<BN254>>();
-    // run::<Groth16Backend<BLS12_377>>();
-    // run::<Groth16Backend<BLS12_381>>();
-    // run::<Groth16Backend<BLS24_315>>();
-    // run::<Groth16Backend<BLS24_317>>();
-    // run::<Groth16Backend<BW6_761>>();
-    // run::<Groth16Backend<BW6_633>>();
+    run::<Groth16Backend<BLS12_377>>();
+    run::<Groth16Backend<BLS12_381>>();
+    run::<Groth16Backend<BLS24_315>>();
+    run::<Groth16Backend<BLS24_317>>();
+    run::<Groth16Backend<BW6_761>>();
+    run::<Groth16Backend<BW6_633>>();
 
-    // run::<PlonkBackend<BN254>>();
-    // run::<PlonkBackend<BLS12_377>>();
-    // run::<PlonkBackend<BLS12_381>>();
-    // run::<PlonkBackend<BLS24_315>>();
-    // run::<PlonkBackend<BLS24_317>>();
-    // run::<PlonkBackend<BW6_761>>();
-    // run::<PlonkBackend<BW6_633>>();
+    run::<PlonkBackend<BN254>>();
+    run::<PlonkBackend<BLS12_377>>();
+    run::<PlonkBackend<BLS12_381>>();
+    run::<PlonkBackend<BLS24_315>>();
+    run::<PlonkBackend<BLS24_317>>();
+    run::<PlonkBackend<BW6_761>>();
+    run::<PlonkBackend<BW6_633>>();
 }
 
 fn run<B: Backend>() {
