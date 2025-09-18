@@ -20,7 +20,7 @@ Add rSnark to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-rsnark = "0.1.3"
+rsnark = "0.1"
 ```
 
 or use `cargo add`:
