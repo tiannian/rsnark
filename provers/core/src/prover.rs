@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 use anyhow::Result;
-use rsnark_core::{Circuit, CircuitBuilder, CircuitWitness};
+use rsnark_core::{Circuit, CircuitBuilder, CircuitElement, CircuitWitness};
 
 use crate::{Backend, CircuitProver};
 
@@ -66,14 +66,14 @@ where
     /// - The backend cannot represent the circuit
     /// - Internal compilation errors occur
     ///
-    pub fn compile_circuit<C>(self) -> Result<CircuitProver<B, C>>
+    pub fn compile_circuit<C>(self) -> Result<CircuitProver<B, C::CircuitWitness>>
     where
-        C: CircuitWitness,
-        C::PublicElement: Circuit,
+        C: CircuitElement,
+        <C::CircuitWitness as CircuitWitness>::CircuitElement: Circuit,
     {
         let metadata = self.backend.metadata();
         let mut builder = CircuitBuilder::new(metadata);
-        let circuit = C::create_public(builder.variable_initer_mut(), false);
+        let circuit = C::CircuitWitness::create_public(builder.variable_initer_mut(), false);
         circuit.define(&mut builder);
 
         let define = builder.build();

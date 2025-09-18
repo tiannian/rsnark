@@ -1,18 +1,21 @@
 use rsnark::{
     Groth16BN254GnarkProver,
-    core::{API, Circuit, CircuitDefine, CircuitWitness, curve::BN254},
+    core::{API, Circuit, CircuitWitness},
 };
-use rsnark_provers_core::Backend;
-use rsnark_provers_gnark::Groth16Backend;
+use rsnark_core::{CircuitElement, Witness, circuit, variable::CircuitVariable};
 
-#[derive(Circuit)]
-pub struct TestCircuit<T: CircuitWitness> {
+#[circuit]
+pub struct TestCircuit<T> {
     a: T,
     b: T,
     pub c: T,
 }
 
-impl<T: CircuitWitness> Circuit for CircuitDefine<TestCircuit<T>> {
+impl<T> Circuit for TestCircuit<T>
+where
+    T: CircuitElement,
+    T::CircuitWitness: CircuitWitness<CircuitElement = CircuitVariable<T>>,
+{
     fn define(&self, api: &mut impl API) {
         let c = api.add(&self.a, &self.b);
         api.assert_is_equal(&c, &self.c);
@@ -29,7 +32,7 @@ fn run() {
     let circuit_prover = prover.compile_circuit::<TestCircuit<u32>>().unwrap();
     let (pk, vk) = circuit_prover.setup().unwrap();
 
-    let circuit_witness = TestCircuit {
+    let circuit_witness = Witness::<TestCircuit<u32>> {
         a: 3,
         b: 4,
         c: 7, // 3 + 4 = 7

@@ -1,15 +1,15 @@
 use rsnark::PlonkBN254GnarkProver;
-use rsnark_core::{API, Circuit, CircuitDefine, CircuitWitness};
+use rsnark_core::{API, Circuit, CircuitWitness, Witness, circuit};
 
 // Sub-circuit: Adder - computes a + b = sum
-#[derive(Circuit)]
+#[circuit]
 pub struct AdderCircuit {
     a: u32,
     b: u32,
     pub sum: u32,
 }
 
-impl Circuit for CircuitDefine<AdderCircuit> {
+impl Circuit for AdderCircuit {
     fn define(&self, api: &mut impl API) {
         let result = api.add(&self.a, &self.b);
         api.assert_is_equal(&result, &self.sum);
@@ -17,14 +17,14 @@ impl Circuit for CircuitDefine<AdderCircuit> {
 }
 
 // Sub-circuit: Multiplier - computes x * y = product
-#[derive(Circuit)]
+#[circuit]
 pub struct MultiplierCircuit {
     x: u32,
     y: u32,
     pub product: u32,
 }
 
-impl Circuit for CircuitDefine<MultiplierCircuit> {
+impl Circuit for MultiplierCircuit {
     fn define(&self, api: &mut impl API) {
         let result = api.mul(&self.x, &self.y);
         api.assert_is_equal(&result, &self.product);
@@ -32,16 +32,16 @@ impl Circuit for CircuitDefine<MultiplierCircuit> {
 }
 
 // Main circuit: Composite circuit containing sub-circuits
-#[derive(Circuit)]
+#[circuit]
 pub struct CompositeCircuit {
     // Embedded sub-circuits
     adder: AdderCircuit,
-    multiplier: MultiplierCircuit,
+    pub multiplier: MultiplierCircuit,
 
     pub final_result: u32,
 }
 
-impl Circuit for CircuitDefine<CompositeCircuit> {
+impl Circuit for CompositeCircuit {
     fn define(&self, api: &mut impl API) {
         // 1. Execute adder sub-circuit
         self.adder.define(api);
@@ -64,9 +64,9 @@ fn main() {
     // let solidity_contract = vk.export_solidity().unwrap();
     // println!("Solidity contract: {}", solidity_contract);
 
-    let circuit_witness = CompositeCircuit {
-        adder: AdderCircuit { a: 1, b: 2, sum: 3 },
-        multiplier: MultiplierCircuit {
+    let circuit_witness = Witness::<CompositeCircuit> {
+        adder: Witness::<AdderCircuit> { a: 1, b: 2, sum: 3 },
+        multiplier: Witness::<MultiplierCircuit> {
             x: 2,
             y: 3,
             product: 6,
