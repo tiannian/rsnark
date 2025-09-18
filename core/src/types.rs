@@ -51,13 +51,14 @@ pub struct Operation {
     pub outputs: Vec<VariableType>,
 }
 
+#[serde_as]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "t", content = "v")]
 pub enum VariableType {
     Public(u64),
     Private(u64),
-    Constant(BigInt),
+    Constant(#[serde_as(as = "DisplayFromStr")] BigInt),
     Local(u64),
 }
 
