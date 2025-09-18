@@ -1,6 +1,34 @@
-//! Variable types for circuit construction.
+//! Variable types and constant value support for circuit construction.
 //!
-//! These types can used in API to define circuit.
+//! This module provides the foundation for rSnark's flexible variable system,
+//! including support for BigInt constants and automatic type conversion.
+//!
+//! # Key Features
+//!
+//! - **Automatic constant conversion**: Primitive types are automatically converted to BigInt constants
+//! - **Type safety**: Strong typing ensures correct variable usage in circuits
+//! - **Generic support**: Works with generic circuit structures
+//! - **BigInt precision**: Support for arbitrary precision arithmetic
+//!
+//! # Supported Constant Types
+//!
+//! The following primitive types are automatically converted to circuit constants:
+//! - Unsigned integers: `u8`, `u16`, `u32`, `u64`, `u128`
+//! - Signed integers: `i8`, `i16`, `i32`, `i64`, `i128`  
+//! - Boolean: `bool`
+//!
+//! # Usage in Circuits
+//!
+//! ```rust,ignore
+//! impl Circuit for MyCircuit {
+//!     fn define(&self, api: &mut impl API) {
+//!         // All these literals are automatically converted to BigInt constants
+//!         let result = api.add(&self.input, &42_u32);
+//!         let scaled = api.mul(&result, &1000_i64);
+//!         let flag = api.select(&true, &result, &0);
+//!     }
+//! }
+//! ```
 
 use std::marker::PhantomData;
 
@@ -45,6 +73,23 @@ impl<T> From<VariableType> for CircuitVariable<T> {
     }
 }
 
+/// Macro to automatically implement Variable trait for primitive types.
+///
+/// This macro generates implementations that convert primitive values to BigInt constants.
+/// The conversion preserves the original value's precision and sign, enabling seamless
+/// integration of literal values in circuit operations.
+///
+/// # Generated Implementation
+///
+/// For each type `T`, this generates:
+/// ```rust,ignore
+/// impl Variable for T {
+///     fn ty(&self) -> VariableType {
+///         let x = BigInt::from(*self);
+///         VariableType::Constant(x)
+///     }
+/// }
+/// ```
 macro_rules! define_variable_for_from_u256 {
     ($t:ident) => {
         impl Variable for $t {

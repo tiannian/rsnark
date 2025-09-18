@@ -14,7 +14,7 @@ pub trait Circuit {
 /// Defines a circuit with witness data structure.
 ///
 /// This trait should not be implemented manually. Instead, use the
-/// `#[derive(Circuit)]` macro to automatically generate the implementation.
+/// `#[circuit]` macro to automatically generate the implementation.
 /// It provides methods for creating circuit variables and handling witness data.
 pub trait CircuitWitness: CircuitPublicWitness {
     type CircuitElement: CircuitElement<CircuitWitness = Self>;
@@ -46,17 +46,20 @@ pub trait CircuitElement {
 /// Represents the public witness portion of a circuit.
 ///
 /// This trait should not be implemented manually. Instead, use the
-/// `#[derive(Circuit)]` macro to automatically generate the implementation.
+/// `#[circuit]` macro to automatically generate the implementation.
 /// It handles serialization of public inputs for the circuit.
 pub trait CircuitPublicWitness {
     fn append_public_witness(&self, witness: &mut Vec<BigInt>, is_private: bool);
 }
 
+/// Represents the witness portion of a circuit.
 pub type Witness<T> = <T as CircuitElement>::CircuitWitness;
 
+/// Represents the public witness portion of a circuit.
 pub type PublicWitness<T> =
     <<T as CircuitElement>::CircuitWitness as CircuitWitness>::PublicWitness;
 
+#[doc(hidden)]
 pub type CircuitElementInner<T> =
     <<T as CircuitElement>::CircuitWitness as CircuitWitness>::CircuitElement;
 

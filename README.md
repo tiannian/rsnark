@@ -33,7 +33,7 @@ cargo add rsnark
 
 Defining a circuit requires two simple steps:
 
-1. Define the circuit's inputs and outputs using the `#[derive(Circuit)]` macro
+1. Define the circuit's inputs and outputs using the `#[circuit]` attribute
 2. Implement the `Circuit` trait to define the circuit's constraint rules
 
 Use the following way to define circuit:
@@ -41,17 +41,18 @@ Use the following way to define circuit:
 ```rust
 use rsnark::{
     Groth16BN254GnarkProver,
-    core::{API, Circuit, CircuitDefine, CircuitWitness},
+    core::{API, Circuit, CircuitWitness},
+    circuit,
 };
 
-#[derive(Circuit)]
+#[circuit]
 pub struct TestCircuit {
     a: u32,        // private input
     b: u32,        // private input  
     pub c: u32,    // public input
 }
 
-impl Circuit for CircuitDefine<TestCircuit> {
+impl Circuit for TestCircuit {
     fn define(&self, api: &mut impl API) {
         let c = api.add(&self.a, &self.b);
         api.assert_is_equal(&c, &self.c);
@@ -62,11 +63,13 @@ impl Circuit for CircuitDefine<TestCircuit> {
 Use these code to generate proof:
 
 ```rust
+use rsnark_core::Witness;
+
 let prover = Groth16BN254GnarkProver::new();
 let circuit_prover = prover.compile_circuit::<TestCircuit>().unwrap();
 let (pk, vk) = circuit_prover.setup().unwrap();
 
-let circuit_witness = TestCircuit {
+let circuit_witness = Witness::<TestCircuit> {
     a: 3,
     b: 4,
     c: 7, // 3 + 4 = 7
@@ -79,12 +82,72 @@ circuit_prover.verify(&vk, &proof, public_witness).unwrap();
 
 ## Circuit Private / Public Inputs
 
-The `#[derive(Circuit)]` macro treats Rust's visibility modifiers as indicators:
+The `#[circuit]` attribute treats Rust's visibility modifiers as indicators:
 
 - Fields **without** `pub` are treated as **private inputs**
 - Fields **with** `pub` are treated as **public inputs**
 
 > Note: Private inputs has higher priority, This will effect with [subcircuit](https://docs.rs/rsnark/latest/rsnark/#nested-circuits) struction.
+
+## Generic Circuits
+
+rSnark now supports generic circuits, allowing you to write reusable circuit logic that works with different types:
+
+```rust
+use rsnark::{
+    core::{API, Circuit, CircuitElement, CircuitWitness},
+    circuit,
+};
+
+#[circuit]
+pub struct GenericAddCircuit<T> {
+    a: T,
+    b: T,
+    pub c: T,
+}
+
+impl<T> Circuit for GenericAddCircuit<T>
+where
+    T: CircuitElement,
+    T::CircuitWitness: CircuitWitness<CircuitElement = CircuitVariable<T>>,
+{
+    fn define(&self, api: &mut impl API) {
+        let c = api.add(&self.a, &self.b);
+        api.assert_is_equal(&c, &self.c);
+    }
+}
+
+// Use with different types
+fn example() {
+    let prover = Groth16BN254GnarkProver::new();
+    
+    // Use with u32
+    let circuit_prover = prover.compile_circuit::<GenericAddCircuit<u32>>().unwrap();
+    
+    // Use with u64  
+    let circuit_prover = prover.compile_circuit::<GenericAddCircuit<u64>>().unwrap();
+}
+```
+
+This allows you to write circuit logic once and use it with different numeric types.
+
+## Constant Values
+
+rSnark supports BigInt constant values directly in circuit operations. You can use literal values as constants:
+
+```rust
+impl Circuit for MyCircuit {
+    fn define(&self, api: &mut impl API) {
+        // Use literal constants directly
+        let result = api.add(&self.input, &42);
+        let scaled = api.mul(&result, &1000);
+        
+        api.assert_is_equal(&scaled, &self.expected);
+    }
+}
+```
+
+All primitive integer types and bool can filled in generic paramters.
 
 ## Export Verifier and Proof
 
